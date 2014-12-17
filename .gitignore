@@ -1,3 +1,5 @@
+.settings/*
+.settings
 lib
 lib/*
 bin/*
