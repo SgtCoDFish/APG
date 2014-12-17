@@ -21,8 +21,41 @@
 #ifndef ARRPEEGEE_HPP_
 #define ARRPEEGEE_HPP_
 
+#include <memory>
 
+struct SDL_Window;
+struct SDL_Surface;
 
+namespace Tmx {
+	class Map;
+}
 
+namespace RPG {
+
+class RPG {
+private:
+	bool initFailure = false;
+
+	std::unique_ptr<SDL_Window, void(*)(SDL_Window *)> window = std::unique_ptr<SDL_Window, void(*)(SDL_Window *)>(nullptr, nullptr);
+	std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer *)> renderer = std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer *)>(nullptr, nullptr);
+
+	std::unique_ptr<Tmx::Map> map;
+
+	SDL_Event eventStore;
+
+public:
+	RPG();
+	~RPG();
+
+	bool init();
+	bool update(float deltaTime);
+	void render(float deltaTime);
+
+	const Tmx::Map *getMap() const {
+		return map.get();
+	}
+};
+
+}
 
 #endif /* ARRPEEGEE_HPP_ */
