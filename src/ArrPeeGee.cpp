@@ -208,7 +208,7 @@ int main(int argc, char *argv[]) {
 	bool done = false;
 
 	auto startTime = std::chrono::high_resolution_clock::now();
-	std::vector<float> timesTaken(100);
+	std::vector<float> timesTaken(1000);
 	while (!done) {
 		auto timeNow = std::chrono::high_resolution_clock::now();
 		float deltaTime =
@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
 
 		done = rpg->update(deltaTime);
 
-		if(timesTaken.size() >= 100) {
+		if(timesTaken.size() >= 1000) {
 			const float sum = std::accumulate(timesTaken.begin(), timesTaken.end(), 0.0f);
 			const float fps = 1 / (sum / timesTaken.size());
 
