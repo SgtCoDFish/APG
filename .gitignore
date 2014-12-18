@@ -11,3 +11,4 @@ Release/*
 .cproject
 .project
 *.dll
+*.md.html
