@@ -1,5 +1,5 @@
 /*
- * ArrPeeGee.hpp
+ * SDLTileset.hpp
  * Copyright (C) 2014 Ashley Davis (SgtCoDFish)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,45 +17,43 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef ARRPEEGEE_HPP_
-#define ARRPEEGEE_HPP_
+#ifndef SDLTILESET_HPP_
+#define SDLTILESET_HPP_
 
 #include <memory>
+#include <utility>
 
-#include "ErrorBase.hpp"
-#include "APGCommon.hpp"
 #include "SXXDL.hpp"
-#include "SDLTmxRenderer.hpp"
-
-namespace Tmx {
-	class Map;
-}
 
 namespace APG {
-class Game : public ErrorBase {
-private:
-	SXXDL::window_ptr window = SXXDL::make_window_ptr(nullptr);
-	SXXDL::renderer_ptr renderer = SXXDL::make_renderer_ptr(nullptr);
 
-	map_ptr map;
 
-	SDL_Event eventStore;
-
-	std::unique_ptr<SDLTmxRenderer> tmxRenderer = nullptr;
-
+/**
+ * Wrapper around an SDL texture along with a width and height.
+ */
+class SDLTileset {
 public:
-	Game();
-	~Game();
+	/** Width in pixels. */
+	const int w;
 
-	bool init();
-	bool update(float deltaTime);
-	void render(float deltaTime);
+	/** Height in pixels. */
+	const int h;
 
-	const Tmx::Map *getMap() const {
-		return map.get();
+	const int width_in_tiles;
+	const int height_in_tiles;
+
+	const SXXDL::texture_ptr texture;
+
+	SDLTileset(map_ptr &map, int w, int h, SXXDL::texture_ptr &texture) :
+			w { w }, h { h }, width_in_tiles{w / map->GetTileWidth()}, height_in_tiles{h / map->GetTileHeight()}, texture { std::move(texture) } {
 	}
+
+	SDLTileset(SDLTileset &other) = delete;
+	SDLTileset(const SDLTileset &other) = delete;
 };
+
+using tileset_ptr = std::unique_ptr<SDLTileset>;
 
 }
 
-#endif /* ARRPEEGEE_HPP_ */
+#endif /* SDLTILESET_HPP_ */

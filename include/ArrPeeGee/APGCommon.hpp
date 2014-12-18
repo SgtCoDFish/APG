@@ -1,5 +1,5 @@
 /*
- * ArrPeeGee.hpp
+ * RPGCommon.hpp
  * Copyright (C) 2014 Ashley Davis (SgtCoDFish)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,45 +17,17 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef ARRPEEGEE_HPP_
-#define ARRPEEGEE_HPP_
+#ifndef RPGCOMMON_HPP_
+#define RPGCOMMON_HPP_
 
 #include <memory>
 
-#include "ErrorBase.hpp"
-#include "APGCommon.hpp"
-#include "SXXDL.hpp"
-#include "SDLTmxRenderer.hpp"
-
 namespace Tmx {
-	class Map;
+class Map;
 }
 
 namespace APG {
-class Game : public ErrorBase {
-private:
-	SXXDL::window_ptr window = SXXDL::make_window_ptr(nullptr);
-	SXXDL::renderer_ptr renderer = SXXDL::make_renderer_ptr(nullptr);
-
-	map_ptr map;
-
-	SDL_Event eventStore;
-
-	std::unique_ptr<SDLTmxRenderer> tmxRenderer = nullptr;
-
-public:
-	Game();
-	~Game();
-
-	bool init();
-	bool update(float deltaTime);
-	void render(float deltaTime);
-
-	const Tmx::Map *getMap() const {
-		return map.get();
-	}
-};
-
+using map_ptr = std::unique_ptr<Tmx::Map>;
 }
 
-#endif /* ARRPEEGEE_HPP_ */
+#endif /* RPGCOMMON_HPP_ */
