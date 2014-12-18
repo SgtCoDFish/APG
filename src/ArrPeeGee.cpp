@@ -23,6 +23,8 @@
 #include <iostream>
 #include <memory>
 #include <chrono>
+#include <vector>
+#include <numeric>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -30,7 +32,12 @@
 #include <Tmx.h>
 #include <ArrPeeGee.hpp>
 
+using surface_ptr = std::unique_ptr<SDL_Surface, void(*)(SDL_Surface *)>;
+using texture_ptr = std::unique_ptr<SDL_Texture, void(*)(SDL_Texture *)>;
 const std::string ASSET_PREFIX = "assets/";
+std::vector<texture_ptr> tileset_surfaces;
+std::vector<int> tileset_widths;
+int solidLayer = 0;
 
 RPG::RPG::RPG() {
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0) {
@@ -40,7 +47,7 @@ RPG::RPG::RPG() {
 	}
 
 	const int imageFlags = IMG_INIT_PNG;
-	if(!IMG_Init(imageFlags) & imageFlags) {
+	if (!IMG_Init(imageFlags) & imageFlags) {
 		std::cerr << "Couldn't initialise SDL2_image:\n" << IMG_GetError() << std::endl;
 		initFailure = true;
 		return;
@@ -53,7 +60,7 @@ RPG::RPG::~RPG() {
 }
 
 bool RPG::RPG::init() {
-	if(initFailure) {
+	if (initFailure) {
 		std::cerr << "Call to init() after failed SDL2 initialisation.\n";
 		return false;
 	}
@@ -87,16 +94,33 @@ bool RPG::RPG::init() {
 
 	auto tilesets = map->GetTilesets();
 
-	for(auto &tileset : tilesets) {
-		SDL_Surface *surface = IMG_Load((ASSET_PREFIX + tileset->GetImage()->GetSource()).c_str());
+	for (auto &tileset : tilesets) {
+		auto bad_surface = surface_ptr(
+				IMG_Load((ASSET_PREFIX + tileset->GetImage()->GetSource()).c_str()),
+				SDL_FreeSurface);
 
-		if(surface == nullptr) {
-			std::cerr << "Couldn't load " << tileset->GetImage()->GetSource() << ":\n" << IMG_GetError() << std::endl;
+		if (bad_surface == nullptr) {
+			std::cerr << "Couldn't load " << tileset->GetImage()->GetSource() << ":\n"
+					<< IMG_GetError() << std::endl;
 			return false;
 		}
 
-		SDL_FreeSurface(surface);
+		auto texture = texture_ptr(SDL_CreateTextureFromSurface(renderer.get(), bad_surface.get()),
+				SDL_DestroyTexture);
+
+		if (texture == nullptr) {
+			std::cerr << "Couldn't optimise image: " << tileset->GetImage()->GetSource() << ":\n"
+					<< IMG_GetError() << std::endl;
+			return false;
+		}
+
+		int w;
+		SDL_QueryTexture(texture.get(), nullptr, nullptr, &w, nullptr);
+		tileset_surfaces.push_back(std::move(texture));
+		tileset_widths.push_back(w);
 	}
+
+	std::cout << "--- Loaded " << tileset_surfaces.size() << " tilesets ---\n";
 
 	return true;
 }
@@ -115,6 +139,37 @@ bool RPG::RPG::update(float deltaTime) {
 
 void RPG::RPG::render(float deltaTime) {
 	SDL_RenderClear(renderer.get());
+
+	int renderCount = 0;
+	for (auto &layer : map->GetLayers()) {
+		if (layer->GetVisible()) {
+			for (int y = 0; y < layer->GetHeight(); y++) {
+				for (int x = 0; x < layer->GetWidth(); x++) {
+					const auto tileset_index = layer->GetTileTilesetIndex(x, y);
+					const auto &current_tileset = tileset_surfaces[tileset_index];
+
+					const unsigned int tile_id = layer->GetTileId(x, y);
+					if (tile_id == 0) {
+						continue;
+					}
+					const int width_in_tiles = tileset_widths[tileset_index] / 32;
+					const int tileset_y = tile_id / width_in_tiles;
+					const int tileset_x = tile_id % width_in_tiles;
+
+//				std::cout << "\n(" << renderCount << ")Tile ID: " << tile_id << "\nWidth In Tiles: "
+//						<< width_in_tiles << "\ntileset_x: " << tileset_x << "\ntileset_y: "
+//						<< tileset_y << std::endl;
+
+					const auto src_rect = SDL_Rect { tileset_x * 32, tileset_y * 32, 32, 32 };
+					const auto dst_rect = SDL_Rect { x * 32, y * 32, 32, 32 };
+
+					SDL_RenderCopy(renderer.get(), current_tileset.get(), &src_rect, &dst_rect);
+					renderCount++;
+				}
+			}
+		}
+	}
+
 	SDL_RenderPresent(renderer.get());
 }
 
@@ -130,23 +185,30 @@ int main(int argc, char *argv[]) {
 	std::cout << "Map width: " << map->GetWidth() << ", height: " << map->GetHeight() << ".\n";
 	std::cout << "Has " << map->GetNumLayers() << " layers.\n";
 
+	int layerCount = 0;
 	for (auto &layer : map->GetLayers()) {
 		auto name = layer->GetName();
-		std::cout << "Map layer " << name << std::endl;
 
-		if(name == "solidobs") {
-			auto tile = layer->GetTile(0,0);
+		if (name == "solidobs") {
+			solidLayer = layerCount;
+			std::cout << "Solidobs layer = " << solidLayer << std::endl;
+			auto tile = layer->GetTile(0, 0);
 
-			std::cout << "On solidobs:\n\tTileset name: " << map->GetTileset(tile.tilesetId)->GetName() << "\n\tTileID: " << tile.id << "\n";
+			std::cout << "On solidobs:\n\tTileset name: "
+					<< map->GetTileset(tile.tilesetId)->GetName() << "\n\tTileID: " << tile.id
+					<< "\n";
 
 			std::cout << "\t(0,0) == (1,0): " << (layer->GetTile(1, 0).id == tile.id) << std::endl;
 			std::cout << "\t(0,0) == (1,1): " << (layer->GetTile(1, 1).id == tile.id) << std::endl;
 		}
+
+		layerCount++;
 	}
 
 	bool done = false;
 
 	auto startTime = std::chrono::high_resolution_clock::now();
+	std::vector<float> timesTaken(100);
 	while (!done) {
 		auto timeNow = std::chrono::high_resolution_clock::now();
 		float deltaTime =
@@ -154,8 +216,17 @@ int main(int argc, char *argv[]) {
 						/ 1000.0f;
 
 		startTime = timeNow;
+		timesTaken.push_back(deltaTime);
 
 		done = rpg->update(deltaTime);
+
+		if(timesTaken.size() >= 100) {
+			const float sum = std::accumulate(timesTaken.begin(), timesTaken.end(), 0.0f);
+			const float fps = 1 / (sum / timesTaken.size());
+
+			std::cout << "FPS: " << fps << std::endl;
+			timesTaken.clear();
+		}
 	}
 
 	return EXIT_SUCCESS;
