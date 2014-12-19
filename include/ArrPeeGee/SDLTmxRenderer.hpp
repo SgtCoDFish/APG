@@ -52,6 +52,7 @@ private:
 	std::vector<tileset_ptr> tilesets;
 
 public:
+	// disallow copying because we own resources.
 	SDLTmxRenderer(SDLTmxRenderer &other) = delete;
 	SDLTmxRenderer(const SDLTmxRenderer &other) = delete;
 
