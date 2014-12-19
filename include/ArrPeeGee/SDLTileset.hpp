@@ -30,7 +30,7 @@
 namespace APG {
 
 /**
- * Wrapper around an SDL texture along with a width and height.
+ * Immutable wrapper around an SDL texture along with a width and height.
  */
 class SDLTileset {
 public:
@@ -46,7 +46,8 @@ public:
 	const SXXDL::texture_ptr texture;
 
 	SDLTileset(map_ptr &map, int w, int h, SXXDL::texture_ptr &texture) :
-			w { w }, h { h }, width_in_tiles{w / map->GetTileWidth()}, height_in_tiles{h / map->GetTileHeight()}, texture { std::move(texture) } {
+			w { w }, h { h }, width_in_tiles { w / map->GetTileWidth() }, height_in_tiles { h
+					/ map->GetTileHeight() }, texture { std::move(texture) } {
 	}
 
 	SDLTileset(SDLTileset &other) = delete;

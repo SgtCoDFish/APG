@@ -44,8 +44,8 @@ bool APGTest::init() {
 	}
 
 	window = SXXDL::make_window_ptr(
-			SDL_CreateWindow("APG Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640,
-					480, SDL_WINDOW_SHOWN));
+			SDL_CreateWindow("APG Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024,
+					768, SDL_WINDOW_SHOWN));
 
 	if (window == nullptr) {
 		std::cerr << "Couldn't create window:\n" << SDL_GetError() << std::endl;
