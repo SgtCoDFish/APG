@@ -1,5 +1,5 @@
 /*
- * ArrPeeGee.cpp
+ * APGTest.cpp
  * Copyright (C) 2014 Ashley Davis (SgtCoDFish)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,43 +24,27 @@
 #include <chrono>
 #include <vector>
 #include <numeric>
+#include <utility>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
 #include <Tmx.h>
-#include <ArrPeeGee.hpp>
+#include <Game.hpp>
+#include <APGTest.hpp>
+#include <SDLTmxRenderer.hpp>
+#include <SDLTileset.hpp>
 
 const std::string ASSET_PREFIX = "assets/";
 
-APG::Game::Game() {
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0) {
-		std::cerr << "Couldn't initialise SDL2:\n" << SDL_GetError() << std::endl;
-		setErrorState("SDL2 init failed.");
-		return;
-	}
-
-	const int imageFlags = IMG_INIT_PNG;
-	if ((IMG_Init(imageFlags) & imageFlags) == 0) {
-		std::cerr << "Couldn't initialise SDL2_image:\n" << IMG_GetError() << std::endl;
-		setErrorState("SDL2_image init failed.");
-		return;
-	}
-}
-
-APG::Game::~Game() {
-	IMG_Quit();
-	SDL_Quit();
-}
-
-bool APG::Game::init() {
+bool APGTest::init() {
 	if (hasError()) {
 		std::cerr << "Failed SDL2 initialisation:\n" << getErrorMessage() << std::endl;
 		return false;
 	}
 
 	window = SXXDL::make_window_ptr(
-			SDL_CreateWindow("ArrPeeGee", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640,
+			SDL_CreateWindow("APG Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640,
 					480, SDL_WINDOW_SHOWN));
 
 	if (window == nullptr) {
@@ -86,7 +70,7 @@ bool APG::Game::init() {
 		return false;
 	}
 
-	tmxRenderer = std::make_unique<SDLTmxRenderer>(map, renderer);
+	tmxRenderer = std::make_unique<APG::SDLTmxRenderer>(map, renderer);
 
 	if (tmxRenderer->hasError()) {
 		std::cerr << "Error creating tmxRenderer: " << tmxRenderer->getErrorMessage() << std::endl;
@@ -96,7 +80,7 @@ bool APG::Game::init() {
 	return true;
 }
 
-bool APG::Game::update(float deltaTime) {
+bool APGTest::update(float deltaTime) {
 	while (SDL_PollEvent(&eventStore)) {
 		if (eventStore.type == SDL_QUIT) {
 			return true;
@@ -113,7 +97,7 @@ bool APG::Game::update(float deltaTime) {
 	return false;
 }
 
-void APG::Game::render(float deltaTime) {
+void APGTest::render(float deltaTime) {
 	SDL_RenderClear(renderer.get());
 
 	tmxRenderer->renderAll();
@@ -122,7 +106,7 @@ void APG::Game::render(float deltaTime) {
 }
 
 int main(int argc, char *argv[]) {
-	auto rpg = std::make_unique<APG::Game>();
+	auto rpg = std::make_unique<APGTest>();
 
 	if (!rpg->init()) {
 		return EXIT_FAILURE;

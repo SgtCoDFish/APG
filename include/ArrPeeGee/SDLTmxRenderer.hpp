@@ -29,6 +29,10 @@
 
 #include <glm/vec2.hpp>
 
+namespace Tmx {
+class Tileset;
+}
+
 namespace APG {
 
 /**

@@ -1,5 +1,5 @@
 /*
- * SDLTileset.hpp
+ * Game.hpp
  * Copyright (C) 2014 Ashley Davis (SgtCoDFish)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,44 +17,46 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef SDLTILESET_HPP_
-#define SDLTILESET_HPP_
+#ifndef APGGAME_HPP_
+#define APGGAME_HPP_
 
 #include <memory>
-#include <utility>
 
+#include "ErrorBase.hpp"
+#include "APGCommon.hpp"
 #include "SXXDL.hpp"
+#include "SDLTmxRenderer.hpp"
 
-#include "TmxMap.h"
+namespace Tmx {
+	class Map;
+}
 
 namespace APG {
-
-/**
- * Wrapper around an SDL texture along with a width and height.
- */
-class SDLTileset {
+class Game : public ErrorBase {
 public:
-	/** Width in pixels. */
-	const int w;
+	Game();
+	virtual ~Game();
 
-	/** Height in pixels. */
-	const int h;
+	/**
+	 * Should carry out initialisation of the game.
+	 * @return true if successful, false if an error state has been set.
+	 */
+	virtual bool init() = 0;
 
-	const int width_in_tiles;
-	const int height_in_tiles;
+	/**
+	 * Called every frame. Should call render.
+	 * @param deltaTime the amount of time elapsed since the last frame.
+	 * @return true if it's time to quit, false otherwise.
+	 */
+	virtual bool update(float deltaTime) = 0;
 
-	const SXXDL::texture_ptr texture;
-
-	SDLTileset(map_ptr &map, int w, int h, SXXDL::texture_ptr &texture) :
-			w { w }, h { h }, width_in_tiles{w / map->GetTileWidth()}, height_in_tiles{h / map->GetTileHeight()}, texture { std::move(texture) } {
-	}
-
-	SDLTileset(SDLTileset &other) = delete;
-	SDLTileset(const SDLTileset &other) = delete;
+	/**
+	 * Should be called in update(float) every frame and render the whole visible screen.
+	 * @param deltaTime the amount of time elapsed since the last frame.
+	 */
+	virtual void render(float deltaTime) = 0;
 };
-
-using tileset_ptr = std::unique_ptr<SDLTileset>;
 
 }
 
-#endif /* SDLTILESET_HPP_ */
+#endif /* APGGAME_HPP_ */

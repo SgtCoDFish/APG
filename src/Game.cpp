@@ -1,5 +1,5 @@
 /*
- * ArrPeeGee.hpp
+ * Game.cpp
  * Copyright (C) 2014 Ashley Davis (SgtCoDFish)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,45 +17,32 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef ARRPEEGEE_HPP_
-#define ARRPEEGEE_HPP_
+#include <iostream>
+#include <sstream>
 
-#include <memory>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
-#include "ErrorBase.hpp"
-#include "APGCommon.hpp"
-#include "SXXDL.hpp"
-#include "SDLTmxRenderer.hpp"
+#include "Game.hpp"
 
-namespace Tmx {
-	class Map;
-}
-
-namespace APG {
-class Game : public ErrorBase {
-private:
-	SXXDL::window_ptr window = SXXDL::make_window_ptr(nullptr);
-	SXXDL::renderer_ptr renderer = SXXDL::make_renderer_ptr(nullptr);
-
-	map_ptr map;
-
-	SDL_Event eventStore;
-
-	std::unique_ptr<SDLTmxRenderer> tmxRenderer = nullptr;
-
-public:
-	Game();
-	~Game();
-
-	bool init();
-	bool update(float deltaTime);
-	void render(float deltaTime);
-
-	const Tmx::Map *getMap() const {
-		return map.get();
+APG::Game::Game() {
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0) {
+		std::stringstream ss;
+		ss << "Couldn't initialise SDL2:\n" << SDL_GetError();
+		setErrorState(ss.str());
+		return;
 	}
-};
 
+	const int imageFlags = IMG_INIT_PNG;
+	if ((IMG_Init(imageFlags) & imageFlags) == 0) {
+		std::stringstream ss;
+		ss << "Couldn't initialise SDL2_image:\n" << IMG_GetError() << std::endl;
+		setErrorState(ss.str());
+		return;
+	}
 }
 
-#endif /* ARRPEEGEE_HPP_ */
+APG::Game::~Game() {
+	IMG_Quit();
+	SDL_Quit();
+}
