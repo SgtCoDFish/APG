@@ -34,9 +34,6 @@ namespace APG {
 
 class SDLGame : public Game {
 protected:
-	static uint32_t sdlInitFlags;
-	static uint32_t sdlImageInitFlags;
-	static uint32_t sdlWindowFlags;
 
 	SXXDL::window_ptr window = SXXDL::make_window_ptr(nullptr);
 	SDL_GLContext glContext = nullptr;
@@ -65,6 +62,10 @@ public:
 
 	bool update(float deltaTime) override;
 	void quit();
+
+	static uint32_t sdlInitFlags;
+	static uint32_t sdlImageInitFlags;
+	static uint32_t sdlWindowFlags;
 };
 
 }

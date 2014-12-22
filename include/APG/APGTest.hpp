@@ -26,7 +26,7 @@ private:
 	std::unique_ptr<APG::SDLTmxRenderer> tmxRenderer = nullptr;
 
 public:
-	APGTest() : SDLGame("APGTest",640, 480, 3, 2) {}
+	APGTest() : SDLGame("APGTest", 1280, 720, 3, 2) {}
 	virtual ~APGTest() {
 		if(glcontext != nullptr) {
 			SDL_GL_DeleteContext(glcontext);
@@ -40,7 +40,5 @@ public:
 		return map.get();
 	}
 };
-
-
 
 #endif /* APGTEST_HPP_ */

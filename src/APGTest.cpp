@@ -83,6 +83,7 @@ void APGTest::render(float deltaTime) {
 }
 
 int main(int argc, char *argv[]) {
+	APG::SDLGame::sdlWindowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 	auto rpg = std::make_unique<APGTest>();
 
 	if (!rpg->init()) {
