@@ -29,8 +29,11 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
+#include <GL/glew.h>
+
 #include <Tmx.h>
 #include <Game.hpp>
+#include <SXXDL.hpp>
 #include <APGTest.hpp>
 #include <SDLTmxRenderer.hpp>
 #include <SDLTileset.hpp>
@@ -39,16 +42,7 @@ const std::string ASSET_PREFIX = "assets/";
 
 bool APGTest::init() {
 	if (hasError()) {
-		std::cerr << "Failed SDL2 initialisation:\n" << getErrorMessage() << std::endl;
-		return false;
-	}
-
-	window = SXXDL::make_window_ptr(
-			SDL_CreateWindow("APG Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024,
-					768, SDL_WINDOW_SHOWN));
-
-	if (window == nullptr) {
-		std::cerr << "Couldn't create window:\n" << SDL_GetError() << std::endl;
+		std::cerr << "Failed SDLGame initialisation:\n" << getErrorMessage() << std::endl;
 		return false;
 	}
 
@@ -78,23 +72,6 @@ bool APGTest::init() {
 	}
 
 	return true;
-}
-
-bool APGTest::update(float deltaTime) {
-	while (SDL_PollEvent(&eventStore)) {
-		if (eventStore.type == SDL_QUIT) {
-			return true;
-		}
-	}
-
-	if(hasError() || tmxRenderer->hasError()) {
-		std::cerr << "Error in Game: " << getErrorMessage() << "\nError in renderer: " << tmxRenderer->getErrorMessage() << std::endl;
-		return true;
-	}
-
-	render(deltaTime);
-
-	return false;
 }
 
 void APGTest::render(float deltaTime) {

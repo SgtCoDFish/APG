@@ -24,12 +24,12 @@
 
 void APG::ErrorBase::setErrorState(const char *message) {
 	hasError_ = true;
-	message_ = std::string(message);
+	message_ = std::string(message) + "\n";
 }
 
 void APG::ErrorBase::setErrorState(const std::string &message) {
 	hasError_ = true;
-	message_ = std::string(message);
+	message_ = std::string(message) + "\n";
 }
 
 void APG::ErrorBase::unsetErrorState() {

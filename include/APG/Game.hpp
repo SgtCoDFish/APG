@@ -23,19 +23,13 @@
 #include <memory>
 
 #include "ErrorBase.hpp"
-#include "APGCommon.hpp"
-#include "SXXDL.hpp"
-#include "SDLTmxRenderer.hpp"
-
-namespace Tmx {
-	class Map;
-}
 
 namespace APG {
+
 class Game : public ErrorBase {
 public:
-	Game();
-	virtual ~Game();
+	Game() {}
+	virtual ~Game() {}
 
 	/**
 	 * Should carry out initialisation of the game.

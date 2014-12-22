@@ -11,27 +11,29 @@
 #include <memory>
 
 #include "Game.hpp"
+#include "SDLGame.hpp"
 #include "APGCommon.hpp"
 #include "SXXDL.hpp"
 #include "SDLTmxRenderer.hpp"
 
-class APGTest : public APG::Game {
+class APGTest : public APG::SDLGame {
 private:
-	SXXDL::window_ptr window = SXXDL::make_window_ptr(nullptr);
 	SXXDL::renderer_ptr renderer = SXXDL::make_renderer_ptr(nullptr);
+	SDL_GLContext glcontext = nullptr;
 
 	APG::map_ptr map;
-
-	SDL_Event eventStore;
 
 	std::unique_ptr<APG::SDLTmxRenderer> tmxRenderer = nullptr;
 
 public:
-	APGTest() : Game() {}
-	~APGTest() {}
+	APGTest() : SDLGame("APGTest",640, 480, 3, 2) {}
+	virtual ~APGTest() {
+		if(glcontext != nullptr) {
+			SDL_GL_DeleteContext(glcontext);
+		}
+	}
 
 	bool init() override;
-	bool update(float deltaTime) override;
 	void render(float deltaTime) override;
 
 	const Tmx::Map *getMap() const {
