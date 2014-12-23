@@ -30,6 +30,7 @@
 #include <SDL2/SDL_image.h>
 
 #include <GL/glew.h>
+#include <GL/gl.h>
 
 #include <Tmx.h>
 #include <Game.hpp>
