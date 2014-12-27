@@ -50,8 +50,11 @@ public:
 					/ map->GetTileHeight() }, texture { std::move(texture) } {
 	}
 
+	// can't use copy constructor since we uniquely own the texture.
 	SDLTileset(SDLTileset &other) = delete;
 	SDLTileset(const SDLTileset &other) = delete;
+	SDLTileset &operator=(SDLTileset &other) = delete;
+	SDLTileset &operator=(const SDLTileset &other) = delete;
 };
 
 using tileset_ptr = std::unique_ptr<SDLTileset>;
