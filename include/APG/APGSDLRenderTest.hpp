@@ -5,8 +5,8 @@
  * Author: Ashley Davis (SgtCoDFish)
  */
 
-#ifndef APGTEST_HPP_
-#define APGTEST_HPP_
+#ifndef APGSDLRENDERTEST_HPP_
+#define APGSDLRENDERTEST_HPP_
 
 #include <memory>
 
@@ -16,18 +16,18 @@
 #include "SXXDL.hpp"
 #include "SDLTmxRenderer.hpp"
 
-class APGTest : public APG::SDLGame {
+class APGSDLRenderTest : public APG::SDLGame {
 private:
 	SXXDL::renderer_ptr renderer = SXXDL::make_renderer_ptr(nullptr);
 	SDL_GLContext glcontext = nullptr;
 
 	APG::map_ptr map;
 
-	std::unique_ptr<APG::SDLTmxRenderer> tmxRenderer = nullptr;
+	std::unique_ptr<APG::SDLTmxRenderer> sdlTmxRenderer = nullptr;
 
 public:
-	APGTest() : SDLGame("APGTest", 1280, 720, 3, 2) {}
-	virtual ~APGTest() {
+	APGSDLRenderTest() : SDLGame("APGSDLRenderTest", 1280, 720, 3, 2) {}
+	virtual ~APGSDLRenderTest() {
 		if(glcontext != nullptr) {
 			SDL_GL_DeleteContext(glcontext);
 		}
@@ -41,4 +41,4 @@ public:
 	}
 };
 
-#endif /* APGTEST_HPP_ */
+#endif /* APGSDLRENDERTEST_HPP_ */

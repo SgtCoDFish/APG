@@ -35,13 +35,13 @@
 #include <Tmx.h>
 #include <Game.hpp>
 #include <SXXDL.hpp>
-#include <APGTest.hpp>
+#include <APGSDLRenderTest.hpp>
 #include <SDLTmxRenderer.hpp>
 #include <SDLTileset.hpp>
 
 const std::string ASSET_PREFIX = "assets/";
 
-bool APGTest::init() {
+bool APGSDLRenderTest::init() {
 	if (hasError()) {
 		std::cerr << "Failed SDLGame initialisation:\n" << getErrorMessage() << std::endl;
 		return false;
@@ -65,27 +65,27 @@ bool APGTest::init() {
 		return false;
 	}
 
-	tmxRenderer = std::make_unique<APG::SDLTmxRenderer>(map, renderer);
+	sdlTmxRenderer = std::make_unique<APG::SDLTmxRenderer>(map, renderer);
 
-	if (tmxRenderer->hasError()) {
-		std::cerr << "Error creating tmxRenderer: " << tmxRenderer->getErrorMessage() << std::endl;
+	if (sdlTmxRenderer->hasError()) {
+		std::cerr << "Error creating tmxRenderer: " << sdlTmxRenderer->getErrorMessage() << std::endl;
 		return false;
 	}
 
 	return true;
 }
 
-void APGTest::render(float deltaTime) {
+void APGSDLRenderTest::render(float deltaTime) {
 	SDL_RenderClear(renderer.get());
 
-	tmxRenderer->renderAll();
+	sdlTmxRenderer->renderAll();
 
 	SDL_RenderPresent(renderer.get());
 }
 
 int main(int argc, char *argv[]) {
 	APG::SDLGame::sdlWindowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
-	auto rpg = std::make_unique<APGTest>();
+	auto rpg = std::make_unique<APGSDLRenderTest>();
 
 	if (!rpg->init()) {
 		return EXIT_FAILURE;
