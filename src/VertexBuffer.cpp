@@ -46,13 +46,13 @@ APG::VertexBuffer::~VertexBuffer() {
 }
 
 void APG::VertexBuffer::bind() const {
-	glBindBuffer(bufferType, vboID);
+	glBindBuffer((GLenum) bufferType, vboID);
 }
 
 void APG::VertexBuffer::upload() {
 	if(!hasError() && vertices != nullptr) {
 		bind();
-		glBufferData(bufferType, sizeof(vertices), vertices, drawType);
+		glBufferData((GLenum) bufferType, sizeof(vertices), vertices, drawType);
 
 		GLenum glError = glGetError();
 		if(glError != GL_NO_ERROR) {

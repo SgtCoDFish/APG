@@ -1,5 +1,5 @@
 /*
- * APGTest.cpp
+ * APGGLRenderTest.cpp
  * Copyright (C) 2014 Ashley Davis (SgtCoDFish)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,6 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <cstdint>
 #include <cstdlib>
 
 #include <iostream>
@@ -24,75 +25,54 @@
 #include <chrono>
 #include <vector>
 #include <numeric>
-#include <utility>
-
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 
 #include <GL/glew.h>
 #include <GL/gl.h>
 
-#include <Tmx.h>
-#include <Game.hpp>
-#include <SXXDL.hpp>
-#include <APGSDLRenderTest.hpp>
-#include <SDLTmxRenderer.hpp>
-#include <SDLTileset.hpp>
+#include "APGGLRenderTest.hpp"
+#include "Game.hpp"
+#include "SDLGame.hpp"
+#include "APGCommon.hpp"
+#include "SXXDL.hpp"
 
-const std::string ASSET_PREFIX = "assets/";
+const char *APG::APGGLRenderTest::vertexShaderFilename = "pass_vertex.glslv";
+const char * APG::APGGLRenderTest::fragmentShaderFilename = "red_frag.glslf";
 
-bool APGSDLRenderTest::init() {
+bool APG::APGGLRenderTest::init() {
 	if (hasError()) {
-		std::cerr << "Failed SDLGame initialisation:\n" << getErrorMessage() << std::endl;
+		std::cerr << "Failed to initialise APGGLRenderTest.\n";
 		return false;
 	}
 
-	renderer = SXXDL::make_renderer_ptr(
-			SDL_CreateRenderer(window.get(), -1, SDL_RENDERER_ACCELERATED));
+	renderer = std::make_unique<GLTmxRenderer>();
+	shaderProgram = std::make_unique<ShaderProgram>(vertexShaderFilename, fragmentShaderFilename);
 
-	if (renderer == nullptr) {
-		std::cerr << "Couldn't create renderer:\n" << SDL_GetError() << std::endl;
-		return false;
-	}
+	std::cout << "Shader Info Log\n---------------\n\n" << shaderProgram->getShaderInfoLog();
+	std::cout << "\nLink Info Log\n-------------\n\n" << shaderProgram->getLinkInfoLog()
+			<< std::endl;
 
-	SDL_SetRenderDrawColor(renderer.get(), 0xFF, 0x00, 0x00, 0xFF);
-
-	map = std::make_unique<Tmx::Map>();
-	map->ParseFile(ASSET_PREFIX + "world1.tmx");
-
-	if (map->HasError()) {
-		std::cerr << "Error loading map: " << map->GetErrorText() << std::endl;
-		return false;
-	}
-
-	sdlTmxRenderer = std::make_unique<APG::SDLTmxRenderer>(map, renderer);
-
-	if (sdlTmxRenderer->hasError()) {
-		std::cerr << "Error creating tmxRenderer: " << sdlTmxRenderer->getErrorMessage() << std::endl;
+	if (shaderProgram->hasError()) {
+		std::cerr << "Couldn't create shader:\n" << shaderProgram->getErrorMessage() << std::endl;
 		return false;
 	}
 
 	return true;
 }
 
-void APGSDLRenderTest::render(float deltaTime) {
-	SDL_RenderClear(renderer.get());
+void APG::APGGLRenderTest::render(float deltaTime) {
 
-	sdlTmxRenderer->renderAll();
-
-	SDL_RenderPresent(renderer.get());
 }
 
-#ifdef APG_TEST_SDL
+#ifndef APG_TEST_SDL
 int main(int argc, char *argv[]) {
 	APG::SDLGame::sdlWindowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
-	auto rpg = std::make_unique<APGSDLRenderTest>();
+	auto game = std::make_unique<APG::APGGLRenderTest>();
 
-	if (!rpg->init()) {
+	if (!game->init()) {
 		return EXIT_FAILURE;
 	}
 
-	auto map = rpg->getMap();
+	auto map = game->getMap();
 
 	std::cout << "Map width: " << map->GetWidth() << ", height: " << map->GetHeight() << ".\n";
 	std::cout << "Has " << map->GetNumLayers() << " layers.\n";
@@ -110,7 +90,7 @@ int main(int argc, char *argv[]) {
 		startTime = timeNow;
 		timesTaken.push_back(deltaTime);
 
-		done = rpg->update(deltaTime);
+		done = game->update(deltaTime);
 
 		if (timesTaken.size() >= 1000) {
 			const float sum = std::accumulate(timesTaken.begin(), timesTaken.end(), 0.0f);
