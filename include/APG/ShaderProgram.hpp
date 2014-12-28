@@ -33,7 +33,7 @@ private:
 	uint32_t vertexShader, fragmentShader;
 	uint32_t shaderProgram;
 
-	uint32_t *validateType(uint32_t shaderType);
+	uint32_t *validateTypeAndGet(uint32_t shaderType);
 
 	std::string shaderInfoLog, linkInfoLog;
 
@@ -43,8 +43,18 @@ private:
 public:
 	ShaderProgram(const std::string &vertexShaderFilename,
 			const std::string &fragmentShaderFileName);
+	~ShaderProgram();
 
 	void use();
+
+	void setFloatAttribute(const char * const attributeName, int32_t valueCount, int32_t stride, GLvoid *offset, bool normalize = false);
+	void setFloatAttribute(const std::string &attributeName, int32_t valueCount, int32_t stride, GLvoid *offset, bool normalize = false) {
+		setFloatAttribute(attributeName.c_str(), valueCount, stride, offset, normalize);
+	}
+
+	uint32_t getProgramID() const {
+		return shaderProgram;
+	}
 
 	std::string getShaderInfoLog() const {
 		return shaderInfoLog;

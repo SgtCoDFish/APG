@@ -30,19 +30,21 @@
 #include "SXXDL.hpp"
 #include "ShaderProgram.hpp"
 #include "GLTmxRenderer.hpp"
-#include "TmxMap.h"
+#include "VertexBuffer.hpp"
 
+#include "TmxMap.h"
 
 namespace APG {
 
 class APGGLRenderTest : public APG::SDLGame {
 private:
 	static const char *vertexShaderFilename;
-	static const char * fragmentShaderFilename;
+	static const char *fragmentShaderFilename;
 	APG::map_ptr map;
 
 	std::unique_ptr<GLTmxRenderer> renderer = std::unique_ptr<GLTmxRenderer>(nullptr);
 	std::unique_ptr<ShaderProgram> shaderProgram = std::unique_ptr<ShaderProgram>(nullptr);
+	std::unique_ptr<VertexBuffer> vertexBuffer = std::unique_ptr<VertexBuffer>(nullptr);
 public:
 	APGGLRenderTest() : SDLGame("APGGLRenderTest", 1280, 720, 3, 2) {}
 	virtual ~APGGLRenderTest() = default;

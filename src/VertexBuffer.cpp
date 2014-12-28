@@ -27,12 +27,14 @@
 
 #include "VertexBuffer.hpp"
 
-APG::VertexBuffer::VertexBuffer(BufferType bufferType, DrawType drawType, float * const vertices) :
-		bufferType { bufferType }, drawType { drawType }, vertices { vertices } {
+APG::VertexBuffer::VertexBuffer(BufferType bufferType, DrawType drawType, float * const vertices,
+		uint64_t vertexCount) :
+		bufferType { bufferType }, drawType { drawType }, vertices { vertices }, vertexCount {
+				vertexCount } {
 	generateID();
 	bind();
 
-	if(vertices != nullptr) {
+	if (vertices != nullptr) {
 		upload();
 	}
 }
@@ -46,22 +48,24 @@ APG::VertexBuffer::~VertexBuffer() {
 }
 
 void APG::VertexBuffer::bind() const {
-	glBindBuffer((GLenum) bufferType, vboID);
+	glBindBuffer(bufferType, vboID);
 }
 
 void APG::VertexBuffer::upload() {
-	if(!hasError() && vertices != nullptr) {
+	if (!hasError() && vertices != nullptr && vertexCount > 0) {
 		bind();
-		glBufferData((GLenum) bufferType, sizeof(vertices), vertices, drawType);
+		glBufferData(bufferType, vertexCount * sizeof(float), vertices, drawType);
 
 		GLenum glError = glGetError();
-		if(glError != GL_NO_ERROR) {
-			if(glError == GL_OUT_OF_MEMORY) {
+		if (glError != GL_NO_ERROR) {
+			if (glError == GL_OUT_OF_MEMORY) {
 				setErrorState("Ran out of memory trying to upload vertex data.");
+				return;
 			} else {
 				std::stringstream ss;
 				ss << "OpenGL error:\n" << gluErrorString(glError);
 				setErrorState(ss.str());
+				return;
 			}
 		}
 	}

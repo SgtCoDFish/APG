@@ -19,11 +19,14 @@
 
 #include <cstdint>
 
+#include <string>
 #include <sstream>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <GL/glew.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 #include <SDLGame.hpp>
 
@@ -46,7 +49,7 @@ APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint
 
 	initGL(glMajorVersion, glMinorVersion);
 	initSDL(windowWidth, windowHeight);
-	initGlew();
+	initContextAndGlew();
 }
 
 APG::SDLGame::~SDLGame() {
@@ -106,10 +109,22 @@ void APG::SDLGame::initGL(uint8_t glMajorVersion, uint8_t glMinorVersion) {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, glMinorVersion);
 }
 
-void APG::SDLGame::initGlew() {
+void APG::SDLGame::initContextAndGlew() {
+	if(hasError()) {
+		return;
+	}
+
 	glContext = SDL_GL_CreateContext(window.get());
+
+
 	glewExperimental = GL_TRUE;
 	glewInit();
+
+	// reset all errors since apparently glew causes some.
+	auto error = glGetError();
+	while(error != GL_NO_ERROR) {
+		error = glGetError();
+	}
 }
 
 void APG::SDLGame::quit() {

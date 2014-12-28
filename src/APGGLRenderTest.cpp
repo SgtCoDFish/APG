@@ -34,9 +34,13 @@
 #include "SDLGame.hpp"
 #include "APGCommon.hpp"
 #include "SXXDL.hpp"
+#include "VertexBuffer.hpp"
 
 const char *APG::APGGLRenderTest::vertexShaderFilename = "pass_vertex.glslv";
 const char * APG::APGGLRenderTest::fragmentShaderFilename = "red_frag.glslf";
+
+GLfloat vertices[] = { 0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f };
+GLuint vao;
 
 bool APG::APGGLRenderTest::init() {
 	if (hasError()) {
@@ -44,15 +48,42 @@ bool APG::APGGLRenderTest::init() {
 		return false;
 	}
 
-	renderer = std::make_unique<GLTmxRenderer>();
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	vertexBuffer = std::make_unique<VertexBuffer>(APG::BufferType::ARRAY,
+			APG::DrawType::STATIC_DRAW, vertices, 6);
+
+	if (vertexBuffer->hasError()) {
+		std::cerr << "Error initialising vertex buffer: " << vertexBuffer->getErrorMessage()
+				<< std::endl;
+		return false;
+	}
+
+	vertexBuffer->bind();
+
 	shaderProgram = std::make_unique<ShaderProgram>(vertexShaderFilename, fragmentShaderFilename);
 
-	std::cout << "Shader Info Log\n---------------\n\n" << shaderProgram->getShaderInfoLog();
-	std::cout << "\nLink Info Log\n-------------\n\n" << shaderProgram->getLinkInfoLog()
-			<< std::endl;
+	if (shaderProgram->hasError()) {
+		std::cout << "Shader Info Log\n---------------\n" << shaderProgram->getShaderInfoLog();
+		std::cout << "\nLink Info Log\n-------------\n" << shaderProgram->getLinkInfoLog()
+				<< std::endl;
+		std::cerr << "Couldn't create shader:\n" << shaderProgram->getErrorMessage() << std::endl;
+		return false;
+	}
+
+	shaderProgram->setFloatAttribute("position", 2, 0, nullptr, false);
 
 	if (shaderProgram->hasError()) {
-		std::cerr << "Couldn't create shader:\n" << shaderProgram->getErrorMessage() << std::endl;
+		std::cerr << "Couldn't setup attributes:\n" << shaderProgram->getErrorMessage()
+				<< std::endl;
+		return false;
+	}
+
+	renderer = std::make_unique<GLTmxRenderer>();
+
+	if (glGetError() != GL_NO_ERROR) {
+		std::cerr << "Error in gl.\n";
 		return false;
 	}
 
@@ -60,7 +91,12 @@ bool APG::APGGLRenderTest::init() {
 }
 
 void APG::APGGLRenderTest::render(float deltaTime) {
+	glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
 
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	SDL_GL_SwapWindow(window.get());
 }
 
 #ifndef APG_TEST_SDL
@@ -71,11 +107,6 @@ int main(int argc, char *argv[]) {
 	if (!game->init()) {
 		return EXIT_FAILURE;
 	}
-
-	auto map = game->getMap();
-
-	std::cout << "Map width: " << map->GetWidth() << ", height: " << map->GetHeight() << ".\n";
-	std::cout << "Has " << map->GetNumLayers() << " layers.\n";
 
 	bool done = false;
 
@@ -102,6 +133,8 @@ int main(int argc, char *argv[]) {
 			timesTaken.clear();
 		}
 	}
+
+	glDeleteVertexArrays(1, &vao);
 
 	return EXIT_SUCCESS;
 }

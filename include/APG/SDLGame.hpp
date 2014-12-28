@@ -48,7 +48,7 @@ protected:
 
 	void initSDL(uint32_t windowWidth, uint32_t windowHeight);
 	void initGL(uint8_t glMajorVersion, uint8_t glMinorVersion);
-	void initGlew();
+	void initContextAndGlew();
 
 public:
 	SDLGame(const char *windowTitle, uint32_t windowWidth, uint32_t windowHeight,

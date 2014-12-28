@@ -28,7 +28,7 @@
 
 namespace APG {
 
-enum class BufferType {
+enum BufferType {
 	ARRAY = GL_ARRAY_BUFFER,
 	ELEMENT_ARRAY = GL_ELEMENT_ARRAY_BUFFER,
 	PIXEL_PACK = GL_PIXEL_PACK_BUFFER,
@@ -41,17 +41,11 @@ enum class BufferType {
 };
 
 enum DrawType {
-	STATIC_DRAW = GL_STATIC_DRAW,
-	STATIC_READ = GL_STATIC_READ,
-	STATIC_COPY = GL_STATIC_COPY,
+	STATIC_DRAW = GL_STATIC_DRAW, STATIC_READ = GL_STATIC_READ, STATIC_COPY = GL_STATIC_COPY,
 
-	STREAM_DRAW = GL_STREAM_DRAW,
-	STREAM_READ = GL_STREAM_READ,
-	STREAM_COPY = GL_STREAM_COPY,
+	STREAM_DRAW = GL_STREAM_DRAW, STREAM_READ = GL_STREAM_READ, STREAM_COPY = GL_STREAM_COPY,
 
-	DYNAMIC_DRAW = GL_DYNAMIC_DRAW,
-	DYNAMIC_READ = GL_DYNAMIC_READ,
-	DYNAMIC_COPY = GL_DYNAMIC_COPY,
+	DYNAMIC_DRAW = GL_DYNAMIC_DRAW, DYNAMIC_READ = GL_DYNAMIC_READ, DYNAMIC_COPY = GL_DYNAMIC_COPY,
 };
 
 class VertexBuffer : public ErrorBase {
@@ -62,11 +56,17 @@ private:
 	DrawType drawType;
 
 	float *vertices = nullptr;
+	uint64_t vertexCount = 0;
 
 	void generateID();
 
 public:
-	VertexBuffer(BufferType bufferType, DrawType drawType, float * const vertices = nullptr);
+	VertexBuffer(BufferType bufferType, DrawType drawType) :
+			VertexBuffer { bufferType, drawType, nullptr, 0 } {
+	}
+
+	VertexBuffer(BufferType bufferType, DrawType drawType, float * const vertices,
+			uint64_t vertexCount);
 	~VertexBuffer();
 
 	void bind() const;
@@ -81,8 +81,9 @@ public:
 		return drawType;
 	}
 
-	void setVertices(float * const vertices) {
+	void setVertices(float * const vertices, uint64_t vertexCount) {
 		this->vertices = vertices;
+		this->vertexCount = vertexCount;
 	}
 
 	VertexBuffer(VertexBuffer &other) = delete;
