@@ -39,12 +39,14 @@
 const char *APG::APGGLRenderTest::vertexShaderFilename = "pass_vertex.glslv";
 const char * APG::APGGLRenderTest::fragmentShaderFilename = "red_frag.glslf";
 
-GLfloat vertices[] = { 0.0f, 0.5f, 1.0f, 0.0f, 0.0f, // Vertex 1
+GLfloat vertices[] = {
+		-0.5f, 0.5f, 1.0f, 0.0f, 0.0f, // Vertex 0
+		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // Vertex 1
 		0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // Vertex 2
-		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f // Vertex 3
+		0.5f, 0.5f, 1.0f, 1.0f, 1.0f, // Vertex 3
 		};
 
-GLuint elements[] = { 0, 1, 2 };
+GLuint elements[] = { 0, 1, 2, 0, 3, 2 };
 
 bool APG::APGGLRenderTest::init() {
 	if (hasError()) {
@@ -55,8 +57,8 @@ bool APG::APGGLRenderTest::init() {
 	vao = std::make_unique<VAO>();
 	vao->bind();
 
-	vertexBuffer = std::make_unique<Buffer<float, GL_FLOAT>>(APG::BufferType::ARRAY, APG::DrawType::STATIC_DRAW,
-			vertices, 15);
+	vertexBuffer = std::make_unique<Buffer<>>(APG::BufferType::ARRAY, APG::DrawType::STATIC_DRAW,
+			vertices, 20);
 
 	if (vertexBuffer->hasError()) {
 		std::cerr << "Error initialising vertex buffer: " << vertexBuffer->getErrorMessage()
@@ -66,8 +68,8 @@ bool APG::APGGLRenderTest::init() {
 
 	vertexBuffer->bind();
 
-	elementBuffer = std::make_unique<Buffer<uint32_t, GL_UNSIGNED_INT>>(APG::BufferType::ELEMENT_ARRAY,
-			APG::DrawType::STATIC_DRAW, elements, 3);
+	elementBuffer = std::make_unique<Buffer<uint32_t, GL_UNSIGNED_INT>>(
+			APG::BufferType::ELEMENT_ARRAY, APG::DrawType::STATIC_DRAW, elements, 6);
 
 	shaderProgram = std::make_unique<ShaderProgram>(vertexShaderFilename, fragmentShaderFilename);
 
@@ -102,14 +104,13 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glDrawElements(GL_TRIANGLES, 3, elementBuffer->getGLType(), 0);
+	glDrawElements(GL_TRIANGLES, 6, elementBuffer->getGLType(), 0);
 
 	SDL_GL_SwapWindow(window.get());
 }
 
 #ifndef APG_TEST_SDL
 int main(int argc, char *argv[]) {
-	std::cout << "sizeof(float): " << sizeof(float) << std::endl;
 	APG::SDLGame::sdlWindowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 	auto game = std::make_unique<APG::APGGLRenderTest>();
 

@@ -44,7 +44,7 @@ private:
 	APG::map_ptr map;
 
 	std::unique_ptr<VAO> vao = std::unique_ptr<VAO>(nullptr);
-	std::unique_ptr<Buffer<float, GL_FLOAT>> vertexBuffer = std::unique_ptr<Buffer<float, GL_FLOAT>>(nullptr);
+	std::unique_ptr<Buffer<>> vertexBuffer = std::unique_ptr<Buffer<>>(nullptr);
 	std::unique_ptr<Buffer<uint32_t, GL_UNSIGNED_INT>> elementBuffer = std::unique_ptr<Buffer<uint32_t, GL_UNSIGNED_INT>>(nullptr);
 	std::unique_ptr<ShaderProgram> shaderProgram = std::unique_ptr<ShaderProgram>(nullptr);
 
