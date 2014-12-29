@@ -1,5 +1,5 @@
 /*
- * VertexBuffer.cpp
+ * Buffer.cpp
  * Copyright (C) 2014 Ashley Davis (SgtCoDFish)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,36 +25,36 @@
 #include <GL/glew.h>
 #include <GL/glu.h>
 
-#include "VertexBuffer.hpp"
+#include "Buffer.hpp"
 
-APG::VertexBuffer::VertexBuffer(BufferType bufferType, DrawType drawType, float * const vertices,
+APG::Buffer::Buffer(BufferType bufferType, DrawType drawType, float * const data,
 		uint64_t elementCount) :
 		bufferType { bufferType }, drawType { drawType } {
 	generateID();
 	bind();
 
 	if (vertices != nullptr) {
-		setVertices(vertices, elementCount);
+		setData(data, elementCount);
 		upload();
 	}
 }
 
-void APG::VertexBuffer::generateID() {
-	glGenBuffers(1, &vboID);
+void APG::Buffer::generateID() {
+	glGenBuffers(1, &bufferID);
 }
 
-APG::VertexBuffer::~VertexBuffer() {
-	glDeleteBuffers(1, &vboID);
+APG::Buffer::~Buffer() {
+	glDeleteBuffers(1, &bufferID);
 }
 
-void APG::VertexBuffer::bind() const {
-	glBindBuffer(bufferType, vboID);
+void APG::Buffer::bind() const {
+	glBindBuffer(bufferType, bufferID);
 }
 
-void APG::VertexBuffer::upload() {
-	if (!hasError() && vertices != nullptr && elementCount > 0) {
+void APG::Buffer::upload() {
+	if (!hasError() && data != nullptr && elementCount > 0) {
 		bind();
-		glBufferData(bufferType, elementCount * sizeof(float), vertices, drawType);
+		glBufferData(bufferType, elementCount * sizeof(float), data, drawType);
 
 		GLenum glError = glGetError();
 		if (glError != GL_NO_ERROR) {
@@ -71,7 +71,7 @@ void APG::VertexBuffer::upload() {
 	}
 }
 
-void APG::VertexBuffer::setDrawType(DrawType drawType) {
+void APG::Buffer::setDrawType(DrawType drawType) {
 	this->drawType = drawType;
 	upload();
 }

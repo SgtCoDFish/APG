@@ -34,7 +34,7 @@
 #include "SDLGame.hpp"
 #include "APGCommon.hpp"
 #include "SXXDL.hpp"
-#include "VertexBuffer.hpp"
+#include "Buffer.hpp"
 
 const char *APG::APGGLRenderTest::vertexShaderFilename = "pass_vertex.glslv";
 const char * APG::APGGLRenderTest::fragmentShaderFilename = "red_frag.glslf";
@@ -53,7 +53,7 @@ bool APG::APGGLRenderTest::init() {
 	vao = std::make_unique<VAO>();
 	vao->bind();
 
-	vertexBuffer = std::make_unique<VertexBuffer>(APG::BufferType::ARRAY,
+	vertexBuffer = std::make_unique<Buffer>(APG::BufferType::ARRAY,
 			APG::DrawType::STATIC_DRAW, vertices, 15);
 
 	if (vertexBuffer->hasError()) {

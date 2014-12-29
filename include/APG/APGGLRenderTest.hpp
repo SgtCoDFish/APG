@@ -30,7 +30,7 @@
 #include "SXXDL.hpp"
 #include "ShaderProgram.hpp"
 #include "GLTmxRenderer.hpp"
-#include "VertexBuffer.hpp"
+#include "Buffer.hpp"
 #include "VAO.hpp"
 
 #include "TmxMap.h"
@@ -44,7 +44,7 @@ private:
 	APG::map_ptr map;
 
 	std::unique_ptr<VAO> vao = std::unique_ptr<VAO>(nullptr);
-	std::unique_ptr<VertexBuffer> vertexBuffer = std::unique_ptr<VertexBuffer>(nullptr);
+	std::unique_ptr<Buffer> vertexBuffer = std::unique_ptr<Buffer>(nullptr);
 	std::unique_ptr<ShaderProgram> shaderProgram = std::unique_ptr<ShaderProgram>(nullptr);
 
 	std::unique_ptr<GLTmxRenderer> renderer = std::unique_ptr<GLTmxRenderer>(nullptr);

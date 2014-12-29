@@ -1,5 +1,5 @@
 /*
- * VertexBuffer.hpp
+ * Buffer.hpp
  * Copyright (C) 2014 Ashley Davis (SgtCoDFish)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,8 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef VERTEXBUFFER_HPP_
-#define VERTEXBUFFER_HPP_
+#ifndef APG__BUFFER_HPP_
+#define APG__BUFFER_HPP_
 
 #include <cstdint>
 
@@ -48,26 +48,26 @@ enum DrawType {
 	DYNAMIC_DRAW = GL_DYNAMIC_DRAW, DYNAMIC_READ = GL_DYNAMIC_READ, DYNAMIC_COPY = GL_DYNAMIC_COPY,
 };
 
-class VertexBuffer : public ErrorBase {
+class Buffer : public ErrorBase {
 private:
-	uint32_t vboID;
+	uint32_t bufferID;
 
 	const BufferType bufferType;
 	DrawType drawType;
 
-	float *vertices = nullptr;
+	float *data = nullptr;
 	uint64_t elementCount = 0;
 
 	void generateID();
 
 public:
-	VertexBuffer(BufferType bufferType, DrawType drawType) :
-			VertexBuffer { bufferType, drawType, nullptr, 0 } {
+	Buffer(BufferType bufferType, DrawType drawType) :
+			Buffer { bufferType, drawType, nullptr, 0 } {
 	}
 
-	VertexBuffer(BufferType bufferType, DrawType drawType, float * const vertices,
+	Buffer(BufferType bufferType, DrawType drawType, float * const data,
 			uint64_t elementCount);
-	~VertexBuffer();
+	~Buffer();
 
 	void bind() const;
 	void upload();
@@ -81,17 +81,17 @@ public:
 		return drawType;
 	}
 
-	void setVertices(float * const vertices, uint64_t elementCount) {
-		this->vertices = vertices;
+	void setData(float * const data, uint64_t elementCount) {
+		this->data = data;
 		this->elementCount = elementCount;
 	}
 
-	VertexBuffer(VertexBuffer &other) = delete;
-	VertexBuffer(const VertexBuffer &other) = delete;
-	VertexBuffer &operator=(VertexBuffer &other) = delete;
-	VertexBuffer &operator=(const VertexBuffer &other) = delete;
+	Buffer(Buffer &other) = delete;
+	Buffer(const Buffer &other) = delete;
+	Buffer &operator=(Buffer &other) = delete;
+	Buffer &operator=(const Buffer &other) = delete;
 };
 
 }
 
-#endif /* VERTEXBUFFER_HPP_ */
+#endif /* APG__BUFFER_HPP_ */
