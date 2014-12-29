@@ -31,6 +31,7 @@
 #include "ShaderProgram.hpp"
 #include "GLTmxRenderer.hpp"
 #include "VertexBuffer.hpp"
+#include "VAO.hpp"
 
 #include "TmxMap.h"
 
@@ -42,9 +43,11 @@ private:
 	static const char *fragmentShaderFilename;
 	APG::map_ptr map;
 
-	std::unique_ptr<GLTmxRenderer> renderer = std::unique_ptr<GLTmxRenderer>(nullptr);
-	std::unique_ptr<ShaderProgram> shaderProgram = std::unique_ptr<ShaderProgram>(nullptr);
+	std::unique_ptr<VAO> vao = std::unique_ptr<VAO>(nullptr);
 	std::unique_ptr<VertexBuffer> vertexBuffer = std::unique_ptr<VertexBuffer>(nullptr);
+	std::unique_ptr<ShaderProgram> shaderProgram = std::unique_ptr<ShaderProgram>(nullptr);
+
+	std::unique_ptr<GLTmxRenderer> renderer = std::unique_ptr<GLTmxRenderer>(nullptr);
 public:
 	APGGLRenderTest() : SDLGame("APGGLRenderTest", 1280, 720, 3, 2) {}
 	virtual ~APGGLRenderTest() = default;

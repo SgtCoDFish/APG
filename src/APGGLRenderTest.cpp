@@ -39,11 +39,10 @@
 const char *APG::APGGLRenderTest::vertexShaderFilename = "pass_vertex.glslv";
 const char * APG::APGGLRenderTest::fragmentShaderFilename = "red_frag.glslf";
 
-GLfloat vertices[] = { 0.0f, 0.5f, 1.0f, 0.0f, 0.0f, // Vertex 1: Red
-		0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // Vertex 2: Green
-		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f  // Vertex 3: Blue
+GLfloat vertices[] = { 0.0f, 0.5f, 1.0f, 0.0f, 0.0f, // Vertex 1
+		0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // Vertex 2
+		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f // Vertex 3
 		};
-GLuint vao;
 
 bool APG::APGGLRenderTest::init() {
 	if (hasError()) {
@@ -51,8 +50,8 @@ bool APG::APGGLRenderTest::init() {
 		return false;
 	}
 
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	vao = std::make_unique<VAO>();
+	vao->bind();
 
 	vertexBuffer = std::make_unique<VertexBuffer>(APG::BufferType::ARRAY,
 			APG::DrawType::STATIC_DRAW, vertices, 15);
@@ -138,8 +137,6 @@ int main(int argc, char *argv[]) {
 			timesTaken.clear();
 		}
 	}
-
-	glDeleteVertexArrays(1, &vao);
 
 	return EXIT_SUCCESS;
 }
