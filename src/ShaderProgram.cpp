@@ -17,9 +17,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <string>
 #include <sstream>
 #include <fstream>
+#include <string>
+#include <vector>
 #include <new>
 
 #include <GL/glew.h>
@@ -62,8 +63,8 @@ void APG::ShaderProgram::use() {
 
 void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, int32_t valueCount,
 		int32_t stride, GLvoid *offset, bool normalize) {
-	use();
-	auto attributeLocation = glGetAttribLocation(shaderProgram, attributeName);
+	use(); // TODO: Is this needed?
+	const auto attributeLocation = glGetAttribLocation(shaderProgram, attributeName);
 
 	if (glGetError() != GL_NO_ERROR) {
 		setErrorState("Couldn't get attribute location.");
@@ -81,6 +82,43 @@ void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, int
 		const char *errStr = (const char *) gluErrorString(error);
 		ss << "Error while setting float attribute \"" << attributeName << "\":\n" << errStr;
 		setErrorState(ss.str());
+		return;
+	}
+}
+
+void APG::ShaderProgram::setUniformf(const char * const uniformName,
+		std::initializer_list<float> vals) {
+	use(); // TODO: Is this needed?
+
+	const auto paramCount = vals.size();
+
+	std::vector<float> vec;
+
+	for (const auto &f : vals) {
+		vec.emplace_back(f);
+	}
+
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+
+	switch (paramCount) {
+	case 1:
+		glUniform1f(uniLoc, vec[0]);
+		break;
+
+	case 2:
+		glUniform2f(uniLoc, vec[0], vec[1]);
+		break;
+
+	case 3:
+		glUniform3f(uniLoc, vec[0], vec[1], vec[2]);
+		break;
+
+	case 4:
+		glUniform4f(uniLoc, vec[0], vec[1], vec[2], vec[3]);
+		break;
+
+	default:
+		setErrorState("Call to setUniformf with invalid number of values.");
 		return;
 	}
 }

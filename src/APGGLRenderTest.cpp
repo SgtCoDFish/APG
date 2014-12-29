@@ -73,6 +73,7 @@ bool APG::APGGLRenderTest::init() {
 	}
 
 	shaderProgram->setFloatAttribute("position", 2, 0, nullptr, false);
+	shaderProgram->setUniformf("triangleColor", {1.0f, 1.0f, 0.0f});
 
 	if (shaderProgram->hasError()) {
 		std::cerr << "Couldn't setup attributes:\n" << shaderProgram->getErrorMessage()

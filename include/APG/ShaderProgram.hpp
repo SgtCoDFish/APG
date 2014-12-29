@@ -47,9 +47,16 @@ public:
 
 	void use();
 
-	void setFloatAttribute(const char * const attributeName, int32_t valueCount, int32_t stride, GLvoid *offset, bool normalize = false);
-	void setFloatAttribute(const std::string &attributeName, int32_t valueCount, int32_t stride, GLvoid *offset, bool normalize = false) {
+	void setFloatAttribute(const char * const attributeName, int32_t valueCount, int32_t stride,
+			GLvoid *offset, bool normalize = false);
+	void setFloatAttribute(const std::string &attributeName, int32_t valueCount, int32_t stride,
+			GLvoid *offset, bool normalize = false) {
 		setFloatAttribute(attributeName.c_str(), valueCount, stride, offset, normalize);
+	}
+
+	void setUniformf(const char * const uniformName, std::initializer_list<float> vals);
+	void setUniformf(const std::string &uniformName, std::initializer_list<float> vals) {
+		setUniformf(uniformName.c_str(), vals);
 	}
 
 	uint32_t getProgramID() const {
