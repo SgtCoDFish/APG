@@ -22,7 +22,11 @@
 
 #include <cstdint>
 
+#include <sstream>
+#include <string>
+
 #include <GL/glew.h>
+#include <GL/glu.h>
 
 #include "ErrorBase.hpp"
 
@@ -48,30 +52,68 @@ enum DrawType {
 	DYNAMIC_DRAW = GL_DYNAMIC_DRAW, DYNAMIC_READ = GL_DYNAMIC_READ, DYNAMIC_COPY = GL_DYNAMIC_COPY,
 };
 
-class Buffer : public ErrorBase {
+template<typename T = float, int glType = GL_FLOAT> class Buffer : public ErrorBase {
 private:
 	uint32_t bufferID;
 
 	const BufferType bufferType;
 	DrawType drawType;
 
-	float *data = nullptr;
+	T *data = nullptr;
 	uint64_t elementCount = 0;
 
-	void generateID();
+	void generateID() {
+		glGenBuffers(1, &bufferID);
+	}
 
 public:
 	Buffer(BufferType bufferType, DrawType drawType) :
 			Buffer { bufferType, drawType, nullptr, 0 } {
 	}
 
-	Buffer(BufferType bufferType, DrawType drawType, float * const data,
-			uint64_t elementCount);
-	~Buffer();
+	Buffer(BufferType bufferType, DrawType drawType, T * const data, uint64_t elementCount) :
+			bufferType { bufferType }, drawType { drawType } {
+		generateID();
+		bind();
 
-	void bind() const;
-	void upload();
-	void setDrawType(DrawType drawType);
+		if (data != nullptr) {
+			setData(data, elementCount);
+			upload();
+		}
+	}
+
+	~Buffer() {
+		glDeleteBuffers(1, &bufferID);
+	}
+
+	void bind() const {
+		glBindBuffer(bufferType, bufferID);
+	}
+
+	void upload() {
+		if (!hasError() && data != nullptr && elementCount > 0) {
+			bind();
+			glBufferData(bufferType, elementCount * sizeof(T), data, drawType);
+
+			GLenum glError = glGetError();
+			if (glError != GL_NO_ERROR) {
+				if (glError == GL_OUT_OF_MEMORY) {
+					setErrorState("Ran out of memory trying to upload vertex data.");
+					return;
+				} else {
+					std::stringstream ss;
+					ss << "OpenGL error:\n" << gluErrorString(glError);
+					setErrorState(ss.str());
+					return;
+				}
+			}
+		}
+	}
+
+	void setDrawType(DrawType drawType) {
+		this->drawType = drawType;
+		upload();
+	}
 
 	const BufferType &getBufferType() const {
 		return bufferType;
@@ -81,9 +123,13 @@ public:
 		return drawType;
 	}
 
-	void setData(float * const data, uint64_t elementCount) {
+	void setData(T * const data, uint64_t elementCount) {
 		this->data = data;
 		this->elementCount = elementCount;
+	}
+
+	int getGLType() const {
+		return glType;
 	}
 
 	Buffer(Buffer &other) = delete;

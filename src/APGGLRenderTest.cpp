@@ -44,6 +44,8 @@ GLfloat vertices[] = { 0.0f, 0.5f, 1.0f, 0.0f, 0.0f, // Vertex 1
 		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f // Vertex 3
 		};
 
+GLuint elements[] = { 0, 1, 2 };
+
 bool APG::APGGLRenderTest::init() {
 	if (hasError()) {
 		std::cerr << "Failed to initialise APGGLRenderTest.\n";
@@ -53,8 +55,8 @@ bool APG::APGGLRenderTest::init() {
 	vao = std::make_unique<VAO>();
 	vao->bind();
 
-	vertexBuffer = std::make_unique<Buffer>(APG::BufferType::ARRAY,
-			APG::DrawType::STATIC_DRAW, vertices, 15);
+	vertexBuffer = std::make_unique<Buffer<float, GL_FLOAT>>(APG::BufferType::ARRAY, APG::DrawType::STATIC_DRAW,
+			vertices, 15);
 
 	if (vertexBuffer->hasError()) {
 		std::cerr << "Error initialising vertex buffer: " << vertexBuffer->getErrorMessage()
@@ -63,6 +65,9 @@ bool APG::APGGLRenderTest::init() {
 	}
 
 	vertexBuffer->bind();
+
+	elementBuffer = std::make_unique<Buffer<uint32_t, GL_UNSIGNED_INT>>(APG::BufferType::ELEMENT_ARRAY,
+			APG::DrawType::STATIC_DRAW, elements, 3);
 
 	shaderProgram = std::make_unique<ShaderProgram>(vertexShaderFilename, fragmentShaderFilename);
 
@@ -97,7 +102,7 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawElements(GL_TRIANGLES, 3, elementBuffer->getGLType(), 0);
 
 	SDL_GL_SwapWindow(window.get());
 }
