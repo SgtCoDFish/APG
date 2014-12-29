@@ -24,6 +24,8 @@
 
 #include <string>
 
+#include <glm/glm.hpp>
+
 #include "ErrorBase.hpp"
 
 namespace APG {
@@ -47,17 +49,14 @@ public:
 
 	void use();
 
-	void setFloatAttribute(const char * const attributeName, int32_t valueCount, int32_t stride,
-			GLvoid *offset, bool normalize = false);
-	void setFloatAttribute(const std::string &attributeName, int32_t valueCount, int32_t stride,
-			GLvoid *offset, bool normalize = false) {
-		setFloatAttribute(attributeName.c_str(), valueCount, stride, offset, normalize);
-	}
+	void setFloatAttribute(const char * const attributeName, int32_t valueCount,
+			int32_t strideInElements, int32_t offsetInElements, bool normalize = false);
 
 	void setUniformf(const char * const uniformName, std::initializer_list<float> vals);
-	void setUniformf(const std::string &uniformName, std::initializer_list<float> vals) {
-		setUniformf(uniformName.c_str(), vals);
-	}
+	void setUniformf(const char * const uniformName, float val);
+	void setUniformf(const char * const uniformName, glm::vec2 vals);
+	void setUniformf(const char * const uniformName, glm::vec3 vals);
+	void setUniformf(const char * const uniformName, glm::vec4 vals);
 
 	uint32_t getProgramID() const {
 		return shaderProgram;
@@ -70,6 +69,15 @@ public:
 	std::string getLinkInfoLog() const {
 		return linkInfoLog;
 	}
+	/*
+	 void setFloatAttribute(const std::string &attributeName, int32_t valueCount, int32_t stride,
+	 GLvoid *offset, bool normalize = false) {
+	 setFloatAttribute(attributeName.c_str(), valueCount, stride, offset, normalize);
+	 }
+	 void setUniformf(const std::string &uniformName, std::initializer_list<float> vals) {
+	 setUniformf(uniformName.c_str(), vals);
+	 }
+	 */
 };
 
 }

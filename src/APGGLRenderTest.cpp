@@ -39,7 +39,10 @@
 const char *APG::APGGLRenderTest::vertexShaderFilename = "pass_vertex.glslv";
 const char * APG::APGGLRenderTest::fragmentShaderFilename = "red_frag.glslf";
 
-GLfloat vertices[] = { 0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f };
+GLfloat vertices[] = { 0.0f, 0.5f, 1.0f, 0.0f, 0.0f, // Vertex 1: Red
+		0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // Vertex 2: Green
+		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f  // Vertex 3: Blue
+		};
 GLuint vao;
 
 bool APG::APGGLRenderTest::init() {
@@ -52,7 +55,7 @@ bool APG::APGGLRenderTest::init() {
 	glBindVertexArray(vao);
 
 	vertexBuffer = std::make_unique<VertexBuffer>(APG::BufferType::ARRAY,
-			APG::DrawType::STATIC_DRAW, vertices, 6);
+			APG::DrawType::STATIC_DRAW, vertices, 15);
 
 	if (vertexBuffer->hasError()) {
 		std::cerr << "Error initialising vertex buffer: " << vertexBuffer->getErrorMessage()
@@ -72,8 +75,8 @@ bool APG::APGGLRenderTest::init() {
 		return false;
 	}
 
-	shaderProgram->setFloatAttribute("position", 2, 0, nullptr, false);
-	shaderProgram->setUniformf("triangleColor", {1.0f, 1.0f, 0.0f});
+	shaderProgram->setFloatAttribute("position", 2, 5, 0, false);
+	shaderProgram->setFloatAttribute("color", 3, 5, 2, false);
 
 	if (shaderProgram->hasError()) {
 		std::cerr << "Couldn't setup attributes:\n" << shaderProgram->getErrorMessage()
@@ -92,7 +95,7 @@ bool APG::APGGLRenderTest::init() {
 }
 
 void APG::APGGLRenderTest::render(float deltaTime) {
-	glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -102,6 +105,7 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 
 #ifndef APG_TEST_SDL
 int main(int argc, char *argv[]) {
+	std::cout << "sizeof(float): " << sizeof(float) << std::endl;
 	APG::SDLGame::sdlWindowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 	auto game = std::make_unique<APG::APGGLRenderTest>();
 

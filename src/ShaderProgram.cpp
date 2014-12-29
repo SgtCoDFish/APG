@@ -27,6 +27,8 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#include <glm/glm.hpp>
+
 #include "ShaderProgram.hpp"
 #include "ErrorBase.hpp"
 
@@ -62,18 +64,17 @@ void APG::ShaderProgram::use() {
 }
 
 void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, int32_t valueCount,
-		int32_t stride, GLvoid *offset, bool normalize) {
-	use(); // TODO: Is this needed?
+		int32_t strideInElements, int32_t offsetInElements, bool normalize) {
 	const auto attributeLocation = glGetAttribLocation(shaderProgram, attributeName);
 
-	if (glGetError() != GL_NO_ERROR) {
-		setErrorState("Couldn't get attribute location.");
+	if (attributeLocation == -1 || glGetError() != GL_NO_ERROR) {
+		setErrorState(std::string("Couldn't get attribute location: ") + attributeName);
 		return;
 	}
 
 	glEnableVertexAttribArray(attributeLocation);
 	glVertexAttribPointer(attributeLocation, valueCount, GL_FLOAT, (normalize ? GL_TRUE : GL_FALSE),
-			stride, offset);
+			strideInElements * sizeof(float), (void *) (sizeof(float) * offsetInElements));
 
 	const auto error = glGetError();
 
@@ -88,8 +89,6 @@ void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, int
 
 void APG::ShaderProgram::setUniformf(const char * const uniformName,
 		std::initializer_list<float> vals) {
-	use(); // TODO: Is this needed?
-
 	const auto paramCount = vals.size();
 
 	std::vector<float> vec;
@@ -123,6 +122,26 @@ void APG::ShaderProgram::setUniformf(const char * const uniformName,
 	}
 }
 
+void APG::ShaderProgram::setUniformf(const char * const uniformName, float val) {
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniform1f(uniLoc, val);
+}
+
+void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::vec2 vals) {
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniform2f(uniLoc, vals.x, vals.y);
+}
+
+void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::vec3 vals) {
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniform3f(uniLoc, vals.x, vals.y, vals.z);
+}
+
+void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::vec4 vals) {
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniform4f(uniLoc, vals.x, vals.y, vals.z, vals.w);
+}
+
 void APG::ShaderProgram::loadShader(const std::string &shaderFilename, uint32_t type) {
 	uint32_t *source = validateTypeAndGet(type);
 
@@ -147,7 +166,8 @@ void APG::ShaderProgram::loadShader(const std::string &shaderFilename, uint32_t 
 
 	*source = glCreateShader(type);
 
-	const char *csource = ss.str().c_str();
+	const auto loadStr_ = ss.str();
+	const char *csource = loadStr_.c_str();
 	glShaderSource(*source, 1, &csource, nullptr);
 	glCompileShader(*source);
 

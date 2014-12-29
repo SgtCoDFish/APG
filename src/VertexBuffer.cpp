@@ -28,13 +28,13 @@
 #include "VertexBuffer.hpp"
 
 APG::VertexBuffer::VertexBuffer(BufferType bufferType, DrawType drawType, float * const vertices,
-		uint64_t vertexCount) :
-		bufferType { bufferType }, drawType { drawType }, vertices { vertices }, vertexCount {
-				vertexCount } {
+		uint64_t elementCount) :
+		bufferType { bufferType }, drawType { drawType } {
 	generateID();
 	bind();
 
 	if (vertices != nullptr) {
+		setVertices(vertices, elementCount);
 		upload();
 	}
 }
@@ -52,9 +52,9 @@ void APG::VertexBuffer::bind() const {
 }
 
 void APG::VertexBuffer::upload() {
-	if (!hasError() && vertices != nullptr && vertexCount > 0) {
+	if (!hasError() && vertices != nullptr && elementCount > 0) {
 		bind();
-		glBufferData(bufferType, vertexCount * sizeof(float), vertices, drawType);
+		glBufferData(bufferType, elementCount * sizeof(float), vertices, drawType);
 
 		GLenum glError = glGetError();
 		if (glError != GL_NO_ERROR) {

@@ -56,7 +56,7 @@ private:
 	DrawType drawType;
 
 	float *vertices = nullptr;
-	uint64_t vertexCount = 0;
+	uint64_t elementCount = 0;
 
 	void generateID();
 
@@ -66,7 +66,7 @@ public:
 	}
 
 	VertexBuffer(BufferType bufferType, DrawType drawType, float * const vertices,
-			uint64_t vertexCount);
+			uint64_t elementCount);
 	~VertexBuffer();
 
 	void bind() const;
@@ -81,9 +81,9 @@ public:
 		return drawType;
 	}
 
-	void setVertices(float * const vertices, uint64_t vertexCount) {
+	void setVertices(float * const vertices, uint64_t elementCount) {
 		this->vertices = vertices;
-		this->vertexCount = vertexCount;
+		this->elementCount = elementCount;
 	}
 
 	VertexBuffer(VertexBuffer &other) = delete;
