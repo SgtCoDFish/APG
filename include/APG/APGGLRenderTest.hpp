@@ -32,6 +32,7 @@
 #include "GLTmxRenderer.hpp"
 #include "Buffer.hpp"
 #include "VAO.hpp"
+#include "Texture.hpp"
 
 #include "TmxMap.h"
 
@@ -48,6 +49,8 @@ private:
 	std::unique_ptr<Buffer<uint32_t, GL_UNSIGNED_INT>> elementBuffer = std::unique_ptr<Buffer<uint32_t, GL_UNSIGNED_INT>>(nullptr);
 	std::unique_ptr<ShaderProgram> shaderProgram = std::unique_ptr<ShaderProgram>(nullptr);
 
+	std::unique_ptr<Texture> texture = std::unique_ptr<Texture>(nullptr);
+
 	std::unique_ptr<GLTmxRenderer> renderer = std::unique_ptr<GLTmxRenderer>(nullptr);
 public:
 	APGGLRenderTest() : SDLGame("APGGLRenderTest", 1280, 720, 3, 2) {}
@@ -58,6 +61,10 @@ public:
 
 	const Tmx::Map *getMap() const {
 		return map.get();
+	}
+
+	SDL_Window *getWindow() const {
+		return window.get();
 	}
 };
 

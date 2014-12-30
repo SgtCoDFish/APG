@@ -35,18 +35,18 @@
 #include "APGCommon.hpp"
 #include "SXXDL.hpp"
 #include "Buffer.hpp"
+#include "Texture.hpp"
 
 const char *APG::APGGLRenderTest::vertexShaderFilename = "pass_vertex.glslv";
 const char * APG::APGGLRenderTest::fragmentShaderFilename = "red_frag.glslf";
 
-GLfloat vertices[] = {
-		-0.5f, 0.5f, 1.0f, 0.0f, 0.0f, // Vertex 0
-		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // Vertex 1
-		0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // Vertex 2
-		0.5f, 0.5f, 1.0f, 1.0f, 1.0f, // Vertex 3
+GLfloat vertices[] = { -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // Top-left
+		0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Top-right
+		0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // Bottom-right
+		-0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f  // Bottom-left
 		};
 
-GLuint elements[] = { 0, 1, 2, 0, 3, 2 };
+GLuint elements[] = { 0, 1, 2, 2, 3, 0 };
 
 bool APG::APGGLRenderTest::init() {
 	if (hasError()) {
@@ -58,7 +58,7 @@ bool APG::APGGLRenderTest::init() {
 	vao->bind();
 
 	vertexBuffer = std::make_unique<Buffer<>>(APG::BufferType::ARRAY, APG::DrawType::STATIC_DRAW,
-			vertices, 20);
+			vertices, 28);
 
 	if (vertexBuffer->hasError()) {
 		std::cerr << "Error initialising vertex buffer: " << vertexBuffer->getErrorMessage()
@@ -81,14 +81,27 @@ bool APG::APGGLRenderTest::init() {
 		return false;
 	}
 
-	shaderProgram->setFloatAttribute("position", 2, 5, 0, false);
-	shaderProgram->setFloatAttribute("color", 3, 5, 2, false);
+	shaderProgram->setFloatAttribute("position", 2, 7, 0, false);
+	shaderProgram->setFloatAttribute("color", 3, 7, 2, false);
+	shaderProgram->setFloatAttribute("texcoord", 2, 7, 5, false);
 
 	if (shaderProgram->hasError()) {
 		std::cerr << "Couldn't setup attributes:\n" << shaderProgram->getErrorMessage()
 				<< std::endl;
 		return false;
 	}
+
+	texture = std::make_unique<Texture>("assets/world1tileset.png");
+
+	if (texture->hasError()) {
+		std::cerr << "Couldn't load texture:\n" << texture->getErrorMessage() << std::endl;
+
+		return false;
+	}
+
+	texture->setFilter(TextureFilterType::LINEAR, TextureFilterType::LINEAR);
+	texture->setWrapType(TextureWrapType::CLAMP_TO_EDGE, TextureWrapType::CLAMP_TO_EDGE);
+	texture->bind();
 
 	renderer = std::make_unique<GLTmxRenderer>();
 
@@ -113,10 +126,6 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 int main(int argc, char *argv[]) {
 	APG::SDLGame::sdlWindowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 	auto game = std::make_unique<APG::APGGLRenderTest>();
-
-	if (!game->init()) {
-		return EXIT_FAILURE;
-	}
 
 	bool done = false;
 

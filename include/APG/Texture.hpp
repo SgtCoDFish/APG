@@ -54,18 +54,25 @@ private:
 	void generateTextureID();
 	void loadTexture(const std::string &fileName);
 
+	uint32_t tempBindID = 0;
+	void tempBind();
+	void rebind();
+
 public:
-	Texture(const char * const fileName) : Texture(std::string(fileName)) {}
+	Texture(const char * const fileName) :
+			Texture(std::string(fileName)) {
+	}
+
 	Texture(const std::string &fileName);
 	~Texture();
 
 	void bind() const;
 
-	void setWrapType(TextureWrapType sWrap, TextureWrapType tWrap) const;
-	void setColor(glm::vec4 &color) const;
-	void setFilter(TextureFilterType minFilter, TextureFilterType magFilter) const;
+	void setWrapType(TextureWrapType sWrap, TextureWrapType tWrap);
+	void setColor(glm::vec4 &color);
+	void setFilter(TextureFilterType minFilter, TextureFilterType magFilter);
 
-	void generateMipMaps() const;
+	void generateMipMaps();
 };
 
 }
