@@ -127,6 +127,10 @@ int main(int argc, char *argv[]) {
 	APG::SDLGame::sdlWindowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 	auto game = std::make_unique<APG::APGGLRenderTest>();
 
+	if (!game->init()) {
+		return EXIT_FAILURE;
+	}
+
 	bool done = false;
 
 	auto startTime = std::chrono::high_resolution_clock::now();

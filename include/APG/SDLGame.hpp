@@ -67,7 +67,7 @@ public:
 		return window.get();
 	}
 
-	SDL_GLContext &getGLContext() const {
+	SDL_GLContext getGLContext() const {
 		return glContext;
 	}
 
