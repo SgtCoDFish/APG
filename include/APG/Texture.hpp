@@ -59,11 +59,11 @@ private:
 	void rebind();
 
 public:
-	Texture(const char * const fileName) :
+	explicit Texture(const char * const fileName) :
 			Texture(std::string(fileName)) {
 	}
 
-	Texture(const std::string &fileName);
+	explicit Texture(const std::string &fileName);
 	~Texture();
 
 	void bind() const;

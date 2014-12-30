@@ -52,10 +52,6 @@ private:
 	std::vector<tileset_ptr> tilesets;
 
 public:
-	// disallow copying because we own resources.
-	SDLTmxRenderer(SDLTmxRenderer &other) = delete;
-	SDLTmxRenderer(const SDLTmxRenderer &other) = delete;
-
 	SDLTmxRenderer(map_ptr &map, SXXDL::renderer_ptr &renderer);
 
 	/**
@@ -70,6 +66,10 @@ public:
 	void setPosition(glm::vec2 &position) {
 		this->position = position;
 	}
+
+	// disallow copying because we own resources.
+	SDLTmxRenderer(SDLTmxRenderer &other) = delete;
+	SDLTmxRenderer(const SDLTmxRenderer &other) = delete;
 };
 
 }
