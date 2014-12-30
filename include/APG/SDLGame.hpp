@@ -63,6 +63,18 @@ public:
 	bool update(float deltaTime) override;
 	void quit();
 
+	SDL_Window *getWindow() const {
+		return window.get();
+	}
+
+	SDL_GLContext &getGLContext() const {
+		return glContext;
+	}
+
+	std::string getWindowTitle() const {
+		return windowTitle;
+	}
+
 	static uint32_t sdlInitFlags;
 	static uint32_t sdlImageInitFlags;
 	static uint32_t sdlWindowFlags;

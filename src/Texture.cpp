@@ -146,7 +146,10 @@ void APG::Texture::setFilter(TextureFilterType minFilter, TextureFilterType magF
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
 
-	if(magFilter == TextureFilterType::LINEAR_MIPMAP_LINEAR || magFilter == TextureFilterType::NEAREST_MIPMAP_LINEAR || magFilter == TextureFilterType::LINEAR_MIPMAP_NEAREST || magFilter == TextureFilterType::NEAREST_MIPMAP_NEAREST) {
+	if (magFilter == TextureFilterType::LINEAR_MIPMAP_LINEAR
+			|| magFilter == TextureFilterType::NEAREST_MIPMAP_LINEAR
+			|| magFilter == TextureFilterType::LINEAR_MIPMAP_NEAREST
+			|| magFilter == TextureFilterType::NEAREST_MIPMAP_NEAREST) {
 		setErrorState("Can't set mipmap filter for mag filter.");
 	}
 

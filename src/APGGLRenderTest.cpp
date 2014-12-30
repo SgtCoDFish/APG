@@ -131,6 +131,7 @@ int main(int argc, char *argv[]) {
 
 	auto startTime = std::chrono::high_resolution_clock::now();
 	std::vector<float> timesTaken;
+
 	while (!done) {
 		auto timeNow = std::chrono::high_resolution_clock::now();
 		float deltaTime =
