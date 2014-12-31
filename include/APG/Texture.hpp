@@ -22,6 +22,7 @@
 
 #include <cstdint>
 
+#include <atomic>
 #include <string>
 
 #include <GL/glew.h>
@@ -47,14 +48,22 @@ enum TextureFilterType {
 	LINEAR_MIPMAP_LINEAR = GL_LINEAR_MIPMAP_LINEAR,
 };
 
+class ShaderProgram;
+
 class Texture : public ErrorBase {
 private:
-	uint32_t textureID;
+	static uint32_t TEXTURE_TARGETS[];
+	static std::atomic<uint32_t> availableTextureUnit;
+
+	uint32_t textureID = 0;
+	uint32_t textureUnit = 0;
+	uint32_t glTextureID = 0;
 
 	void generateTextureID();
 	void loadTexture(const std::string &fileName);
 
-	uint32_t tempBindID = 0;
+	int32_t tempBindID = 0;
+	int32_t tempUnit = 0;
 	void tempBind();
 	void rebind();
 
@@ -73,6 +82,11 @@ public:
 	void setFilter(TextureFilterType minFilter, TextureFilterType magFilter);
 
 	void generateMipMaps();
+
+	void attachToShader(const char * const uniformName, ShaderProgram * const program) const;
+	void attachToShader(const std::string &uniformName, ShaderProgram * const program) const {
+		attachToShader(uniformName.c_str(), program);
+	}
 };
 
 }

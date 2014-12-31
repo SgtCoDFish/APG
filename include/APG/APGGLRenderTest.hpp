@@ -52,7 +52,8 @@ private:
 
 	std::unique_ptr<ShaderProgram> shaderProgram = std::unique_ptr<ShaderProgram>(nullptr);
 
-	std::unique_ptr<Texture> texture = std::unique_ptr<Texture>(nullptr);
+	std::unique_ptr<Texture> texture1 = std::unique_ptr<Texture>(nullptr);
+	std::unique_ptr<Texture> texture2 = std::unique_ptr<Texture>(nullptr);
 
 	std::unique_ptr<GLTmxRenderer> renderer = std::unique_ptr<GLTmxRenderer>(nullptr);
 public:

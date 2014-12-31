@@ -142,6 +142,61 @@ void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::vec4 v
 	glUniform4f(uniLoc, vals.x, vals.y, vals.z, vals.w);
 }
 
+void APG::ShaderProgram::setUniformi(const char * const uniformName,
+		std::initializer_list<int32_t> vals) {
+	const auto paramCount = vals.size();
+
+	std::vector<int32_t> vec;
+
+	for (const auto &f : vals) {
+		vec.emplace_back(f);
+	}
+
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+
+	switch (paramCount) {
+	case 1:
+		glUniform1i(uniLoc, vec[0]);
+		break;
+
+	case 2:
+		glUniform2i(uniLoc, vec[0], vec[1]);
+		break;
+
+	case 3:
+		glUniform3i(uniLoc, vec[0], vec[1], vec[2]);
+		break;
+
+	case 4:
+		glUniform4i(uniLoc, vec[0], vec[1], vec[2], vec[3]);
+		break;
+
+	default:
+		setErrorState("Call to setUniformf with invalid number of values.");
+		return;
+	}
+}
+
+void APG::ShaderProgram::setUniformi(const char * const uniformName, int32_t val) {
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniform1i(uniLoc, val);
+}
+
+void APG::ShaderProgram::setUniformi(const char * const uniformName, glm::ivec2 vals) {
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniform2i(uniLoc, vals.x, vals.y);
+}
+
+void APG::ShaderProgram::setUniformi(const char * const uniformName, glm::ivec3 vals) {
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniform3i(uniLoc, vals.x, vals.y, vals.z);
+}
+
+void APG::ShaderProgram::setUniformi(const char * const uniformName, glm::ivec4 vals) {
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniform4i(uniLoc, vals.x, vals.y, vals.z, vals.w);
+}
+
 void APG::ShaderProgram::loadShader(const std::string &shaderFilename, uint32_t type) {
 	uint32_t *source = validateTypeAndGet(type);
 

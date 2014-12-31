@@ -19,8 +19,11 @@
 
 #include <cstdint>
 
+#include <atomic>
 #include <string>
 #include <sstream>
+
+#include <iostream>
 
 #include <GL/glew.h>
 #include <GL/gl.h>
@@ -32,8 +35,20 @@
 
 #include "Texture.hpp"
 #include "SXXDL.hpp"
+#include "ShaderProgram.hpp"
+
+std::atomic<uint32_t> APG::Texture::availableTextureUnit(0);
+uint32_t APG::Texture::TEXTURE_TARGETS[] = { GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2, GL_TEXTURE3,
+GL_TEXTURE4, GL_TEXTURE5, GL_TEXTURE6, GL_TEXTURE7, GL_TEXTURE8, GL_TEXTURE9,
+GL_TEXTURE10, GL_TEXTURE11, GL_TEXTURE12, GL_TEXTURE13, GL_TEXTURE14, GL_TEXTURE15,
+GL_TEXTURE16, GL_TEXTURE17, GL_TEXTURE18, GL_TEXTURE19, GL_TEXTURE20, GL_TEXTURE21,
+GL_TEXTURE22, GL_TEXTURE23, GL_TEXTURE24, GL_TEXTURE25, GL_TEXTURE26, GL_TEXTURE27,
+GL_TEXTURE28, GL_TEXTURE29, GL_TEXTURE30, GL_TEXTURE31 };
 
 APG::Texture::Texture(const std::string &fileName) {
+	textureUnit = availableTextureUnit++;
+	glTextureID = TEXTURE_TARGETS[textureUnit];
+
 	generateTextureID();
 	loadTexture(fileName);
 }
@@ -108,12 +123,15 @@ void APG::Texture::tempBind() {
 	// http://www.opengl.org/registry/specs/EXT/direct_state_access.txt
 
 	glGetIntegerv(GL_TEXTURE_BINDING_2D, (int32_t *) &tempBindID);
+	glGetIntegerv(GL_ACTIVE_TEXTURE, (int32_t *) &tempUnit);
+	glActiveTexture(glTextureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
 void APG::Texture::rebind() {
+	glActiveTexture(tempUnit);
 	glBindTexture(GL_TEXTURE_2D, tempBindID);
-	tempBindID = 0;
+	tempBindID = tempUnit = 0;
 }
 
 void APG::Texture::bind() const {
@@ -121,6 +139,7 @@ void APG::Texture::bind() const {
 		return;
 	}
 
+	glActiveTexture(glTextureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
@@ -164,4 +183,9 @@ void APG::Texture::generateMipMaps() {
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	rebind();
+}
+
+void APG::Texture::attachToShader(const char * const uniformName,
+		ShaderProgram * const program) const {
+	program->setUniformi(uniformName, textureUnit);
 }

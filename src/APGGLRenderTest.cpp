@@ -91,22 +91,42 @@ bool APG::APGGLRenderTest::init() {
 		return false;
 	}
 
-	texture = std::make_unique<Texture>("assets/world1tileset.png");
+	texture1 = std::make_unique<Texture>("assets/world1tileset.png");
 
-	if (texture->hasError()) {
-		std::cerr << "Couldn't load texture:\n" << texture->getErrorMessage() << std::endl;
+	if (texture1->hasError()) {
+		std::cerr << "Couldn't load texture:\n" << texture1->getErrorMessage() << std::endl;
 
 		return false;
 	}
 
-	texture->setFilter(TextureFilterType::LINEAR, TextureFilterType::LINEAR);
-	texture->setWrapType(TextureWrapType::CLAMP_TO_EDGE, TextureWrapType::CLAMP_TO_EDGE);
-	texture->bind();
+	texture1->setFilter(TextureFilterType::LINEAR, TextureFilterType::LINEAR);
+	texture1->setWrapType(TextureWrapType::CLAMP_TO_EDGE, TextureWrapType::CLAMP_TO_EDGE);
+
+	texture2 = std::make_unique<Texture>("assets/npctileset.png");
+
+	if (texture2->hasError()) {
+		std::cerr << "Couldn't load texture:\n" << texture2->getErrorMessage() << std::endl;
+
+		return false;
+	}
+
+	texture2->setFilter(TextureFilterType::LINEAR, TextureFilterType::LINEAR);
+	texture2->setWrapType(TextureWrapType::CLAMP_TO_EDGE, TextureWrapType::CLAMP_TO_EDGE);
+
+	texture1->attachToShader("tex1", shaderProgram.get());
+	texture2->attachToShader("tex2", shaderProgram.get());
+
+	texture1->bind();
 
 	renderer = std::make_unique<GLTmxRenderer>();
 
-	if (glGetError() != GL_NO_ERROR) {
-		std::cerr << "Error in gl.\n";
+	auto glError = glGetError();
+	if (glError != GL_NO_ERROR) {
+		while (glError != GL_NO_ERROR) {
+			std::cerr << "Error in gl: " << gluErrorString(glError) << std::endl;
+			glError = glGetError();
+		}
+
 		return false;
 	}
 
