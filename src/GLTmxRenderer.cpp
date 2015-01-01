@@ -1,5 +1,5 @@
 /*
- * GLTmxRenderer.hpp
+ * GLTmxRenderer.cpp
  * Copyright (C) 2014, 2015 Ashley Davis (SgtCoDFish)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,30 +17,16 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef GLTMXRENDERER_HPP_
-#define GLTMXRENDERER_HPP_
+#include "Tmx.h"
 
-#include "SpriteBatch.hpp"
-#include "TmxRenderer.hpp"
+#include <glm/vec2.hpp>
 
-namespace Tmx {
-class Layer;
+#include "GLTmxRenderer.hpp"
+
+APG::GLTmxRenderer::GLTmxRenderer(map_ptr &map, SpriteBatch &inBatch) :
+		TmxRenderer(map), batch(inBatch) {
 }
 
-namespace APG {
-
-class GLTmxRenderer : public TmxRenderer {
-private:
-	SpriteBatch &batch;
-
-public:
-	explicit GLTmxRenderer(map_ptr &map, SpriteBatch &batch);
-	virtual ~GLTmxRenderer() {
-	}
-
-	void renderLayer(Tmx::Layer *layer) override;
-};
+void APG::GLTmxRenderer::renderLayer(Tmx::Layer * const layer) {
 
 }
-
-#endif /* GLTMXRENDERER_HPP_ */
