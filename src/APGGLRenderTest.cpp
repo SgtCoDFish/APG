@@ -134,7 +134,7 @@ bool APG::APGGLRenderTest::init() {
 }
 
 void APG::APGGLRenderTest::render(float deltaTime) {
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.313725f, 0.674510f, 0.239216f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glDrawElements(GL_TRIANGLES, 6, elementBuffer->getGLType(), 0);
