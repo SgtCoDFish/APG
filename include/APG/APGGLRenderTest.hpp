@@ -1,6 +1,6 @@
 /*
  * APGGLRenderTest.hpp
- * Copyright (C) 2014 Ashley Davis (SgtCoDFish)
+ * Copyright (C) 2014, 2015 Ashley Davis (SgtCoDFish)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
