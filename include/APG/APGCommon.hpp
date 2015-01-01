@@ -27,7 +27,19 @@ class Map;
 }
 
 namespace APG {
+
 using map_ptr = std::unique_ptr<Tmx::Map>;
+
+struct Vertex {
+	float x;
+	float y;
+
+	float c;
+
+	float u;
+	float v;
+};
+
 }
 
 #endif /* RPGCOMMON_HPP_ */
