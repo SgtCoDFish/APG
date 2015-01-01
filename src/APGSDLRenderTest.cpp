@@ -54,7 +54,7 @@ bool APGSDLRenderTest::init() {
 		return false;
 	}
 
-	SDL_SetRenderDrawColor(renderer.get(), 0xFF, 0x00, 0x00, 0xFF);
+	SDL_SetRenderDrawColor(renderer.get(), 0x50, 0xAC, 0x3D, 0xFF);
 
 	map = std::make_unique<Tmx::Map>();
 	map->ParseFile(ASSET_PREFIX + "world1.tmx");
