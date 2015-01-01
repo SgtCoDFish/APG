@@ -75,7 +75,7 @@ void APG::SDLTmxRenderer::renderLayer(Tmx::Layer *layer) {
 				}
 
 				const int tileset_x = tile_id % current_tileset->getWidthInTiles();
-				const int tileset_y = tile_id / current_tileset->getHeightInTiles();
+				const int tileset_y = tile_id / current_tileset->getWidthInTiles();
 
 				src_rect.x = tileset_x * tile_width;
 				src_rect.y = tileset_y * tile_height;
