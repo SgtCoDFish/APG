@@ -27,8 +27,8 @@ SXXDL::surface_ptr SXXDL::make_surface_ptr(SDL_Surface *surface) {
 	return surface_ptr(surface, SDL_FreeSurface);
 }
 
-SXXDL::texture_ptr SXXDL::make_texture_ptr(SDL_Texture *texture) {
-	return texture_ptr(texture, SDL_DestroyTexture);
+SXXDL::sdl_texture_ptr SXXDL::make_sdl_texture_ptr(SDL_Texture *texture) {
+	return sdl_texture_ptr(texture, SDL_DestroyTexture);
 }
 
 SXXDL::renderer_ptr SXXDL::make_renderer_ptr(SDL_Renderer *renderer) {

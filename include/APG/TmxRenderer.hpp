@@ -1,5 +1,5 @@
 /*
- * SDLTmxRenderer.cpp
+ * TmxRenderer.hpp
  * Copyright (C) 2014, 2015 Ashley Davis (SgtCoDFish)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,15 +17,64 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef TMXRENDERER_HPP_
-#define TMXRENDERER_HPP_
+#ifndef GENTMXRENDERER_HPP_
+#define GENTMXRENDERER_HPP_
+
+#include <vector>
+
+#include "APGCommon.hpp"
+#include "ErrorBase.hpp"
+#include "Tileset.hpp"
+#include "SXXDL.hpp"
+
+#include <glm/vec2.hpp>
 
 namespace APG {
 
-class TmxRenderer {
+class TmxRenderer : public ErrorBase {
+protected:
+	map_ptr &map;
+	std::vector<tileset_ptr> tilesets;
 
+	glm::vec2 position { 0.0f, 0.0f };
+
+	void loadTilesets();
+
+public:
+	explicit TmxRenderer(map_ptr &map);
+
+	virtual ~TmxRenderer() {
+	}
+
+	virtual void renderLayer(Tmx::Layer *layer) = 0;
+	void renderAll();
+
+	const Tmx::Map *getMap() {
+		return map.get();
+	}
+
+	const glm::vec2 &getPosition() const {
+		return position;
+	}
+
+	void setPosition(glm::vec2 &position) {
+		this->position = position;
+	}
+
+	Tileset * const getTilesetByID(int32_t id) const {
+		try {
+			return tilesets[id].get();
+		} catch (std::out_of_range &oor) {
+			return nullptr;
+		}
+	}
+
+	TmxRenderer(TmxRenderer &other) = delete;
+	TmxRenderer(const TmxRenderer &other) = delete;
+	TmxRenderer &operator=(TmxRenderer &other) = delete;
+	TmxRenderer &operator=(const TmxRenderer &other) = delete;
 };
 
 }
 
-#endif /* TMXRENDERER_HPP_ */
+#endif /* GENTMXRENDERER_HPP_ */

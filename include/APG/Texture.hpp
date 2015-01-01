@@ -24,11 +24,13 @@
 
 #include <atomic>
 #include <string>
+#include <memory>
 
 #include <GL/glew.h>
 #include <glm/vec4.hpp>
 
 #include "ErrorBase.hpp"
+#include "SXXDL.hpp"
 
 namespace APG {
 
@@ -62,17 +64,26 @@ private:
 	void generateTextureID();
 	void loadTexture(const std::string &fileName);
 
+	int32_t width = 0;
+	int32_t height = 0;
+
+	float invWidth = 0.0f;
+	float invHeight = 0.0f;
+
+	bool preserveSurface = false;
+	SXXDL::surface_ptr preservedSurface = SXXDL::make_surface_ptr(nullptr);
+
 	int32_t tempBindID = 0;
 	int32_t tempUnit = 0;
 	void tempBind();
 	void rebind();
 
 public:
-	explicit Texture(const char * const fileName) :
-			Texture(std::string(fileName)) {
+	explicit Texture(const char * const fileName, bool preserveSurface = false) :
+			Texture(std::string(fileName), preserveSurface) {
 	}
 
-	explicit Texture(const std::string &fileName);
+	explicit Texture(const std::string &fileName, bool preserveSurface = false);
 	~Texture();
 
 	void bind() const;
@@ -87,7 +98,29 @@ public:
 	void attachToShader(const std::string &uniformName, ShaderProgram * const program) const {
 		attachToShader(uniformName.c_str(), program);
 	}
+
+	inline int32_t getWidth() const {
+		return width;
+	}
+
+	inline int32_t getHeight() const {
+		return height;
+	}
+
+	inline float getInvWidth() const {
+		return invWidth;
+	}
+
+	inline float getInvHeight() const {
+		return invHeight;
+	}
+
+	SDL_Surface *getPreservedSurface() const {
+		return (preserveSurface ? preservedSurface.get() : nullptr);
+	}
 };
+
+using texture_ptr = std::unique_ptr<Texture>;
 
 }
 

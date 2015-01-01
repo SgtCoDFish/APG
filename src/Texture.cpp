@@ -31,6 +31,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
 #include "Texture.hpp"
@@ -45,7 +46,7 @@ GL_TEXTURE16, GL_TEXTURE17, GL_TEXTURE18, GL_TEXTURE19, GL_TEXTURE20, GL_TEXTURE
 GL_TEXTURE22, GL_TEXTURE23, GL_TEXTURE24, GL_TEXTURE25, GL_TEXTURE26, GL_TEXTURE27,
 GL_TEXTURE28, GL_TEXTURE29, GL_TEXTURE30, GL_TEXTURE31 };
 
-APG::Texture::Texture(const std::string &fileName) {
+APG::Texture::Texture(const std::string &fileName, bool preserveSurface) : preserveSurface(preserveSurface) {
 	textureUnit = availableTextureUnit++;
 	glTextureID = TEXTURE_TARGETS[textureUnit];
 
@@ -114,6 +115,17 @@ void APG::Texture::loadTexture(const std::string &fileName) {
 		}
 
 		setErrorState(errStream.str());
+		return;
+	}
+
+	width = surface->w;
+	height = surface->h;
+
+	invWidth = 1.0f / width;
+	invHeight = 1.0f / height;
+
+	if(preserveSurface) {
+		preservedSurface = std::move(surface);
 	}
 }
 

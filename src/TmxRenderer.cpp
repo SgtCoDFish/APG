@@ -1,5 +1,5 @@
 /*
- * SDLTmxRenderer.hpp
+ * TmxRenderer.cpp
  * Copyright (C) 2014, 2015 Ashley Davis (SgtCoDFish)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,46 +17,46 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef TMXSDLRENDERER_HPP_
-#define TMXSDLRENDERER_HPP_
-
 #include <vector>
+
+#include "TmxMap.h"
+#include "TmxLayer.h"
+#include "TmxTileset.h"
+#include "TmxImage.h"
 
 #include "APGCommon.hpp"
 #include "ErrorBase.hpp"
+#include "Tileset.hpp"
 #include "SXXDL.hpp"
 #include "TmxRenderer.hpp"
 
 #include <glm/vec2.hpp>
 
-namespace Tmx {
-class Tileset;
-class Layer;
+APG::TmxRenderer::TmxRenderer(map_ptr &map) :
+		map { map } {
+	loadTilesets();
 }
 
-namespace APG {
+void APG::TmxRenderer::loadTilesets() {
+	for (const auto &tileset : map->GetTilesets()) {
+		const auto tilesetName = map->GetFilepath() + tileset->GetImage()->GetSource();
 
-/**
- * Contains methods for rendering a loaded TMX file using SDL2.
- *
- * Requires that SDL2/SDL2_image have already been initialised.
- */
-class SDLTmxRenderer : public APG::TmxRenderer {
-private:
-	SXXDL::renderer_ptr &renderer;
+		auto loadedTileset = tileset_ptr(new Tileset(tilesetName, map));
 
-	std::vector<SXXDL::sdl_texture_ptr> sdlTextures;
+		if (loadedTileset->hasError()) {
+			setErrorState(
+					std::string("Couldn't load ") + tilesetName + ": "
+							+ loadedTileset->getErrorMessage());
+			return;
+		}
 
-public:
-	SDLTmxRenderer(map_ptr &map, SXXDL::renderer_ptr &renderer);
-
-	void renderLayer(Tmx::Layer *layer) override;
-
-	// disallow copying because we own resources.
-	SDLTmxRenderer(SDLTmxRenderer &other) = delete;
-	SDLTmxRenderer(const SDLTmxRenderer &other) = delete;
-};
-
+		tilesets.emplace_back(std::move(loadedTileset));
+	}
 }
 
-#endif /* TMXSDLRENDERER_HPP_ */
+void APG::TmxRenderer::renderAll() {
+	for (const auto &layer : map->GetLayers()) {
+		renderLayer(layer);
+	}
+}
+

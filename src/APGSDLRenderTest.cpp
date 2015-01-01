@@ -37,7 +37,6 @@
 #include <SXXDL.hpp>
 #include <APGSDLRenderTest.hpp>
 #include <SDLTmxRenderer.hpp>
-#include <SDLTileset.hpp>
 
 const std::string ASSET_PREFIX = "assets/";
 
@@ -68,9 +67,15 @@ bool APGSDLRenderTest::init() {
 	sdlTmxRenderer = std::make_unique<APG::SDLTmxRenderer>(map, renderer);
 
 	if (sdlTmxRenderer->hasError()) {
-		std::cerr << "Error creating tmxRenderer: " << sdlTmxRenderer->getErrorMessage() << std::endl;
+		std::cerr << "Error creating tmxRenderer: " << sdlTmxRenderer->getErrorMessage()
+				<< std::endl;
 		return false;
 	}
+
+	const auto tileset = sdlTmxRenderer->getTilesetByID(0);
+	std::cout << "TS1: (w, h) = (" << tileset->getWidth() << ", " << tileset->getHeight()
+			<< ").\nWIT: " << tileset->getWidthInTiles() << "\nHIT: " << tileset->getHeightInTiles()
+			<< "\n";
 
 	return true;
 }

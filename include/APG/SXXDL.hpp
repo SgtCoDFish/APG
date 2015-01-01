@@ -27,12 +27,12 @@ namespace SXXDL {
 
 using window_ptr = std::unique_ptr<SDL_Window, void(*)(SDL_Window *)>;
 using surface_ptr = std::unique_ptr<SDL_Surface, void(*)(SDL_Surface *)>;
-using texture_ptr = std::unique_ptr<SDL_Texture, void(*)(SDL_Texture *)>;
+using sdl_texture_ptr = std::unique_ptr<SDL_Texture, void(*)(SDL_Texture *)>;
 using renderer_ptr = std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer *)>;
 
 window_ptr make_window_ptr(SDL_Window *window);
 surface_ptr make_surface_ptr(SDL_Surface *surface);
-texture_ptr make_texture_ptr(SDL_Texture *texture);
+sdl_texture_ptr make_sdl_texture_ptr(SDL_Texture *texture);
 renderer_ptr make_renderer_ptr(SDL_Renderer *renderer);
 
 }
