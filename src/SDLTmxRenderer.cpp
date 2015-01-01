@@ -19,7 +19,6 @@
 
 #include <string>
 #include <sstream>
-#include <iostream>
 
 #include "Tmx.h"
 
