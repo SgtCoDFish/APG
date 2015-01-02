@@ -29,16 +29,18 @@
 #include "ShaderProgram.hpp"
 #include "Buffer.hpp"
 #include "APGCommon.hpp"
+#include "Sprite.hpp"
 
 const char * const APG::SpriteBatch::POSITION_ATTRIBUTE = "position";
 const char * const APG::SpriteBatch::COLOR_ATTRIBUTE = "color";
 const char * const APG::SpriteBatch::TEXCOORD_ATTRIBUTE = "texcoord";
 const uint32_t APG::SpriteBatch::DEFAULT_BUFFER_SIZE = 1000;
 
-uint32_t APG::SpriteBatch::indices[6] = {0, 1, 2, 2, 3, 0};
+uint32_t APG::SpriteBatch::indices[6] = { 0, 1, 2, 2, 3, 0 };
 
 APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program) :
-		bufferSize(bufferSize), vertexBuffer(BufferType::ARRAY, DrawType::DYNAMIC_DRAW), indexBuffer(BufferType::ELEMENT_ARRAY, DrawType::STATIC_DRAW) {
+		bufferSize(bufferSize), vertexBuffer(BufferType::ARRAY, DrawType::DYNAMIC_DRAW), indexBuffer(
+				BufferType::ELEMENT_ARRAY, DrawType::STATIC_DRAW) {
 	if (program == nullptr) {
 		this->ownedShaderProgram = SpriteBatch::createDefaultShader();
 		this->program = ownedShaderProgram.get();
@@ -105,7 +107,7 @@ void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32
 
 	float verticesf[20];
 
-	for(int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		verticesf[i * 5 + 0] = vertices[i].x;
 		verticesf[i * 5 + 1] = vertices[i].y;
 		verticesf[i * 5 + 2] = vertices[i].c;
@@ -116,6 +118,45 @@ void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32
 	vertexBuffer.setData(verticesf, 20);
 	image->bind();
 	flush();
+}
+
+void APG::SpriteBatch::draw(APG::Sprite *sprite, float x, float y) {
+	const float color = 1.0f;
+	Vertex vertices[4];
+
+	vertices[0].x = x;
+	vertices[0].y = y;
+	vertices[0].c = color;
+	vertices[0].u = sprite->getU();
+	vertices[0].v = sprite->getV();
+
+	vertices[1].x = x;
+	vertices[1].y = y + sprite->getHeight();
+	vertices[1].c = color;
+	vertices[1].u = sprite->getU();
+	vertices[1].v = sprite->getV2();
+
+	vertices[2].x = x + sprite->getWidth();
+	vertices[2].y = y + sprite->getHeight();
+	vertices[2].c = color;
+	vertices[2].u = sprite->getU2();
+	vertices[2].v = sprite->getV2();
+
+	vertices[3].x = x + sprite->getWidth();
+	vertices[3].y = y;
+	vertices[3].c = color;
+	vertices[3].u = sprite->getU2();
+	vertices[3].v = sprite->getV();
+
+	float verticesf[20];
+
+	for (int i = 0; i < 4; i++) {
+		verticesf[i * 5 + 0] = vertices[i].x;
+		verticesf[i * 5 + 1] = vertices[i].y;
+		verticesf[i * 5 + 2] = vertices[i].c;
+		verticesf[i * 5 + 3] = vertices[i].u;
+		verticesf[i * 5 + 4] = vertices[i].v;
+	}
 }
 
 void APG::SpriteBatch::flush() {

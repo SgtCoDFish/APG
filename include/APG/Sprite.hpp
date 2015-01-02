@@ -20,19 +20,70 @@
 #ifndef SPRITE_HPP_
 #define SPRITE_HPP_
 
+#include <cstdint>
+
+#include <memory>
+
 #include "Buffer.hpp"
+#include "ErrorBase.hpp"
 
 namespace APG {
 
+class Texture;
+
 class Sprite : public FloatBuffer {
 private:
-	std::unique_ptr<uint32_t[]> indices = std::unique_ptr<uint32_t[]>(nullptr);
+	static uint32_t commonIndices[6];
 	std::unique_ptr<UInt32Buffer> ebo = std::unique_ptr<UInt32Buffer>(nullptr);
 
+	Texture * texture = nullptr;
+
+	int32_t texX = 0, texY = 0;
+
+	int32_t width = 0, height = 0;
+
+	float u1 = 0.0f, v1 = 0.0f;
+	float u2 = 0.0f, v2 = 0.0f;
+
+	void calculateUV();
+
 public:
-	Sprite(DrawType vertexDrawHint = DrawType::DYNAMIC_DRAW) :
-			FloatBuffer(BufferType::ARRAY, vertexDrawHint) {
+	Sprite(Texture * const texture, int32_t texX, int32_t texY, int32_t width, int32_t height,
+			DrawType vertexDrawHint = DrawType::DYNAMIC_DRAW);
+
+	Texture * const getTexture() const {
+		return texture;
 	}
+
+	inline int32_t getWidth() const {
+		return width;
+	}
+
+	inline int32_t getHeight() const {
+		return height;
+	}
+
+	inline float getU() const {
+		return u1;
+	}
+
+	inline float getV() const {
+		return v1;
+	}
+
+	inline float getU2() const {
+		return u2;
+	}
+
+	inline float getV2() const {
+		return v2;
+	}
+
+	Sprite(Sprite &other) = delete;
+	Sprite(const Sprite &other) = delete;
+
+	Sprite &operator=(Sprite &other) = delete;
+	Sprite &operator=(const Sprite &other) = delete;
 };
 
 }

@@ -65,7 +65,27 @@ bool APG::APGGLRenderTest::init() {
 	}
 
 	spriteBatch = std::make_unique<SpriteBatch>(SpriteBatch::DEFAULT_BUFFER_SIZE);
+
+	if (spriteBatch->hasError()) {
+		std::cout << "Couldn't create sprite batch:\n" << spriteBatch->getErrorMessage()
+				<< std::endl;
+		return false;
+	}
+
 	renderer = std::make_unique<GLTmxRenderer>(map.get(), *spriteBatch);
+
+	if (renderer->hasError()) {
+		std::cout << "Couldn't create GL tmx renderer:\n" << renderer->getErrorMessage()
+				<< std::endl;
+		return false;
+	}
+
+	sprite = std::make_unique<Sprite>(renderer->getTilesetByID(0), 0, 0, 32, 32);
+
+	if (sprite->hasError()) {
+		std::cout << "Couldn't create sprite:\n" << sprite->getErrorMessage() << std::endl;
+		return false;
+	}
 
 	auto glError = glGetError();
 	if (glError != GL_NO_ERROR) {
@@ -84,12 +104,11 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	glClearColor(0.313725f, 0.674510f, 0.239216f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	renderer->renderAll();
+	spriteBatch->begin();
 
-	if(spriteBatch->hasError()) {
-		std::cout << "SB Error: " << spriteBatch->getErrorMessage() << std::endl;
-		quit();
-	}
+	spriteBatch->draw(sprite.get(), 0, 0);
+
+	spriteBatch->end();
 
 	SDL_GL_SwapWindow(window.get());
 }

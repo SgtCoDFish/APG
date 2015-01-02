@@ -34,6 +34,7 @@
 #include "VAO.hpp"
 #include "Texture.hpp"
 #include "SpriteBatch.hpp"
+#include "Sprite.hpp"
 
 #include "TmxMap.h"
 
@@ -50,6 +51,8 @@ private:
 	std::unique_ptr<SpriteBatch> spriteBatch = std::unique_ptr<SpriteBatch>(nullptr);
 
 	std::unique_ptr<GLTmxRenderer> renderer = std::unique_ptr<GLTmxRenderer>(nullptr);
+
+	std::unique_ptr<Sprite> sprite = std::unique_ptr<Sprite>(nullptr);
 public:
 	APGGLRenderTest() :
 			SDLGame("APGGLRenderTest", 1280, 720, 3, 2) {

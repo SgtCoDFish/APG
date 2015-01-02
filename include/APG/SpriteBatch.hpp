@@ -34,6 +34,8 @@ struct SDL_Surface;
 
 namespace APG {
 
+class Sprite;
+
 class SpriteBatch : public ErrorBase {
 private:
 	static const char * const POSITION_ATTRIBUTE;
@@ -66,6 +68,8 @@ public:
 
 	void draw(Texture * const image, float x, float y, uint32_t width, uint32_t height, float srcX,
 			float srcY, uint32_t srcWidth, uint32_t srcHeight);
+
+	void draw(Sprite * const sprite, float x, float y);
 
 	static std::unique_ptr<APG::ShaderProgram> createDefaultShader();
 };
