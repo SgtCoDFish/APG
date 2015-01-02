@@ -28,6 +28,7 @@
 #include "Buffer.hpp"
 #include "Texture.hpp"
 #include "ShaderProgram.hpp"
+#include "VAO.hpp"
 
 struct SDL_Surface;
 
@@ -39,6 +40,8 @@ private:
 	static const char * const COLOR_ATTRIBUTE;
 	static const char * const TEXCOORD_ATTRIBUTE;
 
+	static uint32_t indices[6];
+
 	uint32_t bufferSize = DEFAULT_BUFFER_SIZE;
 
 	std::unique_ptr<APG::ShaderProgram> ownedShaderProgram = std::unique_ptr<APG::ShaderProgram>(
@@ -47,7 +50,9 @@ private:
 
 	bool drawing = false;
 
-	Buffer<> vertexBuffer;
+	std::unique_ptr<VAO> vao = std::unique_ptr<VAO>(nullptr);
+	FloatBuffer vertexBuffer;
+	UInt32Buffer indexBuffer;
 
 public:
 	static const uint32_t DEFAULT_BUFFER_SIZE;
@@ -59,9 +64,8 @@ public:
 
 	void flush();
 
-	void draw(Texture * const image, glm::vec2::type x, glm::vec2::type y, glm::vec2::type width,
-			glm::vec2::type height, glm::vec2::type srcX, glm::vec2::type srcY,
-			glm::vec2::type srcWidth, glm::vec2::type srcHeight);
+	void draw(Texture * const image, float x, float y, uint32_t width, uint32_t height, float srcX,
+			float srcY, uint32_t srcWidth, uint32_t srcHeight);
 
 	static std::unique_ptr<APG::ShaderProgram> createDefaultShader();
 };

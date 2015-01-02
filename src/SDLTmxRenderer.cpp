@@ -63,15 +63,16 @@ void APG::SDLTmxRenderer::renderLayer(Tmx::Layer *layer) {
 	if (layer->GetVisible()) {
 		for (int y = 0; y < layer->GetHeight(); y++) {
 			for (int x = 0; x < layer->GetWidth(); x++) {
-				const auto tileset_index = layer->GetTileTilesetIndex(x, y);
-				const auto &current_tileset = tilesets[tileset_index];
-				const auto &sdl_tileset = sdlTextures[tileset_index];
 
 				const unsigned int tile_id = layer->GetTileId(x, y);
 
 				if (tile_id == 0) {
 					continue;
 				}
+
+				const auto tileset_index = layer->GetTileTilesetIndex(x, y);
+				const auto &current_tileset = tilesets[tileset_index];
+				const auto &sdl_tileset = sdlTextures[tileset_index];
 
 				const int tileset_x = tile_id % current_tileset->getWidthInTiles();
 				const int tileset_y = tile_id / current_tileset->getWidthInTiles();

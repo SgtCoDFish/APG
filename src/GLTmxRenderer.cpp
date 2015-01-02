@@ -27,6 +27,39 @@ APG::GLTmxRenderer::GLTmxRenderer(Tmx::Map * const map, SpriteBatch &inBatch) :
 		TmxRenderer(map), batch(inBatch) {
 }
 
-void APG::GLTmxRenderer::renderLayer(Tmx::Layer * const layer) {
+void APG::GLTmxRenderer::renderAll() {
+	batch.begin();
 
+	TmxRenderer::renderAll();
+
+	batch.end();
+}
+
+void APG::GLTmxRenderer::renderLayer(Tmx::Layer * const layer) {
+	if (!layer->IsVisible()) {
+		return;
+	}
+
+	const auto tileWidth = (float) map->GetTileWidth();
+	const auto tileHeight = (float) map->GetTileHeight();
+
+	for (int y = 0; y < layer->GetHeight(); y++) {
+		for (int x = 0; x < layer->GetWidth(); x++) {
+			const auto &tile = layer->GetTile(x, y);
+
+			if (tile.id == 0) {
+				continue;
+			}
+
+			Tileset *tileset = tilesets[tile.tilesetId].get();
+			const float tileX = position.x + x * tileWidth;
+			const float tileY = position.y + y * tileHeight;
+
+			const float texX = tile.id % tileset->getWidthInTiles();
+			const float texY = tile.id / tileset->getWidthInTiles();
+
+			batch.draw(tileset, tileX, tileY, tileWidth, tileHeight, texX, texY, tileWidth,
+					tileHeight);
+		}
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * GLTmxRenderer.hpp
+ * Sprite.hpp
  * Copyright (C) 2014, 2015 Ashley Davis (SgtCoDFish)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,31 +17,24 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef GLTMXRENDERER_HPP_
-#define GLTMXRENDERER_HPP_
+#ifndef SPRITE_HPP_
+#define SPRITE_HPP_
 
-#include "SpriteBatch.hpp"
-#include "TmxRenderer.hpp"
-
-namespace Tmx {
-class Layer;
-}
+#include "Buffer.hpp"
 
 namespace APG {
 
-class GLTmxRenderer : public TmxRenderer {
+class Sprite : public FloatBuffer {
 private:
-	SpriteBatch &batch;
+	std::unique_ptr<uint32_t[]> indices = std::unique_ptr<uint32_t[]>(nullptr);
+	std::unique_ptr<UInt32Buffer> ebo = std::unique_ptr<UInt32Buffer>(nullptr);
 
 public:
-	explicit GLTmxRenderer(Tmx::Map * const map, SpriteBatch &batch);
-	virtual ~GLTmxRenderer() {
+	Sprite(DrawType vertexDrawHint = DrawType::DYNAMIC_DRAW) :
+			FloatBuffer(BufferType::ARRAY, vertexDrawHint) {
 	}
-
-	virtual void renderAll();
-	virtual void renderLayer(Tmx::Layer * const layer) override;
 };
 
 }
 
-#endif /* GLTMXRENDERER_HPP_ */
+#endif /* SPRITE_HPP_ */

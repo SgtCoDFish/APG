@@ -45,16 +45,7 @@ private:
 	static const char *fragmentShaderFilename;
 	APG::map_ptr map;
 
-	std::unique_ptr<VAO> vao = std::unique_ptr<VAO>(nullptr);
-
-	std::unique_ptr<Buffer<>> vertexBuffer = std::unique_ptr<Buffer<>>(nullptr);
-	std::unique_ptr<Buffer<uint32_t, GL_UNSIGNED_INT>> elementBuffer = std::unique_ptr<
-			Buffer<uint32_t, GL_UNSIGNED_INT>>(nullptr);
-
 	std::unique_ptr<ShaderProgram> shaderProgram = std::unique_ptr<ShaderProgram>(nullptr);
-
-	std::unique_ptr<Texture> texture1 = std::unique_ptr<Texture>(nullptr);
-	std::unique_ptr<Texture> texture2 = std::unique_ptr<Texture>(nullptr);
 
 	std::unique_ptr<SpriteBatch> spriteBatch = std::unique_ptr<SpriteBatch>(nullptr);
 

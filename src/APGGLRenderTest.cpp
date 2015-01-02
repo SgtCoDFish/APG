@@ -40,14 +40,6 @@
 const char *APG::APGGLRenderTest::vertexShaderFilename = "pass_vertex.glslv";
 const char * APG::APGGLRenderTest::fragmentShaderFilename = "red_frag.glslf";
 
-GLfloat vertices[] = { -0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // Top-left
-		0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, // Top-right
-		0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, // Bottom-right
-		-0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f  // Bottom-left
-		};
-
-GLuint elements[] = { 0, 1, 2, 2, 3, 0 };
-
 bool APG::APGGLRenderTest::init() {
 	if (hasError()) {
 		std::cerr << "Failed to initialise APGGLRenderTest.\n";
@@ -62,23 +54,6 @@ bool APG::APGGLRenderTest::init() {
 		return false;
 	}
 
-	vao = std::make_unique<VAO>();
-	vao->bind();
-
-	vertexBuffer = std::make_unique<Buffer<>>(APG::BufferType::ARRAY, APG::DrawType::STATIC_DRAW,
-			vertices, 28);
-
-	if (vertexBuffer->hasError()) {
-		std::cerr << "Error initialising vertex buffer: " << vertexBuffer->getErrorMessage()
-				<< std::endl;
-		return false;
-	}
-
-	vertexBuffer->bind();
-
-	elementBuffer = std::make_unique<Buffer<uint32_t, GL_UNSIGNED_INT>>(
-			APG::BufferType::ELEMENT_ARRAY, APG::DrawType::STATIC_DRAW, elements, 6);
-
 	shaderProgram = ShaderProgram::fromFiles(vertexShaderFilename, fragmentShaderFilename);
 
 	if (shaderProgram->hasError()) {
@@ -89,45 +64,7 @@ bool APG::APGGLRenderTest::init() {
 		return false;
 	}
 
-	shaderProgram->setFloatAttribute("position", 2, 7, 0, false);
-	shaderProgram->setFloatAttribute("color", 3, 7, 2, false);
-	shaderProgram->setFloatAttribute("texcoord", 2, 7, 5, false);
-
-	if (shaderProgram->hasError()) {
-		std::cerr << "Couldn't setup attributes:\n" << shaderProgram->getErrorMessage()
-				<< std::endl;
-		return false;
-	}
-
-	texture1 = std::make_unique<Texture>("assets/world1tileset.png");
-
-	if (texture1->hasError()) {
-		std::cerr << "Couldn't load texture:\n" << texture1->getErrorMessage() << std::endl;
-
-		return false;
-	}
-
-	texture1->setFilter(TextureFilterType::LINEAR, TextureFilterType::LINEAR);
-	texture1->setWrapType(TextureWrapType::CLAMP_TO_EDGE, TextureWrapType::CLAMP_TO_EDGE);
-
-	texture2 = std::make_unique<Texture>("assets/npctileset.png");
-
-	if (texture2->hasError()) {
-		std::cerr << "Couldn't load texture:\n" << texture2->getErrorMessage() << std::endl;
-
-		return false;
-	}
-
-	texture2->setFilter(TextureFilterType::LINEAR, TextureFilterType::LINEAR);
-	texture2->setWrapType(TextureWrapType::CLAMP_TO_EDGE, TextureWrapType::CLAMP_TO_EDGE);
-
-	texture1->attachToShader("tex1", shaderProgram.get());
-	texture2->attachToShader("tex2", shaderProgram.get());
-
-	texture1->bind();
-
-	spriteBatch = std::make_unique<SpriteBatch>(SpriteBatch::DEFAULT_BUFFER_SIZE,
-			shaderProgram.get());
+	spriteBatch = std::make_unique<SpriteBatch>(SpriteBatch::DEFAULT_BUFFER_SIZE);
 	renderer = std::make_unique<GLTmxRenderer>(map.get(), *spriteBatch);
 
 	auto glError = glGetError();
@@ -147,7 +84,12 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	glClearColor(0.313725f, 0.674510f, 0.239216f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glDrawElements(GL_TRIANGLES, 6, elementBuffer->getGLType(), 0);
+	renderer->renderAll();
+
+	if(spriteBatch->hasError()) {
+		std::cout << "SB Error: " << spriteBatch->getErrorMessage() << std::endl;
+		quit();
+	}
 
 	SDL_GL_SwapWindow(window.get());
 }

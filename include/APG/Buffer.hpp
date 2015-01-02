@@ -52,7 +52,7 @@ enum DrawType {
 	DYNAMIC_DRAW = GL_DYNAMIC_DRAW, DYNAMIC_READ = GL_DYNAMIC_READ, DYNAMIC_COPY = GL_DYNAMIC_COPY,
 };
 
-template<typename T = float, int glType = GL_FLOAT> class Buffer : public ErrorBase {
+template<typename T, int glType> class Buffer : public ErrorBase {
 private:
 	uint32_t bufferID;
 
@@ -137,6 +137,14 @@ public:
 	Buffer &operator=(Buffer &other) = delete;
 	Buffer &operator=(const Buffer &other) = delete;
 };
+
+using FloatBuffer = Buffer<float, GL_FLOAT>;
+using UInt32Buffer = Buffer<uint32_t, GL_UNSIGNED_INT>;
+using UInt16Buffer = Buffer<uint16_t, GL_UNSIGNED_SHORT>;
+using UInt8Buffer = Buffer<uint8_t, GL_UNSIGNED_BYTE>;
+using Int32Buffer = Buffer<int32_t, GL_INT>;
+using Int16Buffer = Buffer<int16_t, GL_SHORT>;
+using Int8Buffer = Buffer<int8_t, GL_BYTE>;
 
 }
 
