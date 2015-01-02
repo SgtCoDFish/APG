@@ -17,8 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef TEXTURE_HPP_
-#define TEXTURE_HPP_
+#ifndef APGGLTEXTURE_HPP_
+#define APGGLTEXTURE_HPP_
 
 #include <cstdint>
 

@@ -34,11 +34,11 @@ private:
 	SpriteBatch &batch;
 
 public:
-	explicit GLTmxRenderer(map_ptr &map, SpriteBatch &batch);
+	explicit GLTmxRenderer(Tmx::Map * const map, SpriteBatch &batch);
 	virtual ~GLTmxRenderer() {
 	}
 
-	void renderLayer(Tmx::Layer *layer) override;
+	virtual void renderLayer(Tmx::Layer * const layer) override;
 };
 
 }

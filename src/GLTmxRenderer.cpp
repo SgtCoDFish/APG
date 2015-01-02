@@ -23,7 +23,7 @@
 
 #include "GLTmxRenderer.hpp"
 
-APG::GLTmxRenderer::GLTmxRenderer(map_ptr &map, SpriteBatch &inBatch) :
+APG::GLTmxRenderer::GLTmxRenderer(Tmx::Map * const map, SpriteBatch &inBatch) :
 		TmxRenderer(map), batch(inBatch) {
 }
 

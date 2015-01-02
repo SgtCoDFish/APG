@@ -40,9 +40,9 @@
 const char *APG::APGGLRenderTest::vertexShaderFilename = "pass_vertex.glslv";
 const char * APG::APGGLRenderTest::fragmentShaderFilename = "red_frag.glslf";
 
-GLfloat vertices[] = { -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // Top-left
-		0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Top-right
-		0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // Bottom-right
+GLfloat vertices[] = { -0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // Top-left
+		0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, // Top-right
+		0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, // Bottom-right
 		-0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f  // Bottom-left
 		};
 
@@ -51,6 +51,14 @@ GLuint elements[] = { 0, 1, 2, 2, 3, 0 };
 bool APG::APGGLRenderTest::init() {
 	if (hasError()) {
 		std::cerr << "Failed to initialise APGGLRenderTest.\n";
+		return false;
+	}
+
+	map = std::make_unique<Tmx::Map>();
+	map->ParseFile("assets/world1.tmx");
+
+	if (map->HasError()) {
+		std::cerr << "Error loading map: " << map->GetErrorText() << std::endl;
 		return false;
 	}
 
@@ -71,7 +79,7 @@ bool APG::APGGLRenderTest::init() {
 	elementBuffer = std::make_unique<Buffer<uint32_t, GL_UNSIGNED_INT>>(
 			APG::BufferType::ELEMENT_ARRAY, APG::DrawType::STATIC_DRAW, elements, 6);
 
-	shaderProgram = std::make_unique<ShaderProgram>(vertexShaderFilename, fragmentShaderFilename);
+	shaderProgram = ShaderProgram::fromFiles(vertexShaderFilename, fragmentShaderFilename);
 
 	if (shaderProgram->hasError()) {
 		std::cout << "Shader Info Log\n---------------\n" << shaderProgram->getShaderInfoLog();
@@ -118,7 +126,9 @@ bool APG::APGGLRenderTest::init() {
 
 	texture1->bind();
 
-	renderer = std::make_unique<GLTmxRenderer>();
+	spriteBatch = std::make_unique<SpriteBatch>(SpriteBatch::DEFAULT_BUFFER_SIZE,
+			shaderProgram.get());
+	renderer = std::make_unique<GLTmxRenderer>(map.get(), *spriteBatch);
 
 	auto glError = glGetError();
 	if (glError != GL_NO_ERROR) {

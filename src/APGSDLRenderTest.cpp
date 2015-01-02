@@ -64,7 +64,7 @@ bool APGSDLRenderTest::init() {
 		return false;
 	}
 
-	sdlTmxRenderer = std::make_unique<APG::SDLTmxRenderer>(map, renderer);
+	sdlTmxRenderer = std::make_unique<APG::SDLTmxRenderer>(map.get(), renderer);
 
 	if (sdlTmxRenderer->hasError()) {
 		std::cerr << "Error creating tmxRenderer: " << sdlTmxRenderer->getErrorMessage()

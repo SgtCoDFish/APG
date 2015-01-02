@@ -29,11 +29,15 @@
 
 #include <glm/vec2.hpp>
 
+namespace Tmx {
+class Map;
+}
+
 namespace APG {
 
 class TmxRenderer : public ErrorBase {
 protected:
-	map_ptr &map;
+	Tmx::Map *map = nullptr;
 	std::vector<tileset_ptr> tilesets;
 
 	glm::vec2 position { 0.0f, 0.0f };
@@ -41,16 +45,16 @@ protected:
 	void loadTilesets();
 
 public:
-	explicit TmxRenderer(map_ptr &map);
+	explicit TmxRenderer(Tmx::Map *map);
 
 	virtual ~TmxRenderer() {
 	}
 
-	virtual void renderLayer(Tmx::Layer *layer) = 0;
+	virtual void renderLayer(Tmx::Layer * const layer) = 0;
 	void renderAll();
 
 	const Tmx::Map *getMap() {
-		return map.get();
+		return map;
 	}
 
 	const glm::vec2 &getPosition() const {

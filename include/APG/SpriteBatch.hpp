@@ -22,24 +22,35 @@
 
 #include <cstdint>
 
+#include <memory>
+
 #include "ErrorBase.hpp"
+#include "Buffer.hpp"
+#include "Texture.hpp"
+#include "ShaderProgram.hpp"
 
 struct SDL_Surface;
 
 namespace APG {
 
-class ShaderProgram;
-
 class SpriteBatch : public ErrorBase {
 private:
-	static const constexpr uint32_t DEFAULT_BUFFER_SIZE = 1000;
+	static const char * const POSITION_ATTRIBUTE;
+	static const char * const COLOR_ATTRIBUTE;
+	static const char * const TEXCOORD_ATTRIBUTE;
 
 	uint32_t bufferSize = DEFAULT_BUFFER_SIZE;
-	ShaderProgram *shaderProgram = nullptr;
+
+	std::unique_ptr<APG::ShaderProgram> ownedShaderProgram = std::unique_ptr<APG::ShaderProgram>(
+			nullptr);
+	ShaderProgram *program = nullptr;
 
 	bool drawing = false;
 
+	Buffer<> vertexBuffer;
+
 public:
+	static const uint32_t DEFAULT_BUFFER_SIZE;
 	SpriteBatch(uint32_t bufferSize = DEFAULT_BUFFER_SIZE, ShaderProgram * const program = nullptr);
 	~SpriteBatch();
 
@@ -48,9 +59,11 @@ public:
 
 	void flush();
 
-	void draw(SDL_Surface * const image, glm::vec2::type x, glm::vec2::type y,
-			glm::vec2::type width, glm::vec2::type height, glm::vec2::type srcX,
-			glm::vec2::type srcY, glm::vec2::type srcWidth, glm::vec2::type srcHeight);
+	void draw(Texture * const image, glm::vec2::type x, glm::vec2::type y, glm::vec2::type width,
+			glm::vec2::type height, glm::vec2::type srcX, glm::vec2::type srcY,
+			glm::vec2::type srcWidth, glm::vec2::type srcHeight);
+
+	static std::unique_ptr<APG::ShaderProgram> createDefaultShader();
 };
 
 }

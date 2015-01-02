@@ -32,7 +32,7 @@
 
 #include <glm/vec2.hpp>
 
-APG::TmxRenderer::TmxRenderer(map_ptr &map) :
+APG::TmxRenderer::TmxRenderer(Tmx::Map *map) :
 		map { map } {
 	loadTilesets();
 }

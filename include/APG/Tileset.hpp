@@ -25,7 +25,13 @@
 #include <string>
 #include <memory>
 
+#include "TmxMap.h"
+
 #include "Texture.hpp"
+
+namespace Tmx {
+class Map;
+}
 
 namespace APG {
 
@@ -46,11 +52,11 @@ private:
 	}
 
 public:
-	Tileset(const char * const fileName, map_ptr &map) :
+	Tileset(const char * const fileName, Tmx::Map * const map) :
 			Tileset(fileName, map->GetTileWidth(), map->GetTileHeight()) {
 	}
 
-	Tileset(const std::string &fileName, map_ptr &map) :
+	Tileset(const std::string &fileName, Tmx::Map * const map) :
 			Tileset(fileName, map->GetTileWidth(), map->GetTileHeight()) {
 	}
 

@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <new>
+#include <memory>
 
 #include <GL/glew.h>
 #include <GL/gl.h>
@@ -32,21 +33,34 @@
 #include "ShaderProgram.hpp"
 #include "ErrorBase.hpp"
 
-APG::ShaderProgram::ShaderProgram(const std::string &vertexShaderFilename,
-		const std::string &fragmentShaderFilename) {
-	loadShader(vertexShaderFilename, GL_VERTEX_SHADER);
+APG::ShaderProgram::ShaderProgram(const std::string &vertexShaderSource,
+		const std::string &fragmentShaderSource) {
+	loadShader(vertexShaderSource, GL_VERTEX_SHADER);
 
 	if (hasError()) {
 		return;
 	}
 
-	loadShader(fragmentShaderFilename, GL_FRAGMENT_SHADER);
+	loadShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
 
 	if (hasError()) {
 		return;
 	}
 
 	combineProgram();
+}
+
+std::unique_ptr<APG::ShaderProgram> APG::ShaderProgram::fromSource(
+		const std::string &vertexShaderSource, const std::string &fragmentShaderSource) {
+	return std::make_unique<APG::ShaderProgram>(vertexShaderSource, vertexShaderSource);
+}
+
+std::unique_ptr<APG::ShaderProgram> APG::ShaderProgram::fromFiles(
+		const std::string &vertexShaderFilename, const std::string &fragmentShaderFilename) {
+	const auto vertexSource = ShaderProgram::loadSourceFromFile(vertexShaderFilename);
+	const auto fragmentSource = ShaderProgram::loadSourceFromFile(fragmentShaderFilename);
+
+	return std::make_unique<APG::ShaderProgram>(vertexSource, fragmentSource);
 }
 
 APG::ShaderProgram::~ShaderProgram() {
@@ -197,18 +211,11 @@ void APG::ShaderProgram::setUniformi(const char * const uniformName, glm::ivec4 
 	glUniform4i(uniLoc, vals.x, vals.y, vals.z, vals.w);
 }
 
-void APG::ShaderProgram::loadShader(const std::string &shaderFilename, uint32_t type) {
-	uint32_t *source = validateTypeAndGet(type);
-
-	if (source == nullptr) {
-		return;
-	}
-
-	std::ifstream inStream(shaderFilename, std::ios::in);
+std::string APG::ShaderProgram::loadSourceFromFile(const std::string &filename) {
+	std::ifstream inStream(filename, std::ios::in);
 
 	if (!inStream.is_open()) {
-		setErrorState(std::string("Could not open ") + shaderFilename);
-		return;
+		return "";
 	}
 
 	std::stringstream ss;
@@ -219,10 +226,19 @@ void APG::ShaderProgram::loadShader(const std::string &shaderFilename, uint32_t 
 
 	inStream.close();
 
+	return ss.str();
+}
+
+void APG::ShaderProgram::loadShader(const std::string &shaderSource, uint32_t type) {
+	uint32_t *source = validateTypeAndGet(type);
+
+	if (source == nullptr) {
+		return;
+	}
+
 	*source = glCreateShader(type);
 
-	const auto loadStr_ = ss.str();
-	const char *csource = loadStr_.c_str();
+	const auto csource = shaderSource.c_str();
 	glShaderSource(*source, 1, &csource, nullptr);
 	glCompileShader(*source);
 
@@ -231,7 +247,7 @@ void APG::ShaderProgram::loadShader(const std::string &shaderFilename, uint32_t 
 	glGetShaderiv(*source, GL_COMPILE_STATUS, &status);
 
 	if (status != GL_TRUE) {
-		statusStream << "Compilation error in " << shaderFilename << ".\n";
+		statusStream << "Compilation error in shader.\n";
 	}
 
 	GLint logLength;
@@ -251,6 +267,8 @@ void APG::ShaderProgram::loadShader(const std::string &shaderFilename, uint32_t 
 		statusStream << "Info log:\n" << buffer;
 
 		delete[] buffer;
+
+		statusStream << "Source:\n" << shaderSource << "\n\n";
 	}
 
 	shaderInfoLog = shaderInfoLog + statusStream.str();

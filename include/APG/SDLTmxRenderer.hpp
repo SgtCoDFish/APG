@@ -48,7 +48,7 @@ private:
 	std::vector<SXXDL::sdl_texture_ptr> sdlTextures;
 
 public:
-	SDLTmxRenderer(map_ptr &map, SXXDL::renderer_ptr &renderer);
+	SDLTmxRenderer(Tmx::Map * const map, SXXDL::renderer_ptr &renderer);
 
 	void renderLayer(Tmx::Layer *layer) override;
 

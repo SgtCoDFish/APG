@@ -33,6 +33,7 @@
 #include "Buffer.hpp"
 #include "VAO.hpp"
 #include "Texture.hpp"
+#include "SpriteBatch.hpp"
 
 #include "TmxMap.h"
 
@@ -54,6 +55,8 @@ private:
 
 	std::unique_ptr<Texture> texture1 = std::unique_ptr<Texture>(nullptr);
 	std::unique_ptr<Texture> texture2 = std::unique_ptr<Texture>(nullptr);
+
+	std::unique_ptr<SpriteBatch> spriteBatch = std::unique_ptr<SpriteBatch>(nullptr);
 
 	std::unique_ptr<GLTmxRenderer> renderer = std::unique_ptr<GLTmxRenderer>(nullptr);
 public:

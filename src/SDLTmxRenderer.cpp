@@ -29,7 +29,7 @@
 #include "TmxRenderer.hpp"
 #include "SDLTmxRenderer.hpp"
 
-APG::SDLTmxRenderer::SDLTmxRenderer(map_ptr &map, SXXDL::renderer_ptr &renderer) :
+APG::SDLTmxRenderer::SDLTmxRenderer(Tmx::Map * const map, SXXDL::renderer_ptr &renderer) :
 		TmxRenderer(map), renderer { renderer } {
 	if (hasError()) {
 		return;

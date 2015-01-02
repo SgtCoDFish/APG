@@ -23,6 +23,7 @@
 #include <cstdint>
 
 #include <string>
+#include <memory>
 
 #include <glm/glm.hpp>
 
@@ -32,6 +33,8 @@ namespace APG {
 
 class ShaderProgram : public ErrorBase {
 private:
+	static std::string loadSourceFromFile(const std::string &filename);
+
 	uint32_t vertexShader, fragmentShader;
 	uint32_t shaderProgram;
 
@@ -43,8 +46,12 @@ private:
 	void combineProgram();
 
 public:
-	ShaderProgram(const std::string &vertexShaderFilename,
-			const std::string &fragmentShaderFileName);
+	ShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource);
+	static std::unique_ptr<APG::ShaderProgram> fromSource(const std::string &vertexShaderSource,
+			const std::string &fragmentShaderSource);
+	static std::unique_ptr<APG::ShaderProgram> fromFiles(const std::string &vertexShaderFilename,
+			const std::string &fragmentShaderFilename);
+
 	~ShaderProgram();
 
 	void use();
@@ -75,15 +82,12 @@ public:
 	std::string getLinkInfoLog() const {
 		return linkInfoLog;
 	}
-	/*
-	 void setFloatAttribute(const std::string &attributeName, int32_t valueCount, int32_t stride,
-	 GLvoid *offset, bool normalize = false) {
-	 setFloatAttribute(attributeName.c_str(), valueCount, stride, offset, normalize);
-	 }
-	 void setUniformf(const std::string &uniformName, std::initializer_list<float> vals) {
-	 setUniformf(uniformName.c_str(), vals);
-	 }
-	 */
+
+	ShaderProgram() = delete;
+	ShaderProgram(ShaderProgram &other) = delete;
+	ShaderProgram(const ShaderProgram &other) = delete;
+	ShaderProgram &operator=(ShaderProgram &other) = delete;
+	ShaderProgram &operator=(const ShaderProgram &other) = delete;
 };
 
 }
