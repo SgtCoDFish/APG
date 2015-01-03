@@ -24,12 +24,16 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 #include <glm/glm.hpp>
 
 #include "ErrorBase.hpp"
 
 namespace APG {
+
+class VertexAttribute;
+class VertexAttributeList;
 
 class ShaderProgram : public ErrorBase {
 private:
@@ -41,6 +45,8 @@ private:
 	uint32_t *validateTypeAndGet(uint32_t shaderType);
 
 	std::string shaderInfoLog, linkInfoLog;
+
+
 
 	void loadShader(const std::string &vertexShaderFilename, uint32_t shaderType);
 	void combineProgram();
@@ -56,6 +62,19 @@ public:
 
 	void use();
 
+	void setVertexAttribute(const VertexAttribute &vertexAttribute);
+	void setVertexAttributes(const VertexAttributeList &attributeList);
+	void setVertexAttributes(const std::vector<VertexAttribute> &vertexAttributes);
+
+	/**
+	 * Sets a float attribute directly. Can make calculations a little more complicated,
+	 * better to set via a VertexAttribute.
+	 * @param attributeName the alias of the attribute, e.g. "position"
+	 * @param valueCount the amount of floats this attribute has, between 1-4 inclusive.
+	 * @param strideInElements the stride in elements (the total number of elements passed in)
+	 * @param offsetInElements the offset in elements (the number of elements before this one)
+	 * @param normalize whether to normalize between -1.0f - 1.0f, default false.
+	 */
 	void setFloatAttribute(const char * const attributeName, int32_t valueCount,
 			int32_t strideInElements, int32_t offsetInElements, bool normalize = false);
 

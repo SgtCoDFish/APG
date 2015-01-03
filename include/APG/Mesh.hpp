@@ -1,5 +1,5 @@
 /*
- * VertexBufferObject.hpp
+ * Mesh.hpp
  * Copyright (C) 2014, 2015 Ashley Davis (SgtCoDFish)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -7,7 +7,7 @@
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program is distributed in the hopesthat it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -17,23 +17,30 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef VERTEXBUFFEROBJECT_HPP_
-#define VERTEXBUFFEROBJECT_HPP_
+#ifndef MESH_HPP_
+#define MESH_HPP_
 
 #include <cstdint>
 
-#include "Buffer.hpp"
+#include <memory>
+
+#include "VertexAttributeList.hpp"
+#include "VertexBufferObject.hpp"
+#include "IndexBufferObject.hpp"
 
 namespace APG {
 
-class VertexBufferObject {
+class Mesh {
 private:
-	FloatBuffer vertexData;
+	std::unique_ptr<VertexAttributeList> attributes = std::unique_ptr<VertexAttributeList>(nullptr);
 
+	std::unique_ptr<VertexBufferObject> vertexBuffer = std::unique_ptr<VertexBufferObject>(nullptr);
+	std::unique_ptr<IndexBufferObject> indexBuffer = std::unique_ptr<IndexBufferObject>(nullptr);
 public:
-	VertexBufferObject(std::initializer_list<VertexAttribute> );
+	Mesh(std::initializer_list<VertexAttribute> attList);
+	Mesh(bool staticVertices, bool staticIndices, std::initializer_list<VertexAttribute> attList);
 };
 
 }
 
-#endif /* VERTEXBUFFEROBJECT_HPP_ */
+#endif /* MESH_HPP_ */

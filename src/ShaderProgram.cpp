@@ -17,6 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <cstdint>
+
 #include <sstream>
 #include <fstream>
 #include <string>
@@ -32,6 +34,8 @@
 
 #include "ShaderProgram.hpp"
 #include "ErrorBase.hpp"
+#include "VertexAttribute.hpp"
+#include "VertexAttributeList.hpp"
 
 APG::ShaderProgram::ShaderProgram(const std::string &vertexShaderSource,
 		const std::string &fragmentShaderSource) {

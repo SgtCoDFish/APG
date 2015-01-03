@@ -1,5 +1,5 @@
 /*
- * RPGCommon.hpp
+ * Mesh.cpp
  * Copyright (C) 2014, 2015 Ashley Davis (SgtCoDFish)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,34 +17,16 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef RPGCOMMON_HPP_
-#define RPGCOMMON_HPP_
+#include <cstdint>
 
-#include <memory>
+#include "Mesh.hpp"
 
-#include <glm/vec2.hpp>
-#include <glm/vec4.hpp>
-
-namespace Tmx {
-class Map;
-}
-
-namespace APG {
-
-using map_ptr = std::unique_ptr<Tmx::Map>;
-
-struct Vertex {
-	float x;
-	float y;
-
-	float c;
-
-	float u;
-	float v;
-};
-
-static const int VERTEX_SIZE = 5;
+APG::Mesh::Mesh(std::initializer_list<VertexAttribute> attList) :
+		Mesh(false, false, attList) {
 
 }
 
-#endif /* RPGCOMMON_HPP_ */
+APG::Mesh::Mesh(bool staticVertices, bool staticIndices,
+		std::initializer_list<APG::VertexAttribute> attList) {
+
+}

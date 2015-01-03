@@ -31,11 +31,8 @@ namespace APG {
 
 class Texture;
 
-class Sprite : public FloatBuffer {
+class Sprite : public ErrorBase {
 private:
-	static uint32_t commonIndices[6];
-	std::unique_ptr<UInt32Buffer> ebo = std::unique_ptr<UInt32Buffer>(nullptr);
-
 	Texture * texture = nullptr;
 
 	int32_t texX = 0, texY = 0;
@@ -48,8 +45,8 @@ private:
 	void calculateUV();
 
 public:
-	Sprite(Texture * const texture, int32_t texX, int32_t texY, int32_t width, int32_t height,
-			DrawType vertexDrawHint = DrawType::DYNAMIC_DRAW);
+	Sprite(Texture * const texture, int32_t texX, int32_t texY, int32_t width, int32_t height
+			);
 
 	Texture * const getTexture() const {
 		return texture;

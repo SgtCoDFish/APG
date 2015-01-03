@@ -27,12 +27,9 @@
 #include "ErrorBase.hpp"
 #include "Texture.hpp"
 
-uint32_t APG::Sprite::commonIndices[] = {0, 1, 2, 2, 3, 0};
-
 APG::Sprite::Sprite(Texture * const texture, int32_t texX, int32_t texY, int32_t width,
-		int32_t height, DrawType vertexDrawHint) :
-		FloatBuffer(BufferType::ARRAY, vertexDrawHint), texture(texture), texX(texX), texY(texY), width(
-				width), height(height) {
+		int32_t height) :
+		texture(texture), texX(texX), texY(texY), width(width), height(height) {
 
 	if (texX + width > texture->getWidth() || texY + height > texture->getHeight()) {
 		std::stringstream ss;

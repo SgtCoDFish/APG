@@ -39,8 +39,35 @@ private:
 
 	bool normalized = false;
 
+	uint16_t offset = 0;
+
 public:
-	VertexAttribute(const std::string &alias, AttributeUsage usage, uint8_t numComponents, bool normalized = false);
+	VertexAttribute(const std::string &alias, AttributeUsage usage, uint8_t numComponents,
+			bool normalized = false);
+
+	std::string getAlias() const {
+		return alias;
+	}
+
+	AttributeUsage getUsage() const {
+		return usage;
+	}
+
+	uint8_t getComponentCount() const {
+		return numComponents;
+	}
+
+	bool isNormalized() const {
+		return normalized;
+	}
+
+	void setOffset(uint16_t offset) {
+		this->offset = offset;
+	}
+
+	uint8_t getOffset() const {
+		return offset;
+	}
 };
 
 }

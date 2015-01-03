@@ -1,5 +1,5 @@
 /*
- * RPGCommon.hpp
+ * VertexAttributeList.hpp
  * Copyright (C) 2014, 2015 Ashley Davis (SgtCoDFish)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,34 +17,34 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef RPGCOMMON_HPP_
-#define RPGCOMMON_HPP_
+#ifndef VERTEXATTRIBUTELIST_HPP_
+#define VERTEXATTRIBUTELIST_HPP_
 
-#include <memory>
+#include <cstdint>
 
-#include <glm/vec2.hpp>
-#include <glm/vec4.hpp>
+#include <vector>
 
-namespace Tmx {
-class Map;
-}
+#include "VertexAttribute.hpp"
 
 namespace APG {
 
-using map_ptr = std::unique_ptr<Tmx::Map>;
+class VertexAttributeList {
+private:
+	std::vector<VertexAttribute> attributes;
 
-struct Vertex {
-	float x;
-	float y;
+	uint16_t stride = 0;
+	void calculateOffsets();
 
-	float c;
+public:
+	explicit VertexAttributeList(std::initializer_list<VertexAttribute> initList) {
+		for (const auto &att : initList) {
+			attributes.emplace_back(VertexAttribute(att));
+		}
 
-	float u;
-	float v;
+		calculateOffsets();
+	}
 };
-
-static const int VERTEX_SIZE = 5;
 
 }
 
-#endif /* RPGCOMMON_HPP_ */
+#endif /* VERTEXATTRIBUTELIST_HPP_ */

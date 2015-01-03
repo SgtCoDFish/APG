@@ -29,6 +29,7 @@
 #include "Texture.hpp"
 #include "ShaderProgram.hpp"
 #include "VAO.hpp"
+#include "Mesh.hpp"
 
 struct SDL_Surface;
 
@@ -42,8 +43,6 @@ private:
 	static const char * const COLOR_ATTRIBUTE;
 	static const char * const TEXCOORD_ATTRIBUTE;
 
-	static uint32_t indices[6];
-
 	uint32_t bufferSize = DEFAULT_BUFFER_SIZE;
 
 	std::unique_ptr<APG::ShaderProgram> ownedShaderProgram = std::unique_ptr<APG::ShaderProgram>(
@@ -55,6 +54,10 @@ private:
 	std::unique_ptr<VAO> vao = std::unique_ptr<VAO>(nullptr);
 	FloatBuffer vertexBuffer;
 	UInt32Buffer indexBuffer;
+
+	std::unique_ptr<float[]> vertices = std::unique_ptr<float[]>(nullptr);
+
+	std::unique_ptr<Mesh> mesh = std::unique_ptr<Mesh>(nullptr);
 
 public:
 	static const uint32_t DEFAULT_BUFFER_SIZE;
