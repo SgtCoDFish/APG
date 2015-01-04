@@ -23,15 +23,32 @@
 #include <cstdint>
 
 #include "Buffer.hpp"
+#include "VertexAttributeList.hpp"
 
 namespace APG {
 
 class VertexBufferObject {
 private:
+	const DrawType drawType;
+
 	FloatBuffer vertexData;
+	VertexAttributeList attributeList;
 
 public:
-	VertexBufferObject(std::initializer_list<VertexAttribute> );
+	explicit VertexBufferObject(std::initializer_list<VertexAttribute> initList);
+	VertexBufferObject(bool isStatic, std::initializer_list<VertexAttribute> initList);
+
+	inline const DrawType getDrawType() const {
+		return drawType;
+	}
+
+	inline const FloatBuffer &getVertexData() const {
+		return vertexData;
+	}
+
+	inline const VertexAttributeList &getAttributes() const {
+		return attributeList;
+	}
 };
 
 }

@@ -36,12 +36,33 @@ private:
 	void calculateOffsets();
 
 public:
-	explicit VertexAttributeList(std::initializer_list<VertexAttribute> initList) {
-		for (const auto &att : initList) {
-			attributes.emplace_back(VertexAttribute(att));
-		}
+	explicit VertexAttributeList(std::initializer_list<VertexAttribute> initList);
+	explicit VertexAttributeList(std::vector<VertexAttribute> &attVec);
 
-		calculateOffsets();
+	/**
+	 * @param attribute the attribute to be copied into this list.
+	 */
+	void addAttribute(const VertexAttribute &attribute);
+
+	/**
+	 * @param attribute the attribute to be moved into this list.
+	 */
+	void addAttribute(VertexAttribute &&attribute);
+
+	inline uint16_t getStride() const {
+		return stride;
+	}
+
+	inline int getAttributeCount() const {
+		return attributes.size();
+	}
+
+	inline const std::vector<VertexAttribute> &getAttributes() const {
+		return attributes;
+	}
+
+	const VertexAttribute &operator[](unsigned int index) const {
+		return attributes[index];
 	}
 };
 

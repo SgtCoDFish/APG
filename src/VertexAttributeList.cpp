@@ -18,8 +18,33 @@
  */
 #include <cstdlib>
 
+#include <utility>
+
 #include "VertexAttributeList.hpp"
 
+APG::VertexAttributeList::VertexAttributeList(std::initializer_list<VertexAttribute> initList) {
+	for (const auto &att : initList) {
+		attributes.emplace_back(VertexAttribute(att));
+	}
+
+	calculateOffsets();
+}
+
+APG::VertexAttributeList::VertexAttributeList(std::vector<VertexAttribute> &attVec) {
+	for (const auto &att : attVec) {
+		attributes.emplace_back(VertexAttribute(att));
+	}
+
+	calculateOffsets();
+}
+
+void APG::VertexAttributeList::addAttribute(const APG::VertexAttribute &attribute) {
+	attributes.emplace_back(VertexAttribute(attribute));
+}
+
+void APG::VertexAttributeList::addAttribute(APG::VertexAttribute &&attribute) {
+	attributes.emplace_back(std::move(attribute));
+}
 
 void APG::VertexAttributeList::calculateOffsets() {
 	stride = 0;

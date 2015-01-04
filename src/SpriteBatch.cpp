@@ -83,101 +83,101 @@ APG::SpriteBatch::~SpriteBatch() {
 
 void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32_t width,
 		uint32_t height, float srcX, float srcY, uint32_t srcWidth, uint32_t srcHeight) {
-	if (hasError()) {
-		return;
-	} else if (!drawing) {
-		setErrorState("Trying to draw without beginning.");
-		return;
-	}
-
-	const float x1 = x;
-	const float y1 = y;
-
-	const float x2 = x + width;
-	const float y2 = y + height;
-
-	const float u1 = image->getInvWidth() * srcX;
-	const float v1 = image->getInvHeight() * srcY;
-
-	const float u2 = image->getInvWidth() * (srcX + srcWidth);
-	const float v2 = image->getInvHeight() * (srcY + srcHeight);
-
-	const float color = 1.0f;
-
-	Vertex verticest[4];
-
-	verticest[0].x = x1;
-	verticest[0].y = y1;
-	verticest[0].c = color;
-	verticest[0].u = u1;
-	verticest[0].v = v1;
-
-	verticest[1].x = x1;
-	verticest[1].y = y2;
-	verticest[1].c = color;
-	verticest[1].u = u1;
-	verticest[1].v = v2;
-
-	verticest[2].x = x2;
-	verticest[2].y = y2;
-	verticest[2].c = color;
-	verticest[2].u = u2;
-	verticest[2].v = v2;
-
-	verticest[3].x = x2;
-	verticest[3].y = y1;
-	verticest[3].c = color;
-	verticest[3].u = u2;
-	verticest[3].v = v1;
-
-	float verticesf[20];
-
-	for (int i = 0; i < 4; i++) {
-		verticesf[i * 5 + 0] = verticest[i].x;
-		verticesf[i * 5 + 1] = verticest[i].y;
-		verticesf[i * 5 + 2] = verticest[i].c;
-		verticesf[i * 5 + 3] = verticest[i].u;
-		verticesf[i * 5 + 4] = verticest[i].v;
-	}
+//	if (hasError()) {
+//		return;
+//	} else if (!drawing) {
+//		setErrorState("Trying to draw without beginning.");
+//		return;
+//	}
+//
+//	const float x1 = x;
+//	const float y1 = y;
+//
+//	const float x2 = x + width;
+//	const float y2 = y + height;
+//
+//	const float u1 = image->getInvWidth() * srcX;
+//	const float v1 = image->getInvHeight() * srcY;
+//
+//	const float u2 = image->getInvWidth() * (srcX + srcWidth);
+//	const float v2 = image->getInvHeight() * (srcY + srcHeight);
+//
+//	const float color = 1.0f;
+//
+//	Vertex verticest[4];
+//
+//	verticest[0].x = x1;
+//	verticest[0].y = y1;
+//	verticest[0].c = color;
+//	verticest[0].u = u1;
+//	verticest[0].v = v1;
+//
+//	verticest[1].x = x1;
+//	verticest[1].y = y2;
+//	verticest[1].c = color;
+//	verticest[1].u = u1;
+//	verticest[1].v = v2;
+//
+//	verticest[2].x = x2;
+//	verticest[2].y = y2;
+//	verticest[2].c = color;
+//	verticest[2].u = u2;
+//	verticest[2].v = v2;
+//
+//	verticest[3].x = x2;
+//	verticest[3].y = y1;
+//	verticest[3].c = color;
+//	verticest[3].u = u2;
+//	verticest[3].v = v1;
+//
+//	float verticesf[20];
+//
+//	for (int i = 0; i < 4; i++) {
+//		verticesf[i * 5 + 0] = verticest[i].x;
+//		verticesf[i * 5 + 1] = verticest[i].y;
+//		verticesf[i * 5 + 2] = verticest[i].c;
+//		verticesf[i * 5 + 3] = verticest[i].u;
+//		verticesf[i * 5 + 4] = verticest[i].v;
+//	}
 }
 
 void APG::SpriteBatch::draw(APG::Sprite *sprite, float x, float y) {
-	const float color = 1.0f;
-	Vertex verticest[4];
-
-	verticest[0].x = x;
-	verticest[0].y = y;
-	verticest[0].c = color;
-	verticest[0].u = sprite->getU();
-	verticest[0].v = sprite->getV();
-
-	verticest[1].x = x;
-	verticest[1].y = y + sprite->getHeight();
-	verticest[1].c = color;
-	verticest[1].u = sprite->getU();
-	verticest[1].v = sprite->getV2();
-
-	verticest[2].x = x + sprite->getWidth();
-	verticest[2].y = y + sprite->getHeight();
-	verticest[2].c = color;
-	verticest[2].u = sprite->getU2();
-	verticest[2].v = sprite->getV2();
-
-	verticest[3].x = x + sprite->getWidth();
-	verticest[3].y = y;
-	verticest[3].c = color;
-	verticest[3].u = sprite->getU2();
-	verticest[3].v = sprite->getV();
-
-	float verticesf[20];
-
-	for (int i = 0; i < 4; i++) {
-		verticesf[i * 5 + 0] = verticest[i].x;
-		verticesf[i * 5 + 1] = verticest[i].y;
-		verticesf[i * 5 + 2] = verticest[i].c;
-		verticesf[i * 5 + 3] = verticest[i].u;
-		verticesf[i * 5 + 4] = verticest[i].v;
-	}
+//	const float color = 1.0f;
+//	Vertex verticest[4];
+//
+//	verticest[0].x = x;
+//	verticest[0].y = y;
+//	verticest[0].c = color;
+//	verticest[0].u = sprite->getU();
+//	verticest[0].v = sprite->getV();
+//
+//	verticest[1].x = x;
+//	verticest[1].y = y + sprite->getHeight();
+//	verticest[1].c = color;
+//	verticest[1].u = sprite->getU();
+//	verticest[1].v = sprite->getV2();
+//
+//	verticest[2].x = x + sprite->getWidth();
+//	verticest[2].y = y + sprite->getHeight();
+//	verticest[2].c = color;
+//	verticest[2].u = sprite->getU2();
+//	verticest[2].v = sprite->getV2();
+//
+//	verticest[3].x = x + sprite->getWidth();
+//	verticest[3].y = y;
+//	verticest[3].c = color;
+//	verticest[3].u = sprite->getU2();
+//	verticest[3].v = sprite->getV();
+//
+//	float verticesf[20];
+//
+//	for (int i = 0; i < 4; i++) {
+//		verticesf[i * 5 + 0] = verticest[i].x;
+//		verticesf[i * 5 + 1] = verticest[i].y;
+//		verticesf[i * 5 + 2] = verticest[i].c;
+//		verticesf[i * 5 + 3] = verticest[i].u;
+//		verticesf[i * 5 + 4] = verticest[i].v;
+//	}
 }
 
 void APG::SpriteBatch::flush() {

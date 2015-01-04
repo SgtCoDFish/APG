@@ -28,13 +28,22 @@ namespace APG {
 
 class IndexBufferObject {
 private:
+	const DrawType drawType;
+
 	UInt32Buffer buffer;
 
 public:
-	IndexBufferObject();
+	explicit IndexBufferObject(bool isStatic = false);
+
+	inline const DrawType getDrawType() const {
+		return drawType;
+	}
+
+	inline const UInt32Buffer &getBuffer() const {
+		return buffer;
+	}
 };
 
 }
-
 
 #endif /* INDEXBUFFEROBJECT_HPP_ */
