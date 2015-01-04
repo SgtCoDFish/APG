@@ -32,7 +32,7 @@ class APGSDLRenderTest : public APG::SDLGame {
 private:
 	SXXDL::renderer_ptr renderer = SXXDL::make_renderer_ptr(nullptr);
 
-	APG::map_ptr map;
+	std::unique_ptr<Tmx::Map> map;
 
 	std::unique_ptr<APG::SDLTmxRenderer> sdlTmxRenderer = nullptr;
 

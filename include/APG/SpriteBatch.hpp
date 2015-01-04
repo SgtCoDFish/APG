@@ -53,8 +53,7 @@ private:
 
 	std::vector<float> vertices;
 
-	std::unique_ptr<APG::ShaderProgram> ownedShaderProgram = std::unique_ptr<APG::ShaderProgram>(
-			nullptr);
+	std::unique_ptr<APG::ShaderProgram> ownedShaderProgram;
 	ShaderProgram *program = nullptr;
 
 	uint64_t idX = 0;

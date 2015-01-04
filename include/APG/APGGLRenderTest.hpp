@@ -44,15 +44,15 @@ class APGGLRenderTest : public APG::SDLGame {
 private:
 	static const char *vertexShaderFilename;
 	static const char *fragmentShaderFilename;
-	APG::map_ptr map;
+	std::unique_ptr<Tmx::Map> map;
 
-	std::unique_ptr<ShaderProgram> shaderProgram = std::unique_ptr<ShaderProgram>(nullptr);
+	std::unique_ptr<ShaderProgram> shaderProgram;
 
-	std::unique_ptr<SpriteBatch> spriteBatch = std::unique_ptr<SpriteBatch>(nullptr);
+	std::unique_ptr<SpriteBatch> spriteBatch;
 
-	std::unique_ptr<GLTmxRenderer> renderer = std::unique_ptr<GLTmxRenderer>(nullptr);
+	std::unique_ptr<GLTmxRenderer> renderer;
 
-	std::unique_ptr<Sprite> sprite = std::unique_ptr<Sprite>(nullptr);
+	std::unique_ptr<Sprite> sprite;
 public:
 	APGGLRenderTest() :
 			SDLGame("APGGLRenderTest", 1280, 720, 3, 2) {
