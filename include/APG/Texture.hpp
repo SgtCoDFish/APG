@@ -58,8 +58,12 @@ private:
 	static std::atomic<uint32_t> availableTextureUnit;
 
 	uint32_t textureID = 0;
-	uint32_t textureUnit = 0;
-	uint32_t glTextureID = 0;
+
+	// the x at the end of the GL_TEXTUREx
+	uint32_t textureUnitInt = 0;
+
+	// the actual value of GL_TEXTUREx for some x
+	uint32_t textureUnitGL = 0;
 
 	void generateTextureID();
 	void loadTexture(const std::string &fileName);

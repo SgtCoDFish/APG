@@ -19,8 +19,8 @@
 
 #include <cstdint>
 
-#include "VertexBufferObject.hpp"
 #include "Buffer.hpp"
+#include "VertexBufferObject.hpp"
 #include "VertexAttribute.hpp"
 
 APG::VertexBufferObject::VertexBufferObject(std::initializer_list<APG::VertexAttribute> initList) :
@@ -29,6 +29,13 @@ APG::VertexBufferObject::VertexBufferObject(std::initializer_list<APG::VertexAtt
 
 APG::VertexBufferObject::VertexBufferObject(bool isStatic,
 		std::initializer_list<APG::VertexAttribute> initList) :
-		drawType(isStatic ? DrawType::STATIC_DRAW : DrawType::DYNAMIC_DRAW), vertexData(
-				APG::BufferType::ARRAY, drawType), attributeList(initList) {
+		VertexBufferObject(isStatic, initList, nullptr, 0) {
+}
+
+APG::VertexBufferObject::VertexBufferObject(bool isStatic,
+		std::initializer_list<VertexAttribute> initList, float vertices[], int vertexCount) :
+		APG::FloatBuffer(BufferType::ARRAY,
+				isStatic ? DrawType::STATIC_DRAW : DrawType::DYNAMIC_DRAW, vertices, vertexCount), //
+		attributeList { initList } {
+
 }

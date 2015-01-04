@@ -30,8 +30,8 @@
 #include "ShaderProgram.hpp"
 #include "VAO.hpp"
 #include "Mesh.hpp"
-
-struct SDL_Surface;
+#include "VertexBufferObject.hpp"
+#include "IndexBufferObject.hpp"
 
 namespace APG {
 
@@ -43,25 +43,26 @@ private:
 	static const char * const COLOR_ATTRIBUTE;
 	static const char * const TEXCOORD_ATTRIBUTE;
 
-	uint32_t bufferSize = DEFAULT_BUFFER_SIZE;
+	const uint32_t bufferSize;
+
+	bool drawing = false;
+
+	VAO vao;
+	VertexBufferObject vertexBuffer;
+	IndexBufferObject indexBuffer;
+
+	std::vector<float> vertices;
 
 	std::unique_ptr<APG::ShaderProgram> ownedShaderProgram = std::unique_ptr<APG::ShaderProgram>(
 			nullptr);
 	ShaderProgram *program = nullptr;
 
-	bool drawing = false;
-
-	std::unique_ptr<VAO> vao = std::unique_ptr<VAO>(nullptr);
-	FloatBuffer vertexBuffer;
-	UInt32Buffer indexBuffer;
-
-	std::unique_ptr<float[]> vertices = std::unique_ptr<float[]>(nullptr);
-
-	std::unique_ptr<Mesh> mesh = std::unique_ptr<Mesh>(nullptr);
+	uint64_t idX = 0;
 
 public:
 	static const uint32_t DEFAULT_BUFFER_SIZE;
-	SpriteBatch(uint32_t bufferSize = DEFAULT_BUFFER_SIZE, ShaderProgram * const program = nullptr);
+	explicit SpriteBatch(uint32_t bufferSize = DEFAULT_BUFFER_SIZE, ShaderProgram * const program =
+			nullptr);
 	~SpriteBatch();
 
 	void begin();

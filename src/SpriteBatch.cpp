@@ -21,9 +21,9 @@
 
 #include <string>
 #include <sstream>
-#include <new>
 #include <utility>
 #include <memory>
+#include <vector>
 
 #include <glm/vec2.hpp>
 
@@ -42,8 +42,15 @@ const char * const APG::SpriteBatch::TEXCOORD_ATTRIBUTE = "texcoord";
 const uint32_t APG::SpriteBatch::DEFAULT_BUFFER_SIZE = 1000;
 
 APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program) :
-		bufferSize(bufferSize), vertexBuffer(BufferType::ARRAY, DrawType::DYNAMIC_DRAW), indexBuffer(
-				BufferType::ELEMENT_ARRAY, DrawType::STATIC_DRAW) {
+		bufferSize(bufferSize), //
+		vao(), //
+		vertexBuffer( { //
+				VertexAttribute(POSITION_ATTRIBUTE, AttributeUsage::POSITION, 2), //
+				VertexAttribute(COLOR_ATTRIBUTE, AttributeUsage::COLOR, 4), //
+				VertexAttribute(TEXCOORD_ATTRIBUTE, AttributeUsage::TEXCOORD, 2) }), //
+
+		indexBuffer(false), //
+		vertices(bufferSize, 0.0f) {
 	if (program == nullptr) {
 		this->ownedShaderProgram = SpriteBatch::createDefaultShader();
 		this->program = ownedShaderProgram.get();
@@ -51,22 +58,11 @@ APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program
 		this->program = program;
 	}
 
-	vao = std::make_unique<VAO>();
-
-	vertices = std::unique_ptr<float[]>(new float[bufferSize * APG::VERTEX_SIZE]);
-
-	const int indicesLength = bufferSize * 6;
-	uint16_t *indices = nullptr;
-
-	try {
-		indices = new uint16_t[indicesLength];
-	} catch (std::bad_alloc &ba) {
-		setErrorState("Couldn't allocate for index array.");
-		return;
-	}
+	const unsigned int indicesLength = bufferSize * 6;
+	std::vector<uint16_t> indices(indicesLength, 0);
 
 	uint16_t j = 0;
-	for (int i = 0; i < indicesLength; i += 6, j += 4) {
+	for (unsigned int i = 0; i < indicesLength; i += 6, j += 4) {
 		indices[i + 0] = j;
 		indices[i + 1] = j + 1;
 		indices[i + 2] = j + 2;
@@ -75,7 +71,7 @@ APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program
 		indices[i + 5] = j;
 	}
 
-	mesh = std::unique_ptr<Mesh>(new Mesh{VertexAttribute(POSITION_ATTRIBUTE, AttributeUsage::POSITION, 2)});
+	indexBuffer.setData(indices);
 }
 
 APG::SpriteBatch::~SpriteBatch() {
@@ -221,7 +217,7 @@ void APG::SpriteBatch::begin() {
 	}
 
 	drawing = true;
-	vao->bind();
+	vao.bind();
 	indexBuffer.upload();
 	vertexBuffer.bind();
 	program->use();

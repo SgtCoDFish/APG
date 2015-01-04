@@ -47,8 +47,8 @@ GL_TEXTURE22, GL_TEXTURE23, GL_TEXTURE24, GL_TEXTURE25, GL_TEXTURE26, GL_TEXTURE
 GL_TEXTURE28, GL_TEXTURE29, GL_TEXTURE30, GL_TEXTURE31 };
 
 APG::Texture::Texture(const std::string &fileName, bool preserveSurface) : preserveSurface(preserveSurface) {
-	textureUnit = availableTextureUnit++;
-	glTextureID = TEXTURE_TARGETS[textureUnit];
+	textureUnitInt = availableTextureUnit++;
+	textureUnitGL = TEXTURE_TARGETS[textureUnitInt];
 
 	generateTextureID();
 	loadTexture(fileName);
@@ -136,7 +136,7 @@ void APG::Texture::tempBind() {
 
 	glGetIntegerv(GL_TEXTURE_BINDING_2D, (int32_t *) &tempBindID);
 	glGetIntegerv(GL_ACTIVE_TEXTURE, (int32_t *) &tempUnit);
-	glActiveTexture(glTextureID);
+	glActiveTexture(textureUnitGL);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
@@ -151,7 +151,7 @@ void APG::Texture::bind() const {
 		return;
 	}
 
-	glActiveTexture(glTextureID);
+	glActiveTexture(textureUnitGL);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
@@ -199,5 +199,5 @@ void APG::Texture::generateMipMaps() {
 
 void APG::Texture::attachToShader(const char * const uniformName,
 		ShaderProgram * const program) const {
-	program->setUniformi(uniformName, textureUnit);
+	program->setUniformi(uniformName, textureUnitInt);
 }

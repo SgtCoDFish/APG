@@ -26,21 +26,16 @@
 
 namespace APG {
 
-class IndexBufferObject {
-private:
-	const DrawType drawType;
-
-	UInt32Buffer buffer;
-
+class IndexBufferObject : public UInt16Buffer {
 public:
-	explicit IndexBufferObject(bool isStatic = false);
-
-	inline const DrawType getDrawType() const {
-		return drawType;
+	explicit IndexBufferObject(bool isStatic = false) :
+			IndexBufferObject { isStatic, nullptr, 0 } {
 	}
 
-	inline const UInt32Buffer &getBuffer() const {
-		return buffer;
+	IndexBufferObject(bool isStatic, uint16_t indices[], int32_t indexCount) :
+			UInt16Buffer(BufferType::ELEMENT_ARRAY,
+					(isStatic ? DrawType::STATIC_DRAW : DrawType::DYNAMIC_DRAW), indices,
+					indexCount) {
 	}
 };
 

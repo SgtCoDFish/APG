@@ -24,6 +24,8 @@
 
 #include <sstream>
 #include <string>
+#include <vector>
+#include <array>
 
 #include <GL/glew.h>
 #include <GL/glu.h>
@@ -53,13 +55,13 @@ enum DrawType {
 };
 
 template<typename T, int glType> class Buffer : public ErrorBase {
-private:
+protected:
 	uint32_t bufferID;
 
 	const BufferType bufferType;
-	DrawType drawType;
+	const DrawType drawType;
 
-	T *data = nullptr;
+	std::vector<T> bufferData;
 	uint64_t elementCount = 0;
 
 	void generateID() {
@@ -91,9 +93,9 @@ public:
 	}
 
 	void upload() {
-		if (!hasError() && data != nullptr && elementCount > 0) {
+		if (!hasError()) {
 			bind();
-			glBufferData(bufferType, elementCount * sizeof(T), data, drawType);
+			glBufferData(bufferType, elementCount * sizeof(T), &(bufferData.front()), drawType);
 
 			GLenum glError = glGetError();
 			if (glError != GL_NO_ERROR) {
@@ -110,11 +112,6 @@ public:
 		}
 	}
 
-	void setDrawType(DrawType drawType) {
-		this->drawType = drawType;
-		upload();
-	}
-
 	const BufferType &getBufferType() const {
 		return bufferType;
 	}
@@ -123,13 +120,43 @@ public:
 		return drawType;
 	}
 
+	/**
+	 * Sets the buffer's data to copy <em>data</em>. Removes everything else in the buffer.
+	 * @param data
+	 * @param elementCount
+	 */
 	void setData(T * const data, uint64_t elementCount) {
-		this->data = data;
-		this->elementCount = elementCount;
+		bufferData.clear();
+		for (uint64_t i = 0; i < elementCount; i++) {
+			bufferData[i] = data[i];
+		}
+	}
+
+	/**
+	 * Sets the buffer's data to copy <em>data</em>. Removes everything else in the buffer.
+	 * @param data
+	 */
+	template<int bufferSize> void setData(std::array<T, bufferSize> &data) {
+		bufferData.clear();
+		for (int i = 0; i < bufferSize; i++) {
+			bufferData[i] = data[i];
+		}
+	}
+
+	void setData(const std::vector<T> &buffer) {
+		bufferData.clear();
+
+		for (const auto &dat : buffer) {
+			bufferData.emplace_back(dat);
+		}
 	}
 
 	int getGLType() const {
 		return glType;
+	}
+
+	uint32_t getBufferID() const {
+		return bufferID;
 	}
 
 	Buffer(Buffer &other) = delete;

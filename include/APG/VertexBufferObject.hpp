@@ -27,24 +27,18 @@
 
 namespace APG {
 
-class VertexBufferObject {
+/**
+ * A float buffer for vertices with vertex attributes added in for good measure.
+ */
+class VertexBufferObject : public FloatBuffer {
 private:
-	const DrawType drawType;
-
-	FloatBuffer vertexData;
 	VertexAttributeList attributeList;
 
 public:
 	explicit VertexBufferObject(std::initializer_list<VertexAttribute> initList);
 	VertexBufferObject(bool isStatic, std::initializer_list<VertexAttribute> initList);
-
-	inline const DrawType getDrawType() const {
-		return drawType;
-	}
-
-	inline const FloatBuffer &getVertexData() const {
-		return vertexData;
-	}
+	VertexBufferObject(bool isStatic, std::initializer_list<VertexAttribute> initList,
+			float vertices[], int vertexCount);
 
 	inline const VertexAttributeList &getAttributes() const {
 		return attributeList;
