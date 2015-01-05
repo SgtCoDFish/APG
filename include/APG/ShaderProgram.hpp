@@ -46,8 +46,6 @@ private:
 
 	std::string shaderInfoLog, linkInfoLog;
 
-
-
 	void loadShader(const std::string &vertexShaderFilename, uint32_t shaderType);
 	void combineProgram();
 
@@ -62,9 +60,8 @@ public:
 
 	void use();
 
-	void setVertexAttribute(const VertexAttribute &vertexAttribute);
+	void setVertexAttribute(const VertexAttribute &vertexAttribute, uint16_t stride);
 	void setVertexAttributes(const VertexAttributeList &attributeList);
-	void setVertexAttributes(const std::vector<VertexAttribute> &vertexAttributes);
 
 	/**
 	 * Sets a float attribute directly. Can make calculations a little more complicated,
@@ -75,8 +72,8 @@ public:
 	 * @param offsetInElements the offset in elements (the number of elements before this one)
 	 * @param normalize whether to normalize between -1.0f - 1.0f, default false.
 	 */
-	void setFloatAttribute(const char * const attributeName, int32_t valueCount,
-			int32_t strideInElements, int32_t offsetInElements, bool normalize = false);
+	void setFloatAttribute(const char * const attributeName, uint8_t valueCount,
+			uint32_t strideInElements, uint32_t offsetInElements, bool normalize = false);
 
 	void setUniformf(const char * const uniformName, std::initializer_list<float> vals);
 	void setUniformf(const char * const uniformName, float val);

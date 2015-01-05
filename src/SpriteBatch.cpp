@@ -42,6 +42,7 @@ const char * const APG::SpriteBatch::TEXCOORD_ATTRIBUTE = "texcoord";
 const uint32_t APG::SpriteBatch::DEFAULT_BUFFER_SIZE = 1000;
 
 APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program) :
+		ErrorBase(), //
 		bufferSize(bufferSize), //
 		vao(), //
 		vertexBuffer( { //
@@ -53,6 +54,14 @@ APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program
 		vertices(bufferSize, 0.0f) {
 	if (program == nullptr) {
 		this->ownedShaderProgram = SpriteBatch::createDefaultShader();
+
+		if (ownedShaderProgram->hasError()) {
+			setErrorState(
+					std::string("Couldn't create default SpriteBatch shader: ")
+							+ ownedShaderProgram->getErrorMessage());
+			return;
+		}
+
 		this->program = ownedShaderProgram.get();
 	} else {
 		this->program = program;
@@ -75,6 +84,11 @@ APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program
 }
 
 APG::SpriteBatch::~SpriteBatch() {
+}
+
+void APG::SpriteBatch::switchTexture(APG::Texture * const newTexture) {
+	flush();
+	lastTexture = newTexture;
 }
 
 void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32_t width,
@@ -137,48 +151,77 @@ void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32
 //	}
 }
 
-void APG::SpriteBatch::draw(APG::Sprite *sprite, float x, float y) {
-//	const float color = 1.0f;
-//	Vertex verticest[4];
-//
-//	verticest[0].x = x;
-//	verticest[0].y = y;
-//	verticest[0].c = color;
-//	verticest[0].u = sprite->getU();
-//	verticest[0].v = sprite->getV();
-//
-//	verticest[1].x = x;
-//	verticest[1].y = y + sprite->getHeight();
-//	verticest[1].c = color;
-//	verticest[1].u = sprite->getU();
-//	verticest[1].v = sprite->getV2();
-//
-//	verticest[2].x = x + sprite->getWidth();
-//	verticest[2].y = y + sprite->getHeight();
-//	verticest[2].c = color;
-//	verticest[2].u = sprite->getU2();
-//	verticest[2].v = sprite->getV2();
-//
-//	verticest[3].x = x + sprite->getWidth();
-//	verticest[3].y = y;
-//	verticest[3].c = color;
-//	verticest[3].u = sprite->getU2();
-//	verticest[3].v = sprite->getV();
-//
-//	float verticesf[20];
-//
-//	for (int i = 0; i < 4; i++) {
-//		verticesf[i * 5 + 0] = verticest[i].x;
-//		verticesf[i * 5 + 1] = verticest[i].y;
-//		verticesf[i * 5 + 2] = verticest[i].c;
-//		verticesf[i * 5 + 3] = verticest[i].u;
-//		verticesf[i * 5 + 4] = verticest[i].v;
-//	}
+void APG::SpriteBatch::draw(APG::Sprite * const sprite, float x, float y) {
+	if (sprite->getTexture() != lastTexture) {
+		switchTexture(sprite->getTexture());
+	}
+
+	const float color = 1.0f;
+
+	vertices[idx++] = x;
+	vertices[idx++] = y;
+	vertices[idx++] = color;
+	vertices[idx++] = sprite->getU();
+	vertices[idx++] = sprite->getV();
+
+	vertices[idx++] = x;
+	vertices[idx++] = y + sprite->getHeight();
+	vertices[idx++] = color;
+	vertices[idx++] = sprite->getU();
+	vertices[idx++] = sprite->getV2();
+
+	vertices[idx++] = x + sprite->getWidth();
+	vertices[idx++] = y + sprite->getHeight();
+	vertices[idx++] = color;
+	vertices[idx++] = sprite->getU2();
+	vertices[idx++] = sprite->getV2();
+
+	vertices[idx++] = x + sprite->getWidth();
+	vertices[idx++] = y;
+	vertices[idx++] = color;
+	vertices[idx++] = sprite->getU2();
+	vertices[idx++] = sprite->getV();
 }
 
 void APG::SpriteBatch::flush() {
-	vertexBuffer.upload();
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	if (idx == 0) {
+		return;
+	}
+
+	vao.bind();
+	vertexBuffer.setData(vertices);
+	lastTexture->bind();
+	vertexBuffer.bind(program);
+	indexBuffer.bind();
+
+	const int spriteCount = (idx * 6) / 20;
+
+	glDrawElements(GL_TRIANGLES, spriteCount, GL_UNSIGNED_INT, 0);
+
+	idx = 0;
+}
+
+void APG::SpriteBatch::begin() {
+	if (hasError()) {
+		return;
+	}
+
+	drawing = true;
+}
+
+void APG::SpriteBatch::end() {
+	if (hasError()) {
+		return;
+	} else if (!drawing) {
+		setErrorState("Trying to end before a begin.");
+		return;
+	}
+
+	drawing = false;
+
+	if (idx > 0) {
+		flush();
+	}
 }
 
 std::unique_ptr<APG::ShaderProgram> APG::SpriteBatch::createDefaultShader() {
@@ -199,40 +242,14 @@ std::unique_ptr<APG::ShaderProgram> APG::SpriteBatch::createDefaultShader() {
 	fragmentShaderStream << "#version 150 core\n" //
 			<< "in vec4 frag_color;\n"  //
 			<< "in vec2 frag_texcoord;\n"  //
-			<< "out vec4 outColor;"  //
-			<< "uniform sampler2D texture;"  //
+			<< "out vec4 outColor;\n"  //
+			<< "uniform sampler2D tex0;\n"  //
 			<< "void main() {\n"  //
-			<< "outColor = color * texture(texture, frag_texcoord);"  //
+			<< "outColor = frag_color * texture(tex0, frag_texcoord);\n"  //
 			<< "}\n\n";
 
 	const auto vertexShader = vertexShaderStream.str();
 	const auto fragmentShader = fragmentShaderStream.str();
 
 	return ShaderProgram::fromSource(vertexShader, fragmentShader);
-}
-
-void APG::SpriteBatch::begin() {
-	if (hasError()) {
-		return;
-	}
-
-	drawing = true;
-	vao.bind();
-	indexBuffer.upload();
-	vertexBuffer.bind();
-	program->use();
-	program->setFloatAttribute(POSITION_ATTRIBUTE, 2, 5, 0);
-	program->setFloatAttribute(COLOR_ATTRIBUTE, 1, 5, 2);
-	program->setFloatAttribute(TEXCOORD_ATTRIBUTE, 2, 5, 3);
-}
-
-void APG::SpriteBatch::end() {
-	if (hasError()) {
-		return;
-	} else if (!drawing) {
-		setErrorState("Trying to end before a begin.");
-		return;
-	}
-
-	drawing = false;
 }

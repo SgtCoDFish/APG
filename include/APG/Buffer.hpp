@@ -88,13 +88,13 @@ public:
 		glDeleteBuffers(1, &bufferID);
 	}
 
-	void bind() const {
+	void bind() {
 		glBindBuffer(bufferType, bufferID);
+		upload();
 	}
 
 	void upload() {
 		if (!hasError()) {
-			bind();
 			glBufferData(bufferType, elementCount * sizeof(T), &(bufferData.front()), drawType);
 
 			GLenum glError = glGetError();

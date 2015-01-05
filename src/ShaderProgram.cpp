@@ -56,7 +56,7 @@ APG::ShaderProgram::ShaderProgram(const std::string &vertexShaderSource,
 
 std::unique_ptr<APG::ShaderProgram> APG::ShaderProgram::fromSource(
 		const std::string &vertexShaderSource, const std::string &fragmentShaderSource) {
-	return std::make_unique<APG::ShaderProgram>(vertexShaderSource, vertexShaderSource);
+	return std::make_unique<APG::ShaderProgram>(vertexShaderSource, fragmentShaderSource);
 }
 
 std::unique_ptr<APG::ShaderProgram> APG::ShaderProgram::fromFiles(
@@ -81,8 +81,20 @@ void APG::ShaderProgram::use() {
 	glUseProgram(shaderProgram);
 }
 
-void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, int32_t valueCount,
-		int32_t strideInElements, int32_t offsetInElements, bool normalize) {
+void APG::ShaderProgram::setVertexAttribute(const APG::VertexAttribute &vertexAttribute,
+		uint16_t stride) {
+	setFloatAttribute(vertexAttribute.getAlias().c_str(), vertexAttribute.getComponentCount(),
+			stride, vertexAttribute.getOffset(), false);
+}
+
+void APG::ShaderProgram::setVertexAttributes(const VertexAttributeList &attributeList) {
+	for (const auto &attribute : attributeList.getAttributes()) {
+		setVertexAttribute(attribute, attributeList.getStride());
+	}
+}
+
+void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, uint8_t valueCount,
+		uint32_t strideInElements, uint32_t offsetInElements, bool normalize) {
 	const auto attributeLocation = glGetAttribLocation(shaderProgram, attributeName);
 
 	if (attributeLocation == -1 || glGetError() != GL_NO_ERROR) {

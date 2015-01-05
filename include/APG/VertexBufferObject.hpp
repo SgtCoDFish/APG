@@ -24,6 +24,7 @@
 
 #include "Buffer.hpp"
 #include "VertexAttributeList.hpp"
+#include "ShaderProgram.hpp"
 
 namespace APG {
 
@@ -43,6 +44,8 @@ public:
 	inline const VertexAttributeList &getAttributes() const {
 		return attributeList;
 	}
+
+	void bind(ShaderProgram * const program);
 };
 
 }

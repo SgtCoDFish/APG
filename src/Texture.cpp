@@ -46,7 +46,8 @@ GL_TEXTURE16, GL_TEXTURE17, GL_TEXTURE18, GL_TEXTURE19, GL_TEXTURE20, GL_TEXTURE
 GL_TEXTURE22, GL_TEXTURE23, GL_TEXTURE24, GL_TEXTURE25, GL_TEXTURE26, GL_TEXTURE27,
 GL_TEXTURE28, GL_TEXTURE29, GL_TEXTURE30, GL_TEXTURE31 };
 
-APG::Texture::Texture(const std::string &fileName, bool preserveSurface) : preserveSurface(preserveSurface) {
+APG::Texture::Texture(const std::string &fileName, bool preserveSurface) :
+		preserveSurface(preserveSurface), preservedSurface(SXXDL::make_surface_ptr(nullptr)) {
 	textureUnitInt = availableTextureUnit++;
 	textureUnitGL = TEXTURE_TARGETS[textureUnitInt];
 
@@ -124,7 +125,7 @@ void APG::Texture::loadTexture(const std::string &fileName) {
 	invWidth = 1.0f / width;
 	invHeight = 1.0f / height;
 
-	if(preserveSurface) {
+	if (preserveSurface) {
 		preservedSurface = std::move(surface);
 	}
 }

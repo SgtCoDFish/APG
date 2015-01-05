@@ -56,7 +56,10 @@ private:
 	std::unique_ptr<APG::ShaderProgram> ownedShaderProgram;
 	ShaderProgram *program = nullptr;
 
-	uint64_t idX = 0;
+	uint64_t idx = 0;
+
+	Texture * lastTexture = nullptr;
+	void switchTexture(Texture * const newTexture);
 
 public:
 	static const uint32_t DEFAULT_BUFFER_SIZE;

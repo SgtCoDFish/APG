@@ -22,6 +22,7 @@
 #include "Buffer.hpp"
 #include "VertexBufferObject.hpp"
 #include "VertexAttribute.hpp"
+#include "ShaderProgram.hpp"
 
 APG::VertexBufferObject::VertexBufferObject(std::initializer_list<APG::VertexAttribute> initList) :
 		VertexBufferObject(false, initList) {
@@ -38,4 +39,10 @@ APG::VertexBufferObject::VertexBufferObject(bool isStatic,
 				isStatic ? DrawType::STATIC_DRAW : DrawType::DYNAMIC_DRAW, vertices, vertexCount), //
 		attributeList { initList } {
 
+}
+
+void APG::VertexBufferObject::bind(ShaderProgram * const program) {
+	Buffer::bind();
+
+	program->setVertexAttributes(attributeList);
 }
