@@ -100,7 +100,7 @@ public:
 			GLenum glError = glGetError();
 			if (glError != GL_NO_ERROR) {
 				if (glError == GL_OUT_OF_MEMORY) {
-					setErrorState("Ran out of memory trying to upload vertex data.");
+					setErrorState("Ran out of memory trying to upload buffer data.");
 					return;
 				} else {
 					std::stringstream ss;
@@ -130,6 +130,7 @@ public:
 		for (uint64_t i = 0; i < elementCount; i++) {
 			bufferData[i] = data[i];
 		}
+		this->elementCount = elementCount;
 	}
 
 	/**
@@ -138,17 +139,26 @@ public:
 	 */
 	template<int bufferSize> void setData(std::array<T, bufferSize> &data) {
 		bufferData.clear();
+
 		for (int i = 0; i < bufferSize; i++) {
 			bufferData[i] = data[i];
 		}
+
+		elementCount = data.size();
 	}
 
-	void setData(const std::vector<T> &buffer) {
+	void setData(const std::vector<T> &buffer, uint64_t amount = 0) {
 		bufferData.clear();
 
-		for (const auto &dat : buffer) {
-			bufferData.emplace_back(dat);
+		if (amount == 0) {
+			amount = buffer.size();
 		}
+
+		for (uint64_t i = 0; i < amount; i++) {
+			bufferData.emplace_back(buffer[i]);
+		}
+
+		elementCount = amount;
 	}
 
 	int getGLType() const {

@@ -104,6 +104,12 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	glClearColor(0.313725f, 0.674510f, 0.239216f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	if (spriteBatch->hasError()) {
+		std::cerr << "Error in SpriteBatch:\n" << spriteBatch->getErrorMessage() << std::endl;
+		quit();
+		return;
+	}
+
 	spriteBatch->begin();
 
 	spriteBatch->draw(sprite.get(), 0, 0);

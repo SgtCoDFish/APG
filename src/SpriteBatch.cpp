@@ -48,10 +48,12 @@ APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program
 		vertexBuffer( { //
 				VertexAttribute(POSITION_ATTRIBUTE, AttributeUsage::POSITION, 2), //
 				VertexAttribute(COLOR_ATTRIBUTE, AttributeUsage::COLOR, 4), //
-				VertexAttribute(TEXCOORD_ATTRIBUTE, AttributeUsage::TEXCOORD, 2) }), //
+				VertexAttribute(TEXCOORD_ATTRIBUTE, AttributeUsage::TEXCOORD, 2) //
+				}),//
 
 		indexBuffer(false), //
-		vertices(bufferSize, 0.0f) {
+		vertices(bufferSize, 0.0f), //
+		color(1.0f, 1.0f, 1.0f, 1.0f) {
 	if (program == nullptr) {
 		this->ownedShaderProgram = SpriteBatch::createDefaultShader();
 
@@ -80,7 +82,7 @@ APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program
 		indices[i + 5] = j;
 	}
 
-	indexBuffer.setData(indices);
+	indexBuffer.setData(indices, indices.size());
 }
 
 APG::SpriteBatch::~SpriteBatch() {
@@ -156,47 +158,71 @@ void APG::SpriteBatch::draw(APG::Sprite * const sprite, float x, float y) {
 		switchTexture(sprite->getTexture());
 	}
 
-	const float color = 1.0f;
-
 	vertices[idx++] = x;
 	vertices[idx++] = y;
-	vertices[idx++] = color;
+	vertices[idx++] = color.r;
+	vertices[idx++] = color.g;
+	vertices[idx++] = color.b;
+	vertices[idx++] = color.a;
 	vertices[idx++] = sprite->getU();
 	vertices[idx++] = sprite->getV();
 
 	vertices[idx++] = x;
 	vertices[idx++] = y + sprite->getHeight();
-	vertices[idx++] = color;
+	vertices[idx++] = color.r;
+	vertices[idx++] = color.g;
+	vertices[idx++] = color.b;
+	vertices[idx++] = color.a;
 	vertices[idx++] = sprite->getU();
 	vertices[idx++] = sprite->getV2();
 
 	vertices[idx++] = x + sprite->getWidth();
 	vertices[idx++] = y + sprite->getHeight();
-	vertices[idx++] = color;
+	vertices[idx++] = color.r;
+	vertices[idx++] = color.g;
+	vertices[idx++] = color.b;
+	vertices[idx++] = color.a;
 	vertices[idx++] = sprite->getU2();
 	vertices[idx++] = sprite->getV2();
 
 	vertices[idx++] = x + sprite->getWidth();
 	vertices[idx++] = y;
-	vertices[idx++] = color;
+	vertices[idx++] = color.r;
+	vertices[idx++] = color.g;
+	vertices[idx++] = color.b;
+	vertices[idx++] = color.a;
 	vertices[idx++] = sprite->getU2();
 	vertices[idx++] = sprite->getV();
 }
 
 void APG::SpriteBatch::flush() {
-	if (idx == 0) {
+	if (idx == 0 || hasError()) {
 		return;
 	}
 
+//	for (unsigned int i = 0; i < idx; i++) {
+//		std::cout << "vertices[" << i << "] = " << vertices[i] << std::endl;
+//	}
+
 	vao.bind();
-	vertexBuffer.setData(vertices);
+	program->use();
 	lastTexture->bind();
+	vertexBuffer.setData(vertices, idx);
 	vertexBuffer.bind(program);
 	indexBuffer.bind();
 
-	const int spriteCount = (idx * 6) / 20;
+	if (program->hasError()) {
+		setErrorState(std::string("Error in shader: ") + program->getErrorMessage());
+		idx = 0;
+		return;
+	}
 
-	glDrawElements(GL_TRIANGLES, spriteCount, GL_UNSIGNED_INT, 0);
+	//TODO: Fix hacky sizeof.
+	const int strideInBytes = (vertexBuffer.getAttributes().getStride() * sizeof(GLfloat));
+	const int spriteCount = idx / strideInBytes;
+	const int indexCount = spriteCount * 6;
+
+	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, 0);
 
 	idx = 0;
 }
@@ -233,7 +259,7 @@ std::unique_ptr<APG::ShaderProgram> APG::SpriteBatch::createDefaultShader() {
 			<< "in vec2 " << TEXCOORD_ATTRIBUTE << ";\n" //
 			<< "out vec2 frag_texcoord;\n" //
 			<< "out vec4 frag_color;\n" //
-			<< "void main() {" //
+			<< "void main() {\n" //
 			<< "frag_color = " << COLOR_ATTRIBUTE << ";\n" //
 			<< "frag_texcoord = " << TEXCOORD_ATTRIBUTE << ";\n" //
 			<< "gl_Position = vec4(" << POSITION_ATTRIBUTE << ", 0.0, 1.0);" //

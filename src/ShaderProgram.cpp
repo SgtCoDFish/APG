@@ -97,8 +97,10 @@ void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, uin
 		uint32_t strideInElements, uint32_t offsetInElements, bool normalize) {
 	const auto attributeLocation = glGetAttribLocation(shaderProgram, attributeName);
 
-	if (attributeLocation == -1 || glGetError() != GL_NO_ERROR) {
-		setErrorState(std::string("Couldn't get attribute location: ") + attributeName);
+	if (attributeLocation == -1) {
+		std::stringstream ss;
+		ss << "Couldn't get attribute location: " << attributeName;
+		setErrorState(ss.str());
 		return;
 	}
 

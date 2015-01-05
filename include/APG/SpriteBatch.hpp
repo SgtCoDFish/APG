@@ -61,6 +61,8 @@ private:
 	Texture * lastTexture = nullptr;
 	void switchTexture(Texture * const newTexture);
 
+	glm::vec4 color;
+
 public:
 	static const uint32_t DEFAULT_BUFFER_SIZE;
 	explicit SpriteBatch(uint32_t bufferSize = DEFAULT_BUFFER_SIZE, ShaderProgram * const program =
