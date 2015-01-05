@@ -31,6 +31,7 @@
 #include <GL/glu.h>
 
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "ShaderProgram.hpp"
 #include "ErrorBase.hpp"
@@ -172,6 +173,11 @@ void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::vec3 v
 void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::vec4 vals) {
 	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
 	glUniform4f(uniLoc, vals.x, vals.y, vals.z, vals.w);
+}
+
+void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::mat4 mat) {
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniformMatrix4fv(uniLoc, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 void APG::ShaderProgram::setUniformi(const char * const uniformName,

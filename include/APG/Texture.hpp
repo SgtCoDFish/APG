@@ -82,6 +82,14 @@ private:
 	void tempBind();
 	void rebind();
 
+	TextureWrapType sWrap;
+	TextureWrapType tWrap;
+	void uploadWrapType() const;
+
+	TextureFilterType minFilter;
+	TextureFilterType magFilter;
+	void uploadFilter() const;
+
 public:
 	explicit Texture(const char * const fileName, bool preserveSurface = false) :
 			Texture(std::string(fileName), preserveSurface) {
@@ -121,6 +129,10 @@ public:
 
 	SDL_Surface *getPreservedSurface() const {
 		return (preserveSurface ? preservedSurface.get() : nullptr);
+	}
+
+	inline uint32_t getGLTextureUnit() const {
+		return textureUnitInt;
 	}
 };
 

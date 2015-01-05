@@ -53,7 +53,10 @@ APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program
 
 		indexBuffer(false), //
 		vertices(bufferSize, 0.0f), //
-		color(1.0f, 1.0f, 1.0f, 1.0f) {
+		color(1.0f, 1.0f, 1.0f, 1.0f), //
+		projectionMatrix(glm::ortho(0.0f, 1280.0f, 720.0f, 0.0f, -1.0f, 1.0f)), //
+		transformMatrix(1.0f), //
+		combinedMatrix(1.0f) {
 	if (program == nullptr) {
 		this->ownedShaderProgram = SpriteBatch::createDefaultShader();
 
@@ -91,6 +94,12 @@ APG::SpriteBatch::~SpriteBatch() {
 void APG::SpriteBatch::switchTexture(APG::Texture * const newTexture) {
 	flush();
 	lastTexture = newTexture;
+}
+
+void APG::SpriteBatch::setupMatrices() {
+	combinedMatrix = projectionMatrix * transformMatrix;
+	program->setUniformf("projTrans", combinedMatrix);
+//	program->setUniformf("tex0", 0);
 }
 
 void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32_t width,
@@ -205,8 +214,8 @@ void APG::SpriteBatch::flush() {
 //	}
 
 	vao.bind();
-	program->use();
 	lastTexture->bind();
+	program->use();
 	vertexBuffer.setData(vertices, idx);
 	vertexBuffer.bind(program);
 	indexBuffer.bind();
@@ -233,6 +242,7 @@ void APG::SpriteBatch::begin() {
 	}
 
 	drawing = true;
+	setupMatrices();
 }
 
 void APG::SpriteBatch::end() {
@@ -259,10 +269,12 @@ std::unique_ptr<APG::ShaderProgram> APG::SpriteBatch::createDefaultShader() {
 			<< "in vec2 " << TEXCOORD_ATTRIBUTE << ";\n" //
 			<< "out vec2 frag_texcoord;\n" //
 			<< "out vec4 frag_color;\n" //
+			<< "uniform mat4 projTrans;\n" //
+//			<< "uniform sampler2D tex0;\n" //
 			<< "void main() {\n" //
 			<< "frag_color = " << COLOR_ATTRIBUTE << ";\n" //
 			<< "frag_texcoord = " << TEXCOORD_ATTRIBUTE << ";\n" //
-			<< "gl_Position = vec4(" << POSITION_ATTRIBUTE << ", 0.0, 1.0);" //
+			<< "gl_Position = projTrans * vec4(" << POSITION_ATTRIBUTE << ", 0.0, 1.0);" //
 			<< "}\n\n";
 
 	fragmentShaderStream << "#version 150 core\n" //

@@ -47,7 +47,12 @@ GL_TEXTURE22, GL_TEXTURE23, GL_TEXTURE24, GL_TEXTURE25, GL_TEXTURE26, GL_TEXTURE
 GL_TEXTURE28, GL_TEXTURE29, GL_TEXTURE30, GL_TEXTURE31 };
 
 APG::Texture::Texture(const std::string &fileName, bool preserveSurface) :
-		preserveSurface(preserveSurface), preservedSurface(SXXDL::make_surface_ptr(nullptr)) {
+		preserveSurface(preserveSurface), //
+		preservedSurface(SXXDL::make_surface_ptr(nullptr)), //
+		sWrap(APG::TextureWrapType::CLAMP_TO_EDGE), //
+		tWrap(APG::TextureWrapType::CLAMP_TO_EDGE), //
+		minFilter(APG::TextureFilterType::LINEAR), //
+		magFilter(APG::TextureFilterType::LINEAR) {
 	textureUnitInt = availableTextureUnit++;
 	textureUnitGL = TEXTURE_TARGETS[textureUnitInt];
 
@@ -154,15 +159,24 @@ void APG::Texture::bind() const {
 
 	glActiveTexture(textureUnitGL);
 	glBindTexture(GL_TEXTURE_2D, textureID);
+	uploadFilter();
+	uploadWrapType();
 }
 
 void APG::Texture::setWrapType(TextureWrapType sWrap, TextureWrapType tWrap) {
 	tempBind();
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sWrap);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, tWrap);
+	this->sWrap = sWrap;
+	this->tWrap = tWrap;
+
+	uploadWrapType();
 
 	rebind();
+}
+
+void APG::Texture::uploadWrapType() const {
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sWrap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, tWrap);
 }
 
 void APG::Texture::setColor(glm::vec4 &color) {
@@ -176,18 +190,26 @@ void APG::Texture::setColor(glm::vec4 &color) {
 void APG::Texture::setFilter(TextureFilterType minFilter, TextureFilterType magFilter) {
 	tempBind();
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
-
 	if (magFilter == TextureFilterType::LINEAR_MIPMAP_LINEAR
 			|| magFilter == TextureFilterType::NEAREST_MIPMAP_LINEAR
 			|| magFilter == TextureFilterType::LINEAR_MIPMAP_NEAREST
 			|| magFilter == TextureFilterType::NEAREST_MIPMAP_NEAREST) {
 		setErrorState("Can't set mipmap filter for mag filter.");
+		rebind();
+		return;
 	}
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+	this->minFilter = minFilter;
+	this->magFilter = magFilter;
+
+	uploadFilter();
 
 	rebind();
+}
+
+void APG::Texture::uploadFilter() const {
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
 }
 
 void APG::Texture::generateMipMaps() {

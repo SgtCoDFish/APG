@@ -24,6 +24,8 @@
 
 #include <memory>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "ErrorBase.hpp"
 #include "Buffer.hpp"
 #include "Texture.hpp"
@@ -62,6 +64,10 @@ private:
 	void switchTexture(Texture * const newTexture);
 
 	glm::vec4 color;
+	glm::mat4 projectionMatrix;
+	glm::mat4 transformMatrix;
+	glm::mat4 combinedMatrix;
+	void setupMatrices();
 
 public:
 	static const uint32_t DEFAULT_BUFFER_SIZE;
