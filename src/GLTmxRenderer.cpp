@@ -22,6 +22,7 @@
 #include <glm/vec2.hpp>
 
 #include "GLTmxRenderer.hpp"
+#include "Sprite.hpp"
 
 APG::GLTmxRenderer::GLTmxRenderer(Tmx::Map * const map, SpriteBatch &inBatch) :
 		TmxRenderer(map), batch(inBatch) {
@@ -40,8 +41,8 @@ void APG::GLTmxRenderer::renderLayer(Tmx::Layer * const layer) {
 		return;
 	}
 
-	const auto tileWidth = (float) map->GetTileWidth();
-	const auto tileHeight = (float) map->GetTileHeight();
+	const auto tileWidth = map->GetTileWidth();
+	const auto tileHeight = map->GetTileHeight();
 
 	for (int y = 0; y < layer->GetHeight(); y++) {
 		for (int x = 0; x < layer->GetWidth(); x++) {
@@ -51,15 +52,16 @@ void APG::GLTmxRenderer::renderLayer(Tmx::Layer * const layer) {
 				continue;
 			}
 
-			Tileset *tileset = tilesets[tile.tilesetId].get();
-			const float tileX = position.x + x * tileWidth;
-			const float tileY = position.y + y * tileHeight;
+			Tileset *tileset = getTilesetByID(tile.tilesetId);
+			const int32_t tileX = position.x + x * tileWidth;
+			const int32_t tileY = position.y + y * tileHeight;
 
-			const float texX = tile.id % tileset->getWidthInTiles();
-			const float texY = tile.id / tileset->getWidthInTiles();
+			const int32_t texX = tile.id % tileset->getWidthInTiles();
+			const int32_t texY = tile.id / tileset->getWidthInTiles();
 
-			batch.draw(tileset, tileX, tileY, tileWidth, tileHeight, texX, texY, tileWidth,
-					tileHeight);
+			Sprite sprite { tileset, texX * tileWidth, texY * tileHeight, tileWidth, tileHeight };
+
+			batch.draw(&sprite, tileX, tileY);
 		}
 	}
 }

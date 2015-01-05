@@ -202,6 +202,10 @@ void APG::SpriteBatch::draw(APG::Sprite * const sprite, float x, float y) {
 	vertices[idx++] = color.a;
 	vertices[idx++] = sprite->getU2();
 	vertices[idx++] = sprite->getV();
+
+	if (idx > bufferSize / 2) {
+		flush();
+	}
 }
 
 void APG::SpriteBatch::flush() {

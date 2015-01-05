@@ -110,11 +110,17 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 		return;
 	}
 
-	spriteBatch->begin();
+//	spriteBatch->begin();
+//
+//	for (int y = 0; y < 32 * 100; y += 32) {
+//		for (int x = 0; x < 32 * 100; x += 32) {
+//			spriteBatch->draw(sprite.get(), x, y);
+//		}
+//	}
+//
+//	spriteBatch->end();
 
-	spriteBatch->draw(sprite.get(), 0, 0);
-
-	spriteBatch->end();
+	renderer->renderAll();
 
 	SDL_GL_SwapWindow(window.get());
 }
@@ -144,7 +150,7 @@ int main(int argc, char *argv[]) {
 
 		done = game->update(deltaTime);
 
-		if (timesTaken.size() >= 1000) {
+		if (timesTaken.size() >= 100) {
 			const float sum = std::accumulate(timesTaken.begin(), timesTaken.end(), 0.0f);
 
 			const float fps = 1 / (sum / timesTaken.size());
