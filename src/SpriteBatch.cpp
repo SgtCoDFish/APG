@@ -101,7 +101,6 @@ void APG::SpriteBatch::switchTexture(APG::Texture * const newTexture) {
 void APG::SpriteBatch::setupMatrices() {
 	combinedMatrix = projectionMatrix * transformMatrix;
 	program->setUniformf("projTrans", combinedMatrix);
-//	program->setUniformf("tex0", 0);
 }
 
 void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32_t width,
@@ -166,7 +165,6 @@ void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32
 
 void APG::SpriteBatch::draw(APG::Sprite * const sprite, float x, float y) {
 	if (sprite->getTexture() != lastTexture) {
-//		std::cout << "Switching texture to GL_TEXTURE" << sprite->getTexture()->getGLTextureUnit() << ".\n";
 		switchTexture(sprite->getTexture());
 	}
 
@@ -218,7 +216,7 @@ void APG::SpriteBatch::flush() {
 
 	vao.bind();
 	lastTexture->bind();
-	program->setUniformi("tex0", lastTexture->getGLTextureUnit());
+	program->setUniformi("tex", lastTexture->getGLTextureUnit());
 	vertexBuffer.setData(vertices, idx);
 	vertexBuffer.bind(program);
 	indexBuffer.bind();
@@ -277,7 +275,6 @@ std::unique_ptr<APG::ShaderProgram> APG::SpriteBatch::createDefaultShader() {
 			<< "out vec2 frag_texcoord;\n" //
 			<< "out vec4 frag_color;\n" //
 			<< "uniform mat4 projTrans;\n" //
-//			<< "uniform sampler2D tex0;\n" //
 			<< "void main() {\n" //
 			<< "frag_color = " << COLOR_ATTRIBUTE << ";\n" //
 			<< "frag_texcoord = " << TEXCOORD_ATTRIBUTE << ";\n" //
@@ -288,9 +285,9 @@ std::unique_ptr<APG::ShaderProgram> APG::SpriteBatch::createDefaultShader() {
 			<< "in vec4 frag_color;\n"  //
 			<< "in vec2 frag_texcoord;\n"  //
 			<< "out vec4 outColor;\n"  //
-			<< "uniform sampler2D tex0;\n"  //
+			<< "uniform sampler2D tex;\n"  //
 			<< "void main() {\n"  //
-			<< "outColor = frag_color * texture(tex0, frag_texcoord);\n"  //
+			<< "outColor = frag_color * texture(tex, frag_texcoord);\n"  //
 			<< "}\n\n";
 
 	const auto vertexShader = vertexShaderStream.str();
