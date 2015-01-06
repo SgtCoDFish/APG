@@ -19,6 +19,8 @@
 
 #include <cstdint>
 
+#include <iostream>
+
 #include <string>
 #include <sstream>
 #include <utility>
@@ -164,6 +166,7 @@ void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32
 
 void APG::SpriteBatch::draw(APG::Sprite * const sprite, float x, float y) {
 	if (sprite->getTexture() != lastTexture) {
+//		std::cout << "Switching texture to GL_TEXTURE" << sprite->getTexture()->getGLTextureUnit() << ".\n";
 		switchTexture(sprite->getTexture());
 	}
 
@@ -213,13 +216,9 @@ void APG::SpriteBatch::flush() {
 		return;
 	}
 
-//	for (unsigned int i = 0; i < idx; i++) {
-//		std::cout << "vertices[" << i << "] = " << vertices[i] << std::endl;
-//	}
-
 	vao.bind();
 	lastTexture->bind();
-	program->use();
+	program->setUniformi("tex0", lastTexture->getGLTextureUnit());
 	vertexBuffer.setData(vertices, idx);
 	vertexBuffer.bind(program);
 	indexBuffer.bind();
@@ -247,6 +246,10 @@ void APG::SpriteBatch::begin() {
 
 	drawing = true;
 	setupMatrices();
+	program->use();
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void APG::SpriteBatch::end() {
