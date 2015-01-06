@@ -37,8 +37,8 @@
 #include "Buffer.hpp"
 #include "Texture.hpp"
 
-const char *APG::APGGLRenderTest::vertexShaderFilename = "pass_vertex.glslv";
-const char * APG::APGGLRenderTest::fragmentShaderFilename = "red_frag.glslf";
+const char *APG::APGGLRenderTest::vertexShaderFilename = "assets/pass_vertex.glslv";
+const char * APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag.glslf";
 
 bool APG::APGGLRenderTest::init() {
 	if (hasError()) {
@@ -128,7 +128,8 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 #ifndef APG_TEST_SDL
 int main(int argc, char *argv[]) {
 	APG::SDLGame::sdlWindowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
-	auto game = std::make_unique<APG::APGGLRenderTest>();
+
+	auto game = std::make_unique<APG::APGGLRenderTest>("APG GLTmxRenderer Example", 1280, 720);
 
 	if (!game->init()) {
 		return EXIT_FAILURE;

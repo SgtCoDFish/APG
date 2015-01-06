@@ -54,8 +54,8 @@ private:
 
 	std::unique_ptr<Sprite> sprite;
 public:
-	APGGLRenderTest() :
-			SDLGame("APGGLRenderTest", 640, 480, 3, 2) {
+	APGGLRenderTest(const std::string &title, uint32_t screenWidth, uint32_t screenHeight) :
+			SDLGame(title, screenWidth, screenHeight, 3, 2) {
 	}
 
 	virtual ~APGGLRenderTest() = default;
