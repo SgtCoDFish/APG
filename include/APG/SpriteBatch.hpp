@@ -85,6 +85,21 @@ public:
 
 	void draw(Sprite * const sprite, float x, float y);
 
+	glm::vec4 getColor() const {
+		return color;
+	}
+
+	void setColor(const glm::vec4 &newColor) {
+		color = glm::vec4(newColor);
+	}
+
+	void setColor(float r, float g, float b, float a) {
+		color.r = r;
+		color.g = g;
+		color.b = b;
+		color.a = a;
+	}
+
 	static std::unique_ptr<APG::ShaderProgram> createDefaultShader();
 };
 
