@@ -36,7 +36,7 @@ uint32_t APG::SDLGame::sdlWindowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
 APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
 		uint8_t glMajorVersion, uint8_t glMinorVersion) :
-		windowTitle(std::string(windowTitle)) {
+		Game(windowWidth, windowHeight), windowTitle(std::string(windowTitle)) {
 	if (SDL_Init(sdlInitFlags) < 0) {
 		setErrorState((std::string("Couldn't initialise SDL: ") + SDL_GetError()));
 		return;
@@ -53,7 +53,7 @@ APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint
 }
 
 APG::SDLGame::~SDLGame() {
-	if(glContext != nullptr) {
+	if (glContext != nullptr) {
 		SDL_GL_DeleteContext(glContext);
 	}
 
@@ -110,19 +110,18 @@ void APG::SDLGame::initGL(uint8_t glMajorVersion, uint8_t glMinorVersion) {
 }
 
 void APG::SDLGame::initContextAndGlew() {
-	if(hasError()) {
+	if (hasError()) {
 		return;
 	}
 
 	glContext = SDL_GL_CreateContext(window.get());
-
 
 	glewExperimental = GL_TRUE;
 	glewInit();
 
 	// reset all errors since apparently glew causes some.
 	auto error = glGetError();
-	while(error != GL_NO_ERROR) {
+	while (error != GL_NO_ERROR) {
 		error = glGetError();
 	}
 }

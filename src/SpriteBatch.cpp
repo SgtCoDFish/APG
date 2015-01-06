@@ -37,6 +37,7 @@
 #include "Sprite.hpp"
 #include "Mesh.hpp"
 #include "VertexAttribute.hpp"
+#include "Game.hpp"
 
 const char * const APG::SpriteBatch::POSITION_ATTRIBUTE = "position";
 const char * const APG::SpriteBatch::COLOR_ATTRIBUTE = "color";
@@ -56,7 +57,7 @@ APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program
 		indexBuffer(false), //
 		vertices(bufferSize, 0.0f), //
 		color(1.0f, 1.0f, 1.0f, 1.0f), //
-		projectionMatrix(glm::ortho(0.0f, 1280.0f, 720.0f, 0.0f, -1.0f, 1.0f)), //
+		projectionMatrix(glm::ortho(0.0f, (float)APG::Game::screenWidth, (float)APG::Game::screenHeight, 0.0f, -1.0f, 1.0f)), //
 		transformMatrix(1.0f), //
 		combinedMatrix(1.0f) {
 	if (program == nullptr) {

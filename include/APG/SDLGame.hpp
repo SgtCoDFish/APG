@@ -34,7 +34,6 @@ namespace APG {
 
 class SDLGame : public Game {
 protected:
-
 	SXXDL::window_ptr window = SXXDL::make_window_ptr(nullptr);
 	SDL_GLContext glContext = nullptr;
 
@@ -51,11 +50,6 @@ protected:
 	void initContextAndGlew();
 
 public:
-	SDLGame(const char *windowTitle, uint32_t windowWidth, uint32_t windowHeight,
-			uint8_t glMajorVersion, uint8_t glMinorVersion) :
-			SDLGame(std::string(windowTitle), windowWidth, windowHeight, glMajorVersion,
-					glMinorVersion) {
-	}
 	SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
 			uint8_t glMajorVersion, uint8_t glMinorVersion);
 	virtual ~SDLGame();

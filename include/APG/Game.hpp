@@ -20,7 +20,7 @@
 #ifndef APGGAME_HPP_
 #define APGGAME_HPP_
 
-#include <memory>
+#include <cstdint>
 
 #include "ErrorBase.hpp"
 
@@ -28,8 +28,16 @@ namespace APG {
 
 class Game : public ErrorBase {
 public:
-	Game() {}
-	virtual ~Game() {}
+	static uint32_t screenWidth;
+	static uint32_t screenHeight;
+
+	Game(uint32_t screenWidth = 1280, uint32_t screenHeight = 720) {
+		Game::screenWidth = screenWidth;
+		Game::screenHeight = screenHeight;
+	}
+
+	virtual ~Game() {
+	}
 
 	/**
 	 * Should carry out initialisation of the game.

@@ -55,7 +55,7 @@ private:
 	std::unique_ptr<Sprite> sprite;
 public:
 	APGGLRenderTest() :
-			SDLGame("APGGLRenderTest", 1280, 720, 3, 2) {
+			SDLGame("APGGLRenderTest", 640, 480, 3, 2) {
 	}
 
 	virtual ~APGGLRenderTest() = default;
