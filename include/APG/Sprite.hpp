@@ -32,7 +32,7 @@ namespace APG {
 class Texture;
 
 class Sprite : public ErrorBase {
-private:
+protected:
 	Texture * texture = nullptr;
 
 	int32_t texX = 0, texY = 0;
