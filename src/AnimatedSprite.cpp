@@ -17,6 +17,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <cstdint>
+
+#include "TmxTile.h"
+
 #include "AnimatedSprite.hpp"
 
-
+APG::AnimatedSprite::AnimatedSprite(Tmx::Tile *tile) {
+	if(tile->IsAnimated()) {
+		setErrorState("Trying to create AnimatedSprite from static tile.");
+	}
+}

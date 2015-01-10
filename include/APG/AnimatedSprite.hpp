@@ -24,16 +24,34 @@
 
 #include "Sprite.hpp"
 
+namespace Tmx {
+	class Tile;
+}
+
+namespace APG {
+
 class AnimatedSprite : public Sprite {
 private:
 	uint32_t frameCount;
 
+	float secondsPerFrame;
+	float animTime;
+
+
 public:
-	AnimatedSprite(Texture * const texture, int32_t texX, int32_t texY, int32_t width, int32_t height, uint32_t frameCount) :
+	AnimatedSprite(Texture * const texture, int32_t texX, int32_t texY, int32_t width, int32_t height, uint32_t frameCount, float secondsPerFrame) :
 		Sprite(texture, texX, texY, width, height),
-		frameCount(frameCount) {
+		frameCount(frameCount),
+		secondsPerFrame(secondsPerFrame) {
 		
 	}
+
+	AnimatedSprite(Tmx::Tile *tile);
+
+	void update();
+	
 };
+
+}
 
 #endif
