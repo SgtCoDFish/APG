@@ -48,7 +48,14 @@ public:
 
 	AnimatedSprite(Tmx::Tile *tile);
 
-	void update();
+	void update(float deltaTime);
+
+    int getU() const override;
+    int getV() const override;
+    int getU2() const override;
+    int getV2() const override;
+
+    Sprite *getFrame(int frameNumber) const;
 	
 };
 
