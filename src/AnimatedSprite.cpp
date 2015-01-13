@@ -32,3 +32,19 @@ APG::AnimatedSprite::AnimatedSprite(Tmx::Tile *tile) {
         // calc uv
     }
 }
+
+int APG::AnimatedSprite::getU() const {
+	return Sprite::getU();
+}
+
+int APG::AnimatedSprite::getV() const {
+	return Sprite::getV();
+}
+
+int APG::AnimatedSprite::getU2() const {
+	return Sprite::getU2();
+}
+
+int APG::AnimatedSprite::getV2() const {
+	return Sprite::getV2();
+}
