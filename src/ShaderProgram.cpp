@@ -262,7 +262,7 @@ void APG::ShaderProgram::loadShader(const std::string &shaderSource, uint32_t ty
 
 	*source = glCreateShader(type);
 
-	const auto csource = shaderSource.c_str();
+	auto csource = shaderSource.c_str();
 	glShaderSource(*source, 1, &csource, nullptr);
 	glCompileShader(*source);
 

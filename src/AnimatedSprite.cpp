@@ -23,16 +23,6 @@
 
 #include "AnimatedSprite.hpp"
 
-APG::AnimatedSprite::AnimatedSprite(Tmx::Tile *tile) {
-	if(!tile->IsAnimated()) {
-		setErrorState("Trying to create AnimatedSprite from static tile.");
-	}
-
-    for(const auto &frame : tile->GetFrames()) {
-        // calc uv
-    }
-}
-
 int APG::AnimatedSprite::getU() const {
 	return Sprite::getU();
 }

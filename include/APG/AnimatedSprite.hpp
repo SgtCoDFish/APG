@@ -42,18 +42,17 @@ public:
 	AnimatedSprite(Texture * const texture, int32_t texX, int32_t texY, int32_t width, int32_t height, uint32_t frameCount, float secondsPerFrame) :
 		Sprite(texture, texX, texY, width, height),
 		frameCount(frameCount),
-		secondsPerFrame(secondsPerFrame) {
+		secondsPerFrame(secondsPerFrame),
+		animTime(0.0f) {
 		
 	}
 
-	AnimatedSprite(Tmx::Tile *tile);
-
 	void update(float deltaTime);
 
-    int getU() const override;
-    int getV() const override;
-    int getU2() const override;
-    int getV2() const override;
+    int getU() const;
+    int getV() const;
+    int getU2() const;
+    int getV2() const;
 
     Sprite *getFrame(int frameNumber) const;
 	

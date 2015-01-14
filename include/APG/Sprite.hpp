@@ -45,8 +45,7 @@ protected:
 	void calculateUV();
 
 public:
-	Sprite(Texture * const texture, int32_t texX, int32_t texY, int32_t width, int32_t height
-			);
+	Sprite(Texture * const texture, int32_t texX, int32_t texY, int32_t width, int32_t height);
 
 	Texture * const getTexture() const {
 		return texture;
