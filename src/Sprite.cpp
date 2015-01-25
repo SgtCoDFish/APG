@@ -35,8 +35,12 @@
 #include "APG/ErrorBase.hpp"
 #include "APG/Texture.hpp"
 
-APG::Sprite::Sprite(Texture * const texture, int32_t texX, int32_t texY, int32_t width,
-		int32_t height) :
+APG::Sprite::Sprite(Texture * const texture) : Sprite(texture, 0, 0, texture->getWidth(), texture->getHeight()) {
+
+}
+
+APG::Sprite::Sprite(Texture * const texture, uint32_t texX, uint32_t texY, uint32_t width,
+		uint32_t height) :
 		texture(texture), texX(texX), texY(texY), width(width), height(height) {
 
 	if (texX + width > texture->getWidth() || texY + height > texture->getHeight()) {

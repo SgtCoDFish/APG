@@ -49,8 +49,8 @@ void APG::GLTmxRenderer::renderLayer(Tmx::Layer * const layer) {
 		return;
 	}
 
-	const auto tileWidth = map->GetTileWidth();
-	const auto tileHeight = map->GetTileHeight();
+	const uint32_t tileWidth = map->GetTileWidth();
+	const uint32_t tileHeight = map->GetTileHeight();
 
 	for (int y = 0; y < layer->GetHeight(); y++) {
 		for (int x = 0; x < layer->GetWidth(); x++) {
@@ -61,11 +61,11 @@ void APG::GLTmxRenderer::renderLayer(Tmx::Layer * const layer) {
 			}
 
 			Tileset *tileset = getTilesetByID(tile.tilesetId);
-			const int32_t tileX = position.x + x * tileWidth;
-			const int32_t tileY = position.y + y * tileHeight;
+			const uint32_t tileX = position.x + x * tileWidth;
+			const uint32_t tileY = position.y + y * tileHeight;
 
-			const int32_t texX = tile.id % tileset->getWidthInTiles();
-			const int32_t texY = tile.id / tileset->getWidthInTiles();
+			const uint32_t texX = tile.id % tileset->getWidthInTiles();
+			const uint32_t texY = tile.id / tileset->getWidthInTiles();
 
 			Sprite sprite { tileset, texX * tileWidth, texY * tileHeight, tileWidth, tileHeight };
 

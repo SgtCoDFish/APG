@@ -27,22 +27,37 @@
 
 #include <cstdint>
 
+#include <initializer_list>
+#include <vector>
+
 #include "tmxparser/TmxTile.h"
 
 #include "APG/AnimatedSprite.hpp"
 
-int APG::AnimatedSprite::getU() const {
-	return Sprite::getU();
+APG::AnimatedSprite::AnimatedSprite(float frameDuration,
+		std::initializer_list<Sprite *> sprites, AnimationMode animationMode) :
+		frameCount { sprites.size() }, secondsPerFrame { frameDuration }, animationMode {
+				animationMode } {
+	for(Sprite *sprite : sprites) {
+		frames.emplace_back(sprite);
+	}
 }
 
-int APG::AnimatedSprite::getV() const {
-	return Sprite::getV();
+APG::AnimatedSprite::AnimatedSprite(float frameDuration,
+		std::vector<Sprite *> sprites, AnimationMode animationMode) :
+		frameCount { sprites.size() }, secondsPerFrame { frameDuration }, animationMode {
+				animationMode } {
+	for(Sprite *sprite : sprites) {
+		frames.emplace_back(sprite);
+	}
 }
 
-int APG::AnimatedSprite::getU2() const {
-	return Sprite::getU2();
+void APG::AnimatedSprite::update(float deltaTime) {
+	animTime += deltaTime;
+	// TODO: Finish
 }
 
-int APG::AnimatedSprite::getV2() const {
-	return Sprite::getV2();
+APG::Sprite *APG::AnimatedSprite::getFrame(uint16_t frameNumber) const {
+	// TODO: Impl
+	return nullptr;
 }

@@ -43,9 +43,9 @@ class Sprite : public ErrorBase {
 protected:
 	Texture * texture = nullptr;
 
-	int32_t texX = 0, texY = 0;
+	uint32_t texX = 0, texY = 0;
 
-	int32_t width = 0, height = 0;
+	uint32_t width = 0, height = 0;
 
 	float u1 = 0.0f, v1 = 0.0f;
 	float u2 = 0.0f, v2 = 0.0f;
@@ -53,7 +53,8 @@ protected:
 	void calculateUV();
 
 public:
-	Sprite(Texture * const texture, int32_t texX, int32_t texY, int32_t width, int32_t height);
+	Sprite(Texture * const texture);
+	Sprite(Texture * const texture, uint32_t texX, uint32_t texY, uint32_t width, uint32_t height);
 
 	Texture * getTexture() const {
 		return texture;

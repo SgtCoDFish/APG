@@ -31,6 +31,9 @@
 
 #include <cstdint>
 
+#include <initializer_list>
+#include <vector>
+
 #include "APG/Sprite.hpp"
 
 namespace Tmx {
@@ -39,32 +42,28 @@ namespace Tmx {
 
 namespace APG {
 
-class AnimatedSprite : public Sprite {
+enum class AnimationMode {
+	NORMAL, REVERSED, LOOP, LOOP_PINGPONG
+};
+
+class AnimatedSprite {
 private:
-	uint32_t frameCount;
+	uint64_t frameCount;
 
-	float secondsPerFrame;
-	float animTime;
+	float secondsPerFrame = 0.0f;
+	float animTime = 0.0f;
 
+	AnimationMode animationMode;
+
+	std::vector<Sprite *> frames;
 
 public:
-	AnimatedSprite(Texture * const texture, int32_t texX, int32_t texY, int32_t width, int32_t height, uint32_t frameCount, float secondsPerFrame) :
-		Sprite(texture, texX, texY, width, height),
-		frameCount(frameCount),
-		secondsPerFrame(secondsPerFrame),
-		animTime(0.0f) {
-		
-	}
+	AnimatedSprite(float frameDuration, std::initializer_list<Sprite *> sprites, AnimationMode animationMode = AnimationMode::NORMAL);
+	AnimatedSprite(float frameDuration, std::vector<Sprite *> sprites, AnimationMode animationMode = AnimationMode::NORMAL);
 
 	void update(float deltaTime);
 
-    int getU() const;
-    int getV() const;
-    int getU2() const;
-    int getV2() const;
-
-    Sprite *getFrame(int frameNumber) const;
-	
+    Sprite *getFrame(uint16_t frameNumber) const;
 };
 
 }
