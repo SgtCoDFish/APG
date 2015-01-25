@@ -73,7 +73,7 @@ public:
 		this->position = position;
 	}
 
-	Tileset * const getTilesetByID(int32_t id) const {
+	Tileset * getTilesetByID(int32_t id) const {
 		try {
 			return tilesets[id].get();
 		} catch (std::out_of_range &oor) {
