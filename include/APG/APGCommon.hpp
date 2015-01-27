@@ -33,10 +33,6 @@
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
-namespace Tmx {
-class Map;
-}
-
 namespace APG {
 
 struct Vertex {
