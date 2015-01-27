@@ -104,10 +104,18 @@ void APG::AnimatedSprite::handleNormalMode_() {
 }
 
 void APG::AnimatedSprite::handleLoopMode_() {
-    // TODO: IMPL
+    handleNormalMode_();
+    
+    if(currentFrame == frameCount - 1) {
+        currentFrame = 0;
+    }
 }
 
 void APG::AnimatedSprite::handleLoopPingPongMode_() {
-    // TODO: IMPL
+    handleNormalMode_();
+
+    if(currentFrame == frameCount - 1 || currentFrame == 0) {
+        animDir = (animDir == 1 ? -1 : 1);
+    }
 }
 

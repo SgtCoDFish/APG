@@ -12,3 +12,4 @@ Release/*
 .project
 *.dll
 *.md.html
+*.swp
