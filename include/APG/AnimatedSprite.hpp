@@ -48,14 +48,22 @@ enum class AnimationMode {
 
 class AnimatedSprite {
 private:
+    uint64_t currentFrame = 0;
 	uint64_t frameCount;
 
 	float secondsPerFrame = 0.0f;
 	float animTime = 0.0f;
+    int animDir = 1;
 
 	AnimationMode animationMode;
 
 	std::vector<Sprite *> frames;
+
+    std::function<void()> modeHandler;
+
+    void handleNormalMode_();
+    void handleLoopMode_();
+    void handleLoopPingPongMode_();
 
 public:
 	AnimatedSprite(float frameDuration, std::initializer_list<Sprite *> sprites, AnimationMode animationMode = AnimationMode::NORMAL);
@@ -64,8 +72,15 @@ public:
 	void update(float deltaTime);
 
     Sprite *getFrame(uint16_t frameNumber) const;
+    
+    inline AnimationMode getAnimationMode() const {
+        return animationMode;
+    }
+
+    void setAnimationMode(AnimationMode mode);
 };
 
 }
 
 #endif
+
