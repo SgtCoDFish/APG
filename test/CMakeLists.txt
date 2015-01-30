@@ -1,0 +1,16 @@
+set (SDLRENDERTEST_SOURCES
+    APGSDLRenderTest.cpp)
+
+set (GLRENDERTEST_SOURCES
+    APGGLRenderTest.cpp)
+
+set (GLRENDERTESTTEST_FLAGS "")
+set (SDLRENDERTEST_FLAGS "-DAPG_TEST_SDL")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS} ${SDLRENDERTEST_FLAGS}")
+add_executable(SDLRenderTest EXCLUDE_FROM_ALL ${SDLRENDERTEST_SOURCES}
+target_link_libraries(SDLRenderTest APG-d)
+
+add_executable(GLRenderTest EXCLUDE_FROM_ALL ${GLRENDERTEST_SOURCES})
+target_link_libraries(GLRenderTest APG-d)
+

@@ -13,3 +13,5 @@ Release/*
 *.dll
 *.md.html
 *.swp
+build
+build/

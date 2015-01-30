@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
+set(CMAKE_LEGACY_CYGWIN32 0)
+
 project(APG)
 
 set(VERSION_MAJOR 0)
@@ -17,16 +19,14 @@ find_package(SDL2)
 find_package(SDL2_image)
 find_package(tmxparser)
 
-set(LIB_FLAGS "-std=c++1y -O3 -g0 -Wall -Wextra")
-set(SDLTEST_FLAGS "-std=c++1y -g3 -O0 -Wall -Wextra -DAPG_TEST_SDL")
-set(GLTEST_FLAGS "-std=c++1y -g3 -O0 -Wall -Wextra")
+set(CMAKE_CXX_COMPILER_ARG1 "-std=c++1y")
+set(CMAKE_CXX_FLAGS_BASE "-Wall -Wextra -fPIC")
+
+set(APG_DEBUG_FLAGS "-g3 -O0")
+set(APG_RELEASE_FLAGS "-g0 -O3")
+
+include_directories("include")
 
 add_subdirectory("src")
-
-add_library(APG SHARED ${SOURCES} ${HEADERS})
-set_target_properties(APG PROPERTIES
-    COMPILE_FLAGS ${LIB_FLAGS})
-
-add_executable(APG_glRenderTest ${SOURCES} ${HEADERS} test/APGGLRenderTest.cpp)
-add_executable(APG_sdlRenderTest ${SOURCES} ${HEADERS} test/APGSDLRenderTest.cpp)
+add_subdirectory("test")
 
