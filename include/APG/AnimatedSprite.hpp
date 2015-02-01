@@ -49,17 +49,15 @@ enum class AnimationMode {
 class AnimatedSprite {
 private:
     uint64_t currentFrame = 0;
-	uint64_t frameCount;
+    uint64_t frameCount;
 
-	float secondsPerFrame = 0.0f;
-	float animTime = 0.0f;
+    float secondsPerFrame = 0.0f;
+    float animTime = 0.0f;
     int animDir = 1;
 
-	AnimationMode animationMode;
+    AnimationMode animationMode;
 
-	std::vector<Sprite *> frames;
-
-    std::function<void()> modeHandler;
+    std::vector<Sprite *> frames;
 
     void handleNormalMode_();
     void handleLoopMode_();

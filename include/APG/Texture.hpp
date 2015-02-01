@@ -76,8 +76,8 @@ private:
 	void generateTextureID();
 	void loadTexture(const std::string &fileName);
 
-	int32_t width = 0;
-	int32_t height = 0;
+	uint32_t width = 0;
+	uint32_t height = 0;
 
 	float invWidth = 0.0f;
 	float invHeight = 0.0f;
@@ -119,11 +119,11 @@ public:
 		attachToShader(uniformName.c_str(), program);
 	}
 
-	inline int32_t getWidth() const {
+	inline uint32_t getWidth() const {
 		return width;
 	}
 
-	inline int32_t getHeight() const {
+	inline uint32_t getHeight() const {
 		return height;
 	}
 

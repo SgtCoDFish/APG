@@ -36,11 +36,12 @@
 
 APG::AnimatedSprite::AnimatedSprite(float frameDuration,
 		std::initializer_list<Sprite *> sprites, AnimationMode animationMode) :
-		frameCount { sprites.size() }, secondsPerFrame { frameDuration }, animationMode {
-				animationMode } {
+		frameCount { sprites.size() }, secondsPerFrame { frameDuration } {
 	for(Sprite *sprite : sprites) {
 		frames.emplace_back(sprite);
 	}
+
+	setAnimationMode(animationMode);
 }
 
 APG::AnimatedSprite::AnimatedSprite(float frameDuration,
@@ -56,11 +57,27 @@ APG::AnimatedSprite::AnimatedSprite(float frameDuration,
 void APG::AnimatedSprite::update(float deltaTime) {
 	animTime += deltaTime;
 	
-    modeHandler();
+    switch(animationMode) {
+    case AnimationMode::NORMAL:
+    case AnimationMode::REVERSED:
+    	handleNormalMode_();
+    	break;
+
+    case AnimationMode::LOOP:
+    	handleLoopMode_();
+    	break;
+
+    case AnimationMode::LOOP_PINGPONG:
+    	handleLoopPingPongMode_();
+    	break;
+
+    default: break;
+    	//
+    }
 }
 
 APG::Sprite *APG::AnimatedSprite::getFrame(uint16_t frameNumber) const {
-	return frames[currentFrame];
+	return frames[frameNumber];
 }
 
 void APG::AnimatedSprite::setAnimationMode(APG::AnimationMode mode) {
@@ -69,25 +86,21 @@ void APG::AnimatedSprite::setAnimationMode(APG::AnimationMode mode) {
     switch(this->animationMode) {
     case AnimationMode::NORMAL:
         currentFrame = 0;
-        modeHandler = &handleNormalMode_();
         break;
 
     case AnimationMode::REVERSED:
         currentFrame = frameCount - 1;
-        dir = -1;
-        modeHandler = &handleNormalMode_();
+        animDir = -1;
         break;
 
     case AnimationMode::LOOP:
         currentFrame = 0;
-        dir = 1;
-        modeHandler = &handleLoopMode_();
+        animDir = 1;
         break;
 
     case AnimationMode::LOOP_PINGPONG:
         currentFrame = 0;
-        dir = 1;
-        modeHandler = &handleLoopPingPongMode_();
+        animDir = 1;
         break;
     }
 }
