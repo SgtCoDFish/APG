@@ -41,6 +41,10 @@ void APG::GLTmxRenderer::renderAll() {
 
 	TmxRenderer::renderAll();
 
+	for(const auto &animSprite : animatedSprites) {
+		batch.draw(animSprite.getFrame(0), 320, 320);
+	}
+
 	batch.end();
 }
 
@@ -61,6 +65,7 @@ void APG::GLTmxRenderer::renderLayer(Tmx::Layer * const layer) {
 			}
 
 			Tileset *tileset = getTilesetByID(tile.tilesetId);
+
 			const uint32_t tileX = position.x + x * tileWidth;
 			const uint32_t tileY = position.y + y * tileHeight;
 

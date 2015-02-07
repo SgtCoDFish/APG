@@ -34,6 +34,7 @@
 #include "APG/ErrorBase.hpp"
 #include "APG/Tileset.hpp"
 #include "APG/SXXDL.hpp"
+#include "APG/AnimatedSprite.hpp"
 
 #include <glm/vec2.hpp>
 
@@ -47,6 +48,7 @@ class TmxRenderer : public ErrorBase {
 protected:
 	Tmx::Map *map = nullptr;
 	std::vector<tileset_ptr> tilesets;
+	std::vector<AnimatedSprite> animatedSprites;
 
 	glm::vec2 position { 0.0f, 0.0f };
 

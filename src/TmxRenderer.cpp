@@ -31,12 +31,14 @@
 #include "tmxparser/TmxLayer.h"
 #include "tmxparser/TmxTileset.h"
 #include "tmxparser/TmxImage.h"
+#include "tmxparser/TmxTile.h"
 
 #include "APG/APGCommon.hpp"
 #include "APG/ErrorBase.hpp"
 #include "APG/Tileset.hpp"
 #include "APG/SXXDL.hpp"
 #include "APG/TmxRenderer.hpp"
+#include "APG/AnimatedSprite.hpp"
 
 #include <glm/vec2.hpp>
 
@@ -47,7 +49,8 @@ APG::TmxRenderer::TmxRenderer(Tmx::Map *map) :
 
 void APG::TmxRenderer::loadTilesets() {
 	for (const auto &tileset : map->GetTilesets()) {
-		const auto tilesetName = map->GetFilepath() + tileset->GetImage()->GetSource();
+		const auto tilesetName = map->GetFilepath()
+				+ tileset->GetImage()->GetSource();
 
 		auto loadedTileset = tileset_ptr(new Tileset(tilesetName, map));
 
@@ -56,6 +59,28 @@ void APG::TmxRenderer::loadTilesets() {
 					std::string("Couldn't load ") + tilesetName + ": "
 							+ loadedTileset->getErrorMessage());
 			return;
+		}
+
+		for (const auto &tile : tileset->GetTiles()) {
+			if (tile->IsAnimated()) {
+				std::vector<Sprite *> sprites;
+
+				int frameCounter = 0;
+				for (const auto &frame : tile->GetFrames()) {
+					sprites.emplace_back(
+							new Sprite(loadedTileset.get(),
+									frameCounter * tileset->GetTileWidth(), 0,
+									tileset->GetTileWidth(),
+									tileset->GetTileHeight()));
+					frameCounter++;
+				}
+
+				animatedSprites.emplace_back(
+						AnimatedSprite(
+								tile->GetTotalDuration()
+										/ tile->GetFrameCount(), sprites,
+								AnimationMode::LOOP));
+			}
 		}
 
 		tilesets.emplace_back(std::move(loadedTileset));
