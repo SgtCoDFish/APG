@@ -25,44 +25,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <glm/vec2.hpp>
+#ifndef INCLUDE_APG_SPRITEBASE_HPP_
+#define INCLUDE_APG_SPRITEBASE_HPP_
 
-#include "tmxparser/Tmx.h"
+namespace APG {
+class Texture;
 
-#include "APG/GLTmxRenderer.hpp"
-#include "APG/Sprite.hpp"
+class SpriteBase {
+public:
+	virtual ~SpriteBase() {}
+	virtual Texture * getTexture() const = 0;
 
-APG::GLTmxRenderer::GLTmxRenderer(Tmx::Map * const map, SpriteBatch &inBatch) :
-		TmxRenderer(map), batch(inBatch) {
+	virtual inline int32_t getWidth() const = 0;
+
+	virtual inline int32_t getHeight() const = 0;
+
+	virtual inline float getU() const = 0;
+	virtual inline float getV() const = 0;
+	virtual inline float getU2() const = 0;
+	virtual inline float getV2() const = 0;
+};
+
 }
 
-void APG::GLTmxRenderer::renderAll() {
-	batch.begin();
-
-	TmxRenderer::renderAll();
-
-	batch.end();
-}
-
-void APG::GLTmxRenderer::renderLayer(Tmx::Layer * const layer) {
-	if (!layer->IsVisible()) {
-		return;
-	}
-
-	const uint32_t tileWidth = map->GetTileWidth();
-	const uint32_t tileHeight = map->GetTileHeight();
-
-	for (int y = 0; y < layer->GetHeight(); y++) {
-		for (int x = 0; x < layer->GetWidth(); x++) {
-			const uint32_t tileX = position.x + x * tileWidth;
-			const uint32_t tileY = position.y + y * tileHeight;
-
-			const auto &tile = layer->GetTile(x, y);
-
-			const auto tileHash = calculateTileHash(
-					tilesets[tile.tilesetId].get(), tile.id);
-
-			batch.draw(sprites.at(tileHash), tileX, tileY);
-		}
-	}
-}
+#endif /* INCLUDE_APG_SPRITEBASE_HPP_ */

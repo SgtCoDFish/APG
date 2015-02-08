@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #ifndef ANIMATED_SPRITE__INCLUDE
 #define ANIMATED_SPRITE__INCLUDE
 
@@ -34,10 +33,11 @@
 #include <initializer_list>
 #include <vector>
 
+#include "APG/SpriteBase.hpp"
 #include "APG/Sprite.hpp"
 
 namespace Tmx {
-	class Tile;
+class Tile;
 }
 
 namespace APG {
@@ -46,36 +46,67 @@ enum class AnimationMode {
 	NORMAL, REVERSED, LOOP, LOOP_PINGPONG
 };
 
-class AnimatedSprite {
+class AnimatedSprite: public SpriteBase {
 private:
-    uint64_t currentFrame = 0;
-    uint64_t frameCount;
+	uint64_t currentFrame = 0;
+	uint64_t frameCount;
 
-    float secondsPerFrame = 0.0f;
-    float animTime = 0.0f;
-    int animDir = 1;
+	float secondsPerFrame = 0.0f;
+	float animTime = 0.0f;
+	int animDir = 1;
 
-    AnimationMode animationMode;
+	AnimationMode animationMode;
 
-    std::vector<Sprite *> frames;
+	std::vector<Sprite *> frames;
 
-    void handleNormalMode_();
-    void handleLoopMode_();
-    void handleLoopPingPongMode_();
+	void handleNormalMode_();
+	void handleLoopMode_();
+	void handleLoopPingPongMode_();
 
 public:
-	AnimatedSprite(float frameDuration, std::initializer_list<Sprite *> sprites, AnimationMode animationMode = AnimationMode::NORMAL);
-	AnimatedSprite(float frameDuration, std::vector<Sprite *> sprites, AnimationMode animationMode = AnimationMode::NORMAL);
+	AnimatedSprite(float frameDuration, std::initializer_list<Sprite *> sprites,
+			AnimationMode animationMode = AnimationMode::NORMAL);
+	AnimatedSprite(float frameDuration, std::vector<Sprite *> sprites,
+			AnimationMode animationMode = AnimationMode::NORMAL);
 
 	void update(float deltaTime);
 
-    Sprite *getFrame(uint16_t frameNumber) const;
-    
-    inline AnimationMode getAnimationMode() const {
-        return animationMode;
-    }
+	Sprite *getCurrentFrame() const;
+	Sprite *getFrame(uint16_t frameNumber) const;
 
-    void setAnimationMode(AnimationMode mode);
+	inline AnimationMode getAnimationMode() const {
+		return animationMode;
+	}
+
+	virtual Texture * getTexture() const override {
+		return getCurrentFrame()->getTexture();
+	}
+
+	virtual inline int32_t getWidth() const override {
+		return getCurrentFrame()->getWidth();
+	}
+
+	virtual inline int32_t getHeight() const override {
+		return getCurrentFrame()->getHeight();
+	}
+
+	virtual inline float getU() const override {
+		return getCurrentFrame()->getU();
+	}
+
+	virtual inline float getV() const override {
+		return getCurrentFrame()->getV();
+	}
+
+	virtual inline float getU2() const override {
+		return getCurrentFrame()->getU2();
+	}
+
+	virtual inline float getV2() const override {
+		return getCurrentFrame()->getV2();
+	}
+
+	void setAnimationMode(AnimationMode mode);
 };
 
 }

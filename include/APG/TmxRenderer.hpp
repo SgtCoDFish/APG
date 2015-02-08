@@ -29,6 +29,7 @@
 #define GENTMXRENDERER_HPP_
 
 #include <vector>
+#include <unordered_map>
 
 #include "APG/APGCommon.hpp"
 #include "APG/ErrorBase.hpp"
@@ -40,19 +41,36 @@
 
 namespace Tmx {
 class Map;
+class Tile;
 }
 
 namespace APG {
 
-class TmxRenderer : public ErrorBase {
+/**
+ * Abstracts a renderer for a TMX file that can be loaded using the tmxparser library.
+ *
+ * Note that sprites from tilesets are stored in a map which hashes based on a uint64_t.
+ * Normally this is completely transparent and you don't need to worry about it at all,
+ * but it assumes that there are no more than 1,000,000 sprites in a single OpenGL texture
+ * unit. This would generally be far more than you'd ever see, but things will break if
+ * this happens so you should be aware.
+ */
+class TmxRenderer: public ErrorBase {
 protected:
+	static const uint64_t MAX_SPRITES_PER_UNIT = 1000000;
+
 	Tmx::Map *map = nullptr;
 	std::vector<tileset_ptr> tilesets;
-	std::vector<AnimatedSprite> animatedSprites;
+	std::unordered_map<uint64_t, SpriteBase *> sprites;
+
+	std::vector<Sprite> loadedSprites;
+	std::vector<AnimatedSprite> loadedAnimatedSprites;
 
 	glm::vec2 position { 0.0f, 0.0f };
 
 	void loadTilesets();
+	uint64_t calculateTileHash(const Tileset *tileset, Tmx::Tile * const tile) const;
+	uint64_t calculateTileHash(const Tileset *tileset, int tileID) const;
 
 public:
 	explicit TmxRenderer(Tmx::Map *map);

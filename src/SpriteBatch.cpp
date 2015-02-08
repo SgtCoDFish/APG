@@ -172,7 +172,7 @@ void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32
 //	}
 }
 
-void APG::SpriteBatch::draw(APG::Sprite * const sprite, float x, float y) {
+void APG::SpriteBatch::draw(APG::SpriteBase * const sprite, float x, float y) {
 	if (sprite->getTexture() != lastTexture) {
 		switchTexture(sprite->getTexture());
 	}
