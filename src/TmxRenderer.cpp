@@ -64,23 +64,21 @@ void APG::TmxRenderer::loadTilesets() {
 		// could rely on tiles which are loaded after the animated tile is.
 
 		for (const auto &tile : tileset->GetTiles()) {
-			if (!tile->IsAnimated()) {
-				const uint32_t texX = tile->GetId()
-						% loadedTileset->getWidthInTiles();
-				const uint32_t texY = tile->GetId()
-						/ loadedTileset->getWidthInTiles();
+            const uint32_t texX = tile->GetId()
+                    % loadedTileset->getWidthInTiles();
+            const uint32_t texY = tile->GetId()
+                    / loadedTileset->getWidthInTiles();
 
-				const uint64_t spriteHash = calculateTileHash(
-						loadedTileset.get(), tile);
+            const uint64_t spriteHash = calculateTileHash(
+                    loadedTileset.get(), tile);
 
-				Sprite newSprite = Sprite(loadedTileset.get(), texX * tileWidth,
-						texY * tileHeight, tileWidth, tileHeight);
-				loadedSprites.emplace_back(std::move(newSprite));
+            Sprite newSprite = Sprite(loadedTileset.get(), texX * tileWidth,
+                    texY * tileHeight, tileWidth, tileHeight);
+            loadedSprites.emplace_back(std::move(newSprite));
 
-				sprites.insert(
-						std::pair<uint64_t, SpriteBase *>(spriteHash,
-								&(loadedSprites.back())));
-			}
+            sprites.insert(
+                    std::pair<uint64_t, SpriteBase *>(spriteHash,
+                            &(loadedSprites.back())));
 		}
 
 		// now iterate again for animated sprites since all the frames must be loaded
