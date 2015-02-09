@@ -13,6 +13,19 @@ message("Conifguring APG version ${VERSION}.")
 file(GLOB_RECURSE APG_SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 file(GLOB_RECURSE APG_HEADERS ${PROJECT_SOURCE_DIR}/include/*.hpp)
 
+if(NOT DEFINED TMXPARSER_INCLUDE_DIR)
+    message("No tmxparser include dir specified")
+else()
+    include_directories($TMXPARSER_INCLUDE_DIR)
+endif()
+
+if(NOT DEFINED TMXPARSER_LIBRARIES)
+    message("No tmxparser library specified")
+else()
+    link_directories($TMXPARSER_LIBRARIES)
+endif()
+
+
 include(FindPkgConfig)
 pkg_search_module(SDL2 REQUIRED sdl2)
 pkg_search_module(SDL2IMAGE REQUIRED SDL2_image)
