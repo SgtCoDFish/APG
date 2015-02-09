@@ -34,12 +34,13 @@
 
 #include "APG/Buffer.hpp"
 #include "APG/ErrorBase.hpp"
+#include "APG/SpriteBase.hpp"
 
 namespace APG {
 
 class Texture;
 
-class Sprite : public ErrorBase {
+class Sprite: public SpriteBase, public ErrorBase {
 protected:
 	Texture * texture = nullptr;
 
@@ -54,41 +55,42 @@ protected:
 
 public:
 	Sprite(Texture * const texture);
-	Sprite(Texture * const texture, uint32_t texX, uint32_t texY, uint32_t width, uint32_t height);
+	Sprite(Texture * const texture, uint32_t texX, uint32_t texY,
+			uint32_t width, uint32_t height);
 
-	Texture * getTexture() const {
+	virtual Texture * getTexture() const override {
 		return texture;
 	}
 
-	inline int32_t getWidth() const {
+	virtual inline int32_t getWidth() const override {
 		return width;
 	}
 
-	inline int32_t getHeight() const {
+	virtual inline int32_t getHeight() const override {
 		return height;
 	}
 
-	inline float getU() const {
+	virtual inline float getU() const override {
 		return u1;
 	}
 
-	inline float getV() const {
+	virtual inline float getV() const override {
 		return v1;
 	}
 
-	inline float getU2() const {
+	virtual inline float getU2() const override {
 		return u2;
 	}
 
-	inline float getV2() const {
+	virtual inline float getV2() const override {
 		return v2;
 	}
 
-	Sprite(Sprite &other) = delete;
-	Sprite(const Sprite &other) = delete;
-
-	Sprite &operator=(Sprite &other) = delete;
-	Sprite &operator=(const Sprite &other) = delete;
+//	Sprite(Sprite &other) = delete;
+//	Sprite(const Sprite &other) = delete;
+//
+//	Sprite &operator=(Sprite &other) = delete;
+//	Sprite &operator=(const Sprite &other) = delete;
 };
 
 }

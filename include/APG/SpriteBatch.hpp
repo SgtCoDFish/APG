@@ -42,6 +42,7 @@
 #include "APG/Mesh.hpp"
 #include "APG/VertexBufferObject.hpp"
 #include "APG/IndexBufferObject.hpp"
+#include "APG/SpriteBase.hpp"
 
 namespace APG {
 
@@ -91,7 +92,7 @@ public:
 	void draw(Texture * const image, float x, float y, uint32_t width, uint32_t height, float srcX,
 			float srcY, uint32_t srcWidth, uint32_t srcHeight);
 
-	void draw(Sprite * const sprite, float x, float y);
+	void draw(SpriteBase * const sprite, float x, float y);
 
 	glm::vec4 getColor() const {
 		return color;

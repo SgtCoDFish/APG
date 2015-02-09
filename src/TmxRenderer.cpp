@@ -26,17 +26,21 @@
  */
 
 #include <vector>
+#include <unordered_map>
+#include <utility>
 
 #include "tmxparser/TmxMap.h"
 #include "tmxparser/TmxLayer.h"
 #include "tmxparser/TmxTileset.h"
 #include "tmxparser/TmxImage.h"
+#include "tmxparser/TmxTile.h"
 
 #include "APG/APGCommon.hpp"
 #include "APG/ErrorBase.hpp"
 #include "APG/Tileset.hpp"
 #include "APG/SXXDL.hpp"
 #include "APG/TmxRenderer.hpp"
+#include "APG/AnimatedSprite.hpp"
 
 #include <glm/vec2.hpp>
 
@@ -46,19 +50,69 @@ APG::TmxRenderer::TmxRenderer(Tmx::Map *map) :
 }
 
 void APG::TmxRenderer::loadTilesets() {
+	const uint32_t tileWidth = map->GetTileWidth();
+	const uint32_t tileHeight = map->GetTileHeight();
+
 	for (const auto &tileset : map->GetTilesets()) {
-		const auto tilesetName = map->GetFilepath() + tileset->GetImage()->GetSource();
+		const auto tilesetName = map->GetFilepath()
+				+ tileset->GetImage()->GetSource();
 
 		auto loadedTileset = tileset_ptr(new Tileset(tilesetName, map));
 
-		if (loadedTileset->hasError()) {
-			setErrorState(
-					std::string("Couldn't load ") + tilesetName + ": "
-							+ loadedTileset->getErrorMessage());
-			return;
+		// now we've loaded the tileset, we need to iterate once to build a Sprite
+		// for each tile, and then again to build up the animated sprites which
+		// could rely on tiles which are loaded after the animated tile is.
+
+		for (const auto &tile : tileset->GetTiles()) {
+			if (!tile->IsAnimated()) {
+				const uint32_t texX = tile->GetId()
+						% loadedTileset->getWidthInTiles();
+				const uint32_t texY = tile->GetId()
+						/ loadedTileset->getWidthInTiles();
+
+				const uint64_t spriteHash = calculateTileHash(
+						loadedTileset.get(), tile);
+
+				Sprite newSprite = Sprite(loadedTileset.get(), texX * tileWidth,
+						texY * tileHeight, tileWidth, tileHeight);
+				loadedSprites.emplace_back(std::move(newSprite));
+
+				sprites.insert(
+						std::pair<uint64_t, SpriteBase *>(spriteHash,
+								&(loadedSprites.back())));
+			}
 		}
 
-		tilesets.emplace_back(std::move(loadedTileset));
+		// now iterate again for animated sprites since all the frames must be loaded
+
+		for (const auto &tile : tileset->GetTiles()) {
+			if (tile->IsAnimated()) {
+				std::vector<Sprite *> frameVec(tile->GetFrameCount());
+
+				for (const auto frame : tile->GetFrames()) {
+					const auto frameHash = calculateTileHash(
+							loadedTileset.get(), frame.GetTileID());
+
+					try {
+						frameVec.emplace_back((Sprite *) sprites.at(frameHash));
+					} catch (std::out_of_range &oor) {
+						setErrorState(
+								"Invalid frame id when loading animated sprite.");
+						return;
+					}
+				}
+
+				const uint64_t tileHash = calculateTileHash(loadedTileset.get(),
+						tile->GetId());
+
+				loadedAnimatedSprites.emplace_back(0.15f, frameVec,
+						AnimationMode::LOOP);
+
+				sprites.insert(
+						std::pair<uint64_t, SpriteBase *>(tileHash,
+								&(loadedAnimatedSprites.back())));
+			}
+		}
 	}
 }
 
@@ -66,5 +120,15 @@ void APG::TmxRenderer::renderAll() {
 	for (const auto &layer : map->GetLayers()) {
 		renderLayer(layer);
 	}
+}
+
+uint64_t APG::TmxRenderer::calculateTileHash(const Tileset *tileset,
+		Tmx::Tile * const tile) const {
+	return calculateTileHash(tileset, tile->GetId());
+}
+
+uint64_t APG::TmxRenderer::calculateTileHash(const Tileset *tileset,
+		int tileID) const {
+	return MAX_SPRITES_PER_UNIT + (tileset->getGLTextureUnit() + 1) + tileID;
 }
 
