@@ -28,6 +28,7 @@
 #include <vector>
 #include <unordered_map>
 #include <utility>
+#include <iostream>
 
 #include "tmxparser/TmxMap.h"
 #include "tmxparser/TmxLayer.h"
@@ -80,6 +81,8 @@ void APG::TmxRenderer::loadTilesets() {
                     std::pair<uint64_t, SpriteBase *>(spriteHash,
                             &(loadedSprites.back())));
 		}
+
+		std::cout << "Loaded " << tileset->GetName() << std::endl;
 
 		// now iterate again for animated sprites since all the frames must be loaded
 

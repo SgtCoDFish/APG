@@ -95,7 +95,11 @@ public:
 
 	Tileset * getTilesetByID(int32_t id) const {
 		try {
-			return tilesets[id].get();
+			if(tilesets.at(id) == nullptr) {
+				return nullptr;
+			}
+
+			return tilesets.at(id).get();
 		} catch (std::out_of_range &oor) {
 			return nullptr;
 		}

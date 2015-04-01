@@ -43,6 +43,11 @@ APG::Sprite::Sprite(Texture * const texture, uint32_t texX, uint32_t texY, uint3
 		uint32_t height) :
 		texture(texture), texX(texX), texY(texY), width(width), height(height) {
 
+	if(texture == nullptr) {
+		setErrorState("Null texture passed to Sprite::Sprite");
+		return;
+	}
+
 	if (texX + width > texture->getWidth() || texY + height > texture->getHeight()) {
 		std::stringstream ss;
 
