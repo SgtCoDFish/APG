@@ -15,3 +15,4 @@ Release/*
 *.swp
 build
 build/
+/Debug-sanitize/

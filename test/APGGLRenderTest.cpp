@@ -88,7 +88,7 @@ bool APG::APGGLRenderTest::init() {
 		return false;
 	}
 
-	sprite = std::make_unique<Sprite>(renderer->getTilesetByID(0), 0, 0, 32, 32);
+	sprite = std::make_unique<Sprite>(renderer->getTilesetByID(0), 8*32, 0, 32, 32);
 
 	if (sprite->hasError()) {
 		std::cout << "Couldn't create sprite:\n" << sprite->getErrorMessage() << std::endl;
@@ -117,16 +117,6 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 		quit();
 		return;
 	}
-
-//	spriteBatch->begin();
-//
-//	for (int y = 0; y < 32 * 100; y += 32) {
-//		for (int x = 0; x < 32 * 100; x += 32) {
-//			spriteBatch->draw(sprite.get(), x, y);
-//		}
-//	}
-//
-//	spriteBatch->end();
 
 	renderer->renderAll();
 
