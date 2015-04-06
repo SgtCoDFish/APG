@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <iostream>
+
 #include <glm/vec2.hpp>
 
 #include "tmxparser/Tmx.h"
@@ -45,6 +47,8 @@ void APG::GLTmxRenderer::renderAll() {
 }
 
 void APG::GLTmxRenderer::renderLayer(Tmx::Layer * const layer) {
+	std::cout << "Rendering layer \"" << layer->GetName() << "\"\n";
+
 	if (!layer->IsVisible()) {
 		return;
 	}
@@ -59,8 +63,8 @@ void APG::GLTmxRenderer::renderLayer(Tmx::Layer * const layer) {
 
 			const auto &tile = layer->GetTile(x, y);
 
-			const auto tileHash = calculateTileHash(
-					tilesets[tile.tilesetId].get(), tile.id);
+			const auto tileHash = calculateTileHash(tilesets[tile.tilesetId].get(), tile.id);
+			std::cout << "Rendering hash #" << tileHash << std::endl;
 
 			batch.draw(sprites.at(tileHash), tileX, tileY);
 		}

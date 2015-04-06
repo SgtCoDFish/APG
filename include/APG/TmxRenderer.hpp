@@ -105,6 +105,8 @@ public:
 		}
 	}
 
+	inline void update(float deltaTime);
+
 	TmxRenderer(TmxRenderer &other) = delete;
 	TmxRenderer(const TmxRenderer &other) = delete;
 	TmxRenderer &operator=(TmxRenderer &other) = delete;

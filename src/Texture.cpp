@@ -30,6 +30,7 @@
 #include <atomic>
 #include <string>
 #include <sstream>
+#include <iostream>
 
 #include <GL/glew.h>
 #include <GL/gl.h>
@@ -64,6 +65,8 @@ APG::Texture::Texture(const std::string &fileName, bool preserveSurface) :
 
 	generateTextureID();
 	loadTexture(fileName);
+
+	std::cout << "Loaded texture \"" << fileName << "\" at GL unit: GL_TEXTURE" << textureUnitInt << "\n";
 }
 
 APG::Texture::~Texture() {

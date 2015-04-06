@@ -57,15 +57,16 @@ APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program
 		bufferSize(bufferSize), //
 		vao(), //
 		vertexBuffer( { //
-				VertexAttribute(POSITION_ATTRIBUTE, AttributeUsage::POSITION, 2), //
-				VertexAttribute(COLOR_ATTRIBUTE, AttributeUsage::COLOR, 4), //
-				VertexAttribute(TEXCOORD_ATTRIBUTE, AttributeUsage::TEXCOORD, 2) //
-				}),//
+		        VertexAttribute(POSITION_ATTRIBUTE, AttributeUsage::POSITION, 2), //
+		        VertexAttribute(COLOR_ATTRIBUTE, AttributeUsage::COLOR, 4), //
+		        VertexAttribute(TEXCOORD_ATTRIBUTE, AttributeUsage::TEXCOORD, 2) //
+		        }),//
 
 		indexBuffer(false), //
 		vertices(bufferSize, 0.0f), //
 		color(1.0f, 1.0f, 1.0f, 1.0f), //
-		projectionMatrix(glm::ortho(0.0f, (float)APG::Game::screenWidth, (float)APG::Game::screenHeight, 0.0f, -1.0f, 1.0f)), //
+		projectionMatrix(
+		        glm::ortho(0.0f, (float) APG::Game::screenWidth, (float) APG::Game::screenHeight, 0.0f, -1.0f, 1.0f)), //
 		transformMatrix(1.0f), //
 		combinedMatrix(1.0f) {
 	if (program == nullptr) {
@@ -73,8 +74,8 @@ APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program
 
 		if (ownedShaderProgram->hasError()) {
 			setErrorState(
-					std::string("Couldn't create default SpriteBatch shader: ")
-							+ ownedShaderProgram->getErrorMessage());
+			        std::string("Couldn't create default SpriteBatch shader: ")
+			                + ownedShaderProgram->getErrorMessage());
 			return;
 		}
 
@@ -112,8 +113,8 @@ void APG::SpriteBatch::setupMatrices() {
 	program->setUniformf("projTrans", combinedMatrix);
 }
 
-void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32_t width,
-		uint32_t height, float srcX, float srcY, uint32_t srcWidth, uint32_t srcHeight) {
+void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32_t width, uint32_t height, float srcX,
+        float srcY, uint32_t srcWidth, uint32_t srcHeight) {
 //	if (hasError()) {
 //		return;
 //	} else if (!drawing) {
@@ -173,6 +174,15 @@ void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32
 }
 
 void APG::SpriteBatch::draw(APG::SpriteBase * const sprite, float x, float y) {
+	if (hasError()) {
+		return;
+	}
+
+	if (sprite == nullptr) {
+		setErrorState("Null sprite passed to SpriteBatch::draw");
+		return;
+	}
+
 	if (sprite->getTexture() != lastTexture) {
 		switchTexture(sprite->getTexture());
 	}
@@ -278,26 +288,26 @@ std::unique_ptr<APG::ShaderProgram> APG::SpriteBatch::createDefaultShader() {
 	std::stringstream vertexShaderStream, fragmentShaderStream;
 
 	vertexShaderStream << "#version 150 core\n" //
-			<< "in vec2 " << POSITION_ATTRIBUTE << ";\n" //
-			<< "in vec4 " << COLOR_ATTRIBUTE << ";\n" //
-			<< "in vec2 " << TEXCOORD_ATTRIBUTE << ";\n" //
-			<< "out vec2 frag_texcoord;\n" //
-			<< "out vec4 frag_color;\n" //
-			<< "uniform mat4 projTrans;\n" //
-			<< "void main() {\n" //
-			<< "frag_color = " << COLOR_ATTRIBUTE << ";\n" //
-			<< "frag_texcoord = " << TEXCOORD_ATTRIBUTE << ";\n" //
-			<< "gl_Position = projTrans * vec4(" << POSITION_ATTRIBUTE << ", 0.0, 1.0);" //
-			<< "}\n\n";
+	        << "in vec2 " << POSITION_ATTRIBUTE << ";\n" //
+	        << "in vec4 " << COLOR_ATTRIBUTE << ";\n" //
+	        << "in vec2 " << TEXCOORD_ATTRIBUTE << ";\n" //
+	        << "out vec2 frag_texcoord;\n" //
+	        << "out vec4 frag_color;\n" //
+	        << "uniform mat4 projTrans;\n" //
+	        << "void main() {\n" //
+	        << "frag_color = " << COLOR_ATTRIBUTE << ";\n" //
+	        << "frag_texcoord = " << TEXCOORD_ATTRIBUTE << ";\n" //
+	        << "gl_Position = projTrans * vec4(" << POSITION_ATTRIBUTE << ", 0.0, 1.0);" //
+	        << "}\n\n";
 
 	fragmentShaderStream << "#version 150 core\n" //
-			<< "in vec4 frag_color;\n"  //
-			<< "in vec2 frag_texcoord;\n"  //
-			<< "out vec4 outColor;\n"  //
-			<< "uniform sampler2D tex;\n"  //
-			<< "void main() {\n"  //
-			<< "outColor = frag_color * texture(tex, frag_texcoord);\n"  //
-			<< "}\n\n";
+	        << "in vec4 frag_color;\n"  //
+	        << "in vec2 frag_texcoord;\n"  //
+	        << "out vec4 outColor;\n"  //
+	        << "uniform sampler2D tex;\n"  //
+	        << "void main() {\n"  //
+	        << "outColor = frag_color * texture(tex, frag_texcoord);\n"  //
+	        << "}\n\n";
 
 	const auto vertexShader = vertexShaderStream.str();
 	const auto fragmentShader = fragmentShaderStream.str();

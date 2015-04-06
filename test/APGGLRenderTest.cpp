@@ -82,7 +82,7 @@ bool APG::APGGLRenderTest::init() {
 
 	renderer = std::make_unique<GLTmxRenderer>(map.get(), *spriteBatch);
 
-	if (renderer->hasError()) {
+	if (renderer->hasError() || renderer->getTilesetByID(0) == nullptr) {
 		std::cout << "Couldn't create GL tmx renderer:\n" << renderer->getErrorMessage()
 				<< std::endl;
 		return false;

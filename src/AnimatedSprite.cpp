@@ -29,29 +29,38 @@
 
 #include <initializer_list>
 #include <vector>
+#include <utility>
 
 #include "tmxparser/TmxTile.h"
 
 #include "APG/AnimatedSprite.hpp"
 
-APG::AnimatedSprite::AnimatedSprite(float frameDuration,
-		std::initializer_list<Sprite *> sprites, AnimationMode animationMode) :
-		frameCount { sprites.size() }, secondsPerFrame { frameDuration } {
+APG::AnimatedSprite::AnimatedSprite(float frameDuration, Sprite &&firstFrame, std::initializer_list<Sprite *> sprites,
+        AnimationMode animationMode) :
+		frameCount { sprites.size() }, secondsPerFrame { frameDuration }, firstFrame { std::move(firstFrame) } {
 	for (Sprite *sprite : sprites) {
-		frames.emplace_back(sprite);
+		if (sprite == nullptr) {
+			frames.emplace_back(&this->firstFrame);
+		} else {
+			frames.emplace_back(sprite);
+		}
 	}
 
 	setAnimationMode(animationMode);
 }
 
-APG::AnimatedSprite::AnimatedSprite(float frameDuration,
-		std::vector<Sprite *> sprites, AnimationMode animationMode) :
-		frameCount { sprites.size() }, secondsPerFrame { frameDuration } {
-	setAnimationMode(animationMode);
-
+APG::AnimatedSprite::AnimatedSprite(float frameDuration, Sprite &&firstFrame, std::vector<Sprite *> sprites,
+        AnimationMode animationMode) :
+		frameCount { sprites.size() }, secondsPerFrame { frameDuration }, firstFrame { std::move(firstFrame) } {
 	for (Sprite *sprite : sprites) {
-		frames.emplace_back(sprite);
+		if (sprite == nullptr) {
+			frames.emplace_back(&this->firstFrame);
+		} else {
+			frames.emplace_back(sprite);
+		}
 	}
+
+	setAnimationMode(animationMode);
 }
 
 void APG::AnimatedSprite::update(float deltaTime) {

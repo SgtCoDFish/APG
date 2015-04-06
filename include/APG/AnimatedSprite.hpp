@@ -57,6 +57,7 @@ private:
 
 	AnimationMode animationMode;
 
+	Sprite firstFrame;
 	std::vector<Sprite *> frames;
 
 	void handleNormalMode_();
@@ -64,9 +65,9 @@ private:
 	void handleLoopPingPongMode_();
 
 public:
-	AnimatedSprite(float frameDuration, std::initializer_list<Sprite *> sprites,
+	AnimatedSprite(float frameDuration, Sprite &&firstFrame, std::initializer_list<Sprite *> sprites,
 			AnimationMode animationMode = AnimationMode::NORMAL);
-	AnimatedSprite(float frameDuration, std::vector<Sprite *> sprites,
+	AnimatedSprite(float frameDuration, Sprite &&firstFrame,  std::vector<Sprite *> sprites,
 			AnimationMode animationMode = AnimationMode::NORMAL);
 
 	void update(float deltaTime);
