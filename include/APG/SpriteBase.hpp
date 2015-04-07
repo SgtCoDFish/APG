@@ -28,12 +28,15 @@
 #ifndef INCLUDE_APG_SPRITEBASE_HPP_
 #define INCLUDE_APG_SPRITEBASE_HPP_
 
+#include <cstdint>
+
 namespace APG {
 class Texture;
 
 class SpriteBase {
 public:
-	virtual ~SpriteBase() {}
+	virtual ~SpriteBase() {
+	}
 	virtual Texture * getTexture() const = 0;
 
 	virtual inline int32_t getWidth() const = 0;
@@ -44,6 +47,18 @@ public:
 	virtual inline float getV() const = 0;
 	virtual inline float getU2() const = 0;
 	virtual inline float getV2() const = 0;
+
+	inline void setHash(uint64_t hash) {
+		this->hash = hash;
+	}
+
+	inline uint64_t getHash() const {
+		return hash;
+	}
+
+private:
+	uint64_t hash = 0;
+
 };
 
 }

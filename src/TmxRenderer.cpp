@@ -82,10 +82,10 @@ void APG::TmxRenderer::loadTilesets() {
 //			std::cout << "(" << texX << ", " << texY << ") hash: " << spriteHash << std::endl;
 
 			Sprite newSprite = Sprite(loadedTileset.get(), texX * tileWidth, texY * tileHeight, tileWidth, tileHeight);
+			newSprite.setHash(spriteHash);
 
 			if (!tile->IsAnimated()) {
 				loadedSprites.emplace_back(std::move(newSprite));
-				sprites.insert(std::pair<uint64_t, SpriteBase *>(spriteHash, &(loadedSprites.back())));
 			} else {
 				tempSprites.insert(std::pair<uint64_t, Sprite>(spriteHash, std::move(newSprite)));
 			}
@@ -109,6 +109,8 @@ void APG::TmxRenderer::loadTilesets() {
 						frameVec.emplace_back(nullptr);
 					} else {
 						try {
+							// will fail always since sprites isn't init yet
+							// need to change animsprite constructor
 							frameVec.emplace_back((Sprite *) sprites.at(frameHash));
 						} catch (std::out_of_range &oor) {
 							setErrorState("Invalid frame id when loading animated sprite.");
@@ -117,11 +119,20 @@ void APG::TmxRenderer::loadTilesets() {
 					}
 				}
 
-				loadedAnimatedSprites.emplace_back(0.15f, std::move(firstTile), frameVec, AnimationMode::LOOP);
+				auto animSprite = AnimatedSprite(0.15f, std::move(firstTile), frameVec, AnimationMode::LOOP);
+				animSprite.setHash(tileHash);
 
-				sprites.insert(std::pair<uint64_t, SpriteBase *>(tileHash, &(loadedAnimatedSprites.back())));
+				loadedAnimatedSprites.emplace_back(std::move(animSprite));
 			}
 		}
+	}
+
+	for (auto &sprite : loadedSprites) {
+		sprites.insert(std::pair<uint64_t, SpriteBase *>(sprite.getHash(), &sprite));
+	}
+
+	for (auto &animSprite : loadedAnimatedSprites) {
+		sprites.insert(std::pair<uint64_t, SpriteBase *>(animSprite.getHash(), &animSprite));
 	}
 
 	std::cout << "Loaded " << tilesets.size() << " tilesets.\n";

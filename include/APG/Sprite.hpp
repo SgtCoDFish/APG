@@ -55,8 +55,7 @@ protected:
 
 public:
 	Sprite(Texture * const texture);
-	Sprite(Texture * const texture, uint32_t texX, uint32_t texY,
-			uint32_t width, uint32_t height);
+	Sprite(Texture * const texture, uint32_t texX, uint32_t texY, uint32_t width, uint32_t height);
 
 	virtual Texture * getTexture() const override {
 		return texture;
