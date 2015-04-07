@@ -48,8 +48,8 @@ enum class AnimationMode {
 
 class AnimatedSprite: public SpriteBase {
 private:
-	uint64_t currentFrame = 0;
-	uint64_t frameCount;
+	uint32_t currentFrame = 0;
+	uint32_t frameCount = 0;
 
 	float secondsPerFrame = 0.0f;
 	float animTime = 0.0f;
@@ -59,21 +59,26 @@ private:
 
 	Sprite firstFrame;
 	std::vector<Sprite *> frames;
+	bool framesDirty = false;
 
 	void handleNormalMode_();
 	void handleLoopMode_();
 	void handleLoopPingPongMode_();
 
 public:
-	AnimatedSprite(float frameDuration, Sprite &&firstFrame, std::initializer_list<Sprite *> sprites,
-			AnimationMode animationMode = AnimationMode::NORMAL);
-	AnimatedSprite(float frameDuration, Sprite &&firstFrame,  std::vector<Sprite *> sprites,
-			AnimationMode animationMode = AnimationMode::NORMAL);
+	explicit AnimatedSprite(float frameDuration, Sprite &&firstFrame, AnimationMode animationMode =
+	        AnimationMode::NORMAL);
+	explicit AnimatedSprite(float frameDuration, Sprite &&firstFrame, std::initializer_list<Sprite *> sprites,
+	        AnimationMode animationMode = AnimationMode::NORMAL);
+	explicit AnimatedSprite(float frameDuration, Sprite &&firstFrame, std::vector<Sprite *> sprites,
+	        AnimationMode animationMode = AnimationMode::NORMAL);
 
 	void update(float deltaTime);
 
+	void addFrame(Sprite * frame);
+
 	Sprite *getCurrentFrame() const;
-	Sprite *getFrame(uint16_t frameNumber) const;
+	Sprite *getFrame(uint32_t frameNumber) const;
 
 	inline AnimationMode getAnimationMode() const {
 		return animationMode;

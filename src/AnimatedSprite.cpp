@@ -30,20 +30,22 @@
 #include <initializer_list>
 #include <vector>
 #include <utility>
+#include <iostream>
 
 #include "tmxparser/TmxTile.h"
 
 #include "APG/AnimatedSprite.hpp"
 
+APG::AnimatedSprite::AnimatedSprite(float frameDuration, Sprite &&firstFrame, AnimationMode animationMode) :
+		secondsPerFrame { frameDuration }, firstFrame { std::move(firstFrame) } {
+	setAnimationMode(animationMode);
+}
+
 APG::AnimatedSprite::AnimatedSprite(float frameDuration, Sprite &&firstFrame, std::initializer_list<Sprite *> sprites,
         AnimationMode animationMode) :
-		frameCount { sprites.size() }, secondsPerFrame { frameDuration }, firstFrame { std::move(firstFrame) } {
+		secondsPerFrame { frameDuration }, firstFrame { std::move(firstFrame) } {
 	for (Sprite *sprite : sprites) {
-		if (sprite == nullptr) {
-			frames.emplace_back(&this->firstFrame);
-		} else {
-			frames.emplace_back(sprite);
-		}
+		addFrame(sprite);
 	}
 
 	setAnimationMode(animationMode);
@@ -51,20 +53,34 @@ APG::AnimatedSprite::AnimatedSprite(float frameDuration, Sprite &&firstFrame, st
 
 APG::AnimatedSprite::AnimatedSprite(float frameDuration, Sprite &&firstFrame, std::vector<Sprite *> sprites,
         AnimationMode animationMode) :
-		frameCount { sprites.size() }, secondsPerFrame { frameDuration }, firstFrame { std::move(firstFrame) } {
+		secondsPerFrame { frameDuration }, firstFrame { std::move(firstFrame) } {
 	for (Sprite *sprite : sprites) {
-		if (sprite == nullptr) {
-			frames.emplace_back(&this->firstFrame);
-		} else {
-			frames.emplace_back(sprite);
-		}
+		addFrame(sprite);
 	}
 
 	setAnimationMode(animationMode);
 }
 
+void APG::AnimatedSprite::addFrame(Sprite * frame) {
+	frames.emplace_back(frame);
+
+	frameCount++;
+	framesDirty = true;
+//	std::cout << "Added new frame: " << frames.back()->getHash() << "\n";
+}
+
 void APG::AnimatedSprite::update(float deltaTime) {
 	animTime += deltaTime;
+
+	if (framesDirty) {
+		framesDirty = false;
+
+		for (auto &frame : frames) {
+			if (frame == nullptr) {
+				frame = &firstFrame;
+			}
+		}
+	}
 
 	switch (animationMode) {
 	case AnimationMode::NORMAL:
@@ -82,11 +98,10 @@ void APG::AnimatedSprite::update(float deltaTime) {
 
 	default:
 		break;
-		//
 	}
 }
 
-APG::Sprite *APG::AnimatedSprite::getFrame(uint16_t frameNumber) const {
+APG::Sprite *APG::AnimatedSprite::getFrame(uint32_t frameNumber) const {
 	return frames[frameNumber];
 }
 
@@ -120,7 +135,7 @@ void APG::AnimatedSprite::setAnimationMode(APG::AnimationMode mode) {
 }
 
 void APG::AnimatedSprite::handleNormalMode_() {
-	if (currentFrame < frameCount - 1 && currentFrame > 0) {
+	if (currentFrame < frameCount) {
 		if (animTime > secondsPerFrame) {
 			animTime -= secondsPerFrame;
 			currentFrame += animDir;
@@ -133,7 +148,7 @@ void APG::AnimatedSprite::handleNormalMode_() {
 void APG::AnimatedSprite::handleLoopMode_() {
 	handleNormalMode_();
 
-	if (currentFrame == frameCount - 1) {
+	if (currentFrame == frameCount) {
 		currentFrame = 0;
 	}
 }
@@ -141,8 +156,10 @@ void APG::AnimatedSprite::handleLoopMode_() {
 void APG::AnimatedSprite::handleLoopPingPongMode_() {
 	handleNormalMode_();
 
-	if (currentFrame == frameCount - 1 || currentFrame == 0) {
-		animDir = (animDir == 1 ? -1 : 1);
+	if (currentFrame == frameCount - 1) {
+		animDir = -1;
+	} else if(currentFrame == 0) {
+		animDir = 1;
 	}
 }
 

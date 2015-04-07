@@ -88,13 +88,6 @@ bool APG::APGGLRenderTest::init() {
 		return false;
 	}
 
-	sprite = std::make_unique<Sprite>(renderer->getTilesetByID(0), 8*32, 0, 32, 32);
-
-	if (sprite->hasError()) {
-		std::cout << "Couldn't create sprite:\n" << sprite->getErrorMessage() << std::endl;
-		return false;
-	}
-
 	auto glError = glGetError();
 	if (glError != GL_NO_ERROR) {
 		while (glError != GL_NO_ERROR) {
@@ -118,7 +111,7 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 		return;
 	}
 
-	renderer->renderAll();
+	renderer->renderAll(deltaTime);
 
 	SDL_GL_SwapWindow(window.get());
 }

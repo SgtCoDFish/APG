@@ -91,7 +91,7 @@ bool APGSDLRenderTest::init() {
 void APGSDLRenderTest::render(float deltaTime) {
 	SDL_RenderClear(renderer.get());
 
-	sdlTmxRenderer->renderAll();
+	sdlTmxRenderer->renderAll(deltaTime);
 
 	SDL_RenderPresent(renderer.get());
 }

@@ -79,7 +79,7 @@ public:
 	}
 
 	virtual void renderLayer(Tmx::Layer * const layer) = 0;
-	void renderAll();
+	void renderAll(float deltaTime);
 
 	const Tmx::Map *getMap() {
 		return map;
@@ -104,8 +104,6 @@ public:
 			return nullptr;
 		}
 	}
-
-	inline void update(float deltaTime);
 
 	TmxRenderer(TmxRenderer &other) = delete;
 	TmxRenderer(const TmxRenderer &other) = delete;

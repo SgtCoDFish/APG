@@ -187,14 +187,19 @@ void APG::SpriteBatch::draw(APG::SpriteBase * const sprite, float x, float y) {
 		switchTexture(sprite->getTexture());
 	}
 
+	const auto u1 = sprite->getU();
+	const auto v1 = sprite->getV();
+	const auto u2 = sprite->getU2();
+	const auto v2 = sprite->getV2();
+
 	vertices[idx++] = x;
 	vertices[idx++] = y;
 	vertices[idx++] = color.r;
 	vertices[idx++] = color.g;
 	vertices[idx++] = color.b;
 	vertices[idx++] = color.a;
-	vertices[idx++] = sprite->getU();
-	vertices[idx++] = sprite->getV();
+	vertices[idx++] = u1;
+	vertices[idx++] = v1;
 
 	vertices[idx++] = x;
 	vertices[idx++] = y + sprite->getHeight();
@@ -202,8 +207,8 @@ void APG::SpriteBatch::draw(APG::SpriteBase * const sprite, float x, float y) {
 	vertices[idx++] = color.g;
 	vertices[idx++] = color.b;
 	vertices[idx++] = color.a;
-	vertices[idx++] = sprite->getU();
-	vertices[idx++] = sprite->getV2();
+	vertices[idx++] = u1;
+	vertices[idx++] = v2;
 
 	vertices[idx++] = x + sprite->getWidth();
 	vertices[idx++] = y + sprite->getHeight();
@@ -211,8 +216,8 @@ void APG::SpriteBatch::draw(APG::SpriteBase * const sprite, float x, float y) {
 	vertices[idx++] = color.g;
 	vertices[idx++] = color.b;
 	vertices[idx++] = color.a;
-	vertices[idx++] = sprite->getU2();
-	vertices[idx++] = sprite->getV2();
+	vertices[idx++] = u2;
+	vertices[idx++] = v2;
 
 	vertices[idx++] = x + sprite->getWidth();
 	vertices[idx++] = y;
@@ -220,8 +225,8 @@ void APG::SpriteBatch::draw(APG::SpriteBase * const sprite, float x, float y) {
 	vertices[idx++] = color.g;
 	vertices[idx++] = color.b;
 	vertices[idx++] = color.a;
-	vertices[idx++] = sprite->getU2();
-	vertices[idx++] = sprite->getV();
+	vertices[idx++] = u2;
+	vertices[idx++] = v1;
 
 	if (idx > bufferSize / 2) {
 		flush();

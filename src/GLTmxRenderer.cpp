@@ -38,16 +38,16 @@ APG::GLTmxRenderer::GLTmxRenderer(Tmx::Map * const map, SpriteBatch &inBatch) :
 		TmxRenderer(map), batch(inBatch) {
 }
 
-void APG::GLTmxRenderer::renderAll() {
+void APG::GLTmxRenderer::renderAll(float deltaTime) {
 	batch.begin();
 
-	TmxRenderer::renderAll();
+	TmxRenderer::renderAll(deltaTime);
 
 	batch.end();
 }
 
 void APG::GLTmxRenderer::renderLayer(Tmx::Layer * const layer) {
-	std::cout << "Rendering layer \"" << layer->GetName() << "\"\n";
+//	std::cout << "Rendering layer \"" << layer->GetName() << "\"\n";
 
 	if (!layer->IsVisible()) {
 		return;
@@ -63,12 +63,19 @@ void APG::GLTmxRenderer::renderLayer(Tmx::Layer * const layer) {
 
 			const auto &tile = layer->GetTile(x, y);
 
+			if (tile.id == 0) {
+				continue;
+			}
+
 			const auto tileHash = calculateTileHash(tilesets[tile.tilesetId].get(), tile.id);
-			std::cout << "Rendering hash #" << tileHash << std::endl;
+//			std::cout << "Rendering hash #" << tileHash << std::endl;
 
-			const auto ourSprite =sprites.at(tileHash);
-
-			batch.draw(ourSprite, tileX, tileY);
+			try {
+				const auto ourSprite = sprites.at(tileHash);
+				batch.draw(ourSprite, tileX, tileY);
+			} catch (std::out_of_range &oor) {
+				continue;
+			}
 		}
 	}
 }

@@ -91,44 +91,45 @@ void APG::TmxRenderer::loadTilesets() {
 			}
 		}
 
+		for (auto &sprite : loadedSprites) {
+			sprites.insert(std::pair<uint64_t, SpriteBase *>(sprite.getHash(), &sprite));
+		}
+
 		// now iterate again for animated sprites since all the frames must be loaded
 		for (const auto &tile : tileset->GetTiles()) {
 			if (tile->IsAnimated()) {
 				std::cout << "Loading animated tile (" << tile->GetId() << ") with " << tile->GetFrameCount()
 				        << " frames.\n";
-				std::vector<Sprite *> frameVec;
-				const uint64_t tileHash = calculateTileHash(loadedTileset.get(), tile->GetId());
-				auto firstTile = std::move(tempSprites.at(tileHash));
-				tempSprites.erase(tileHash);
+				const uint64_t firstTileHash = calculateTileHash(loadedTileset.get(), tile->GetId());
+
+				// TODO: Something is going wrong here, hence  the "dirty" hack in AnimatedSprite
+				auto animSprite = AnimatedSprite(0.3f, std::move(tempSprites.at(firstTileHash)), AnimationMode::LOOP);
+				tempSprites.erase(firstTileHash);
+				animSprite.setHash(firstTileHash);
 
 				for (const auto frame : tile->GetFrames()) {
 					const auto frameHash = calculateTileHash(loadedTileset.get(), frame.GetTileID());
 
-					if (frameHash == tileHash) {
+					if (frameHash == firstTileHash) {
 						// the owned frame could appear multiple times so we add nullptr for each occurrence, then set it in the AnimatedSprite constructor
-						frameVec.emplace_back(nullptr);
+						animSprite.addFrame(nullptr);
 					} else {
 						try {
 							// will fail always since sprites isn't init yet
 							// need to change animsprite constructor
-							frameVec.emplace_back((Sprite *) sprites.at(frameHash));
+							animSprite.addFrame((Sprite *) sprites.at(frameHash));
 						} catch (std::out_of_range &oor) {
-							setErrorState("Invalid frame id when loading animated sprite.");
+							std::stringstream ss;
+							ss << "Invalid frame id when loading animated sprite: " << frameHash;
+							setErrorState(ss.str());
 							return;
 						}
 					}
 				}
 
-				auto animSprite = AnimatedSprite(0.15f, std::move(firstTile), frameVec, AnimationMode::LOOP);
-				animSprite.setHash(tileHash);
-
 				loadedAnimatedSprites.emplace_back(std::move(animSprite));
 			}
 		}
-	}
-
-	for (auto &sprite : loadedSprites) {
-		sprites.insert(std::pair<uint64_t, SpriteBase *>(sprite.getHash(), &sprite));
 	}
 
 	for (auto &animSprite : loadedAnimatedSprites) {
@@ -138,7 +139,11 @@ void APG::TmxRenderer::loadTilesets() {
 	std::cout << "Loaded " << tilesets.size() << " tilesets.\n";
 }
 
-void APG::TmxRenderer::renderAll() {
+void APG::TmxRenderer::renderAll(float deltaTime) {
+	for (auto &animation : loadedAnimatedSprites) {
+		animation.update(deltaTime);
+	}
+
 	for (const auto &layer : map->GetLayers()) {
 		renderLayer(layer);
 	}
@@ -150,11 +155,5 @@ uint64_t APG::TmxRenderer::calculateTileHash(const Tileset *tileset, Tmx::Tile *
 
 uint64_t APG::TmxRenderer::calculateTileHash(const Tileset *tileset, int tileID) const {
 	return MAX_SPRITES_PER_UNIT * (tileset->getGLTextureUnit() + 1) + tileID;
-}
-
-void APG::TmxRenderer::update(float deltaTime) {
-	for (auto &animSprite : loadedAnimatedSprites) {
-		animSprite.update(deltaTime);
-	}
 }
 
