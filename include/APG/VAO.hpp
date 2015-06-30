@@ -38,7 +38,7 @@ private:
 
 public:
 	VAO();
-	~VAO();
+	virtual ~VAO();
 
 	void bind() const;
 

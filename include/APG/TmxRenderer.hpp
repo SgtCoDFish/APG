@@ -75,8 +75,7 @@ protected:
 public:
 	explicit TmxRenderer(Tmx::Map *map);
 
-	virtual ~TmxRenderer() {
-	}
+	virtual ~TmxRenderer() = default;
 
 	virtual void renderLayer(Tmx::Layer * const layer) = 0;
 	void renderAll(float deltaTime);
@@ -94,15 +93,11 @@ public:
 	}
 
 	Tileset * getTilesetByID(int32_t id) const {
-		try {
-			if (tilesets.at(id) == nullptr) {
-				return nullptr;
-			}
-
-			return tilesets.at(id).get();
-		} catch (std::out_of_range &oor) {
+		if (tilesets[id] == nullptr) {
 			return nullptr;
 		}
+
+		return tilesets[id].get();
 	}
 
 	TmxRenderer(TmxRenderer &other) = delete;

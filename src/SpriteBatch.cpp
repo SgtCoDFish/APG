@@ -100,9 +100,6 @@ APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program
 	indexBuffer.setData(indices, indices.size());
 }
 
-APG::SpriteBatch::~SpriteBatch() {
-}
-
 void APG::SpriteBatch::switchTexture(APG::Texture * const newTexture) {
 	flush();
 	lastTexture = newTexture;

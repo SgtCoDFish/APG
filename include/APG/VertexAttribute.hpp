@@ -52,6 +52,7 @@ private:
 public:
 	VertexAttribute(const std::string &alias, AttributeUsage usage, uint8_t numComponents,
 			bool normalized = false);
+	~VertexAttribute() = default;
 
 	std::string getAlias() const {
 		return alias;

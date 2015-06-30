@@ -25,15 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdexcept>
-
 #include "APG/VertexAttribute.hpp"
 
 APG::VertexAttribute::VertexAttribute(const std::string &alias, AttributeUsage usage,
 		uint8_t numComponents, bool normalized) :
 		alias { alias }, usage { usage }, normalized { normalized } {
 	if (numComponents < 1 || numComponents > 4) {
-		throw std::invalid_argument("Invalid number of components passed to VertexAttribute.");
+		// TODO: set some kind of error.
 		return;
 	} else {
 		this->numComponents = numComponents;

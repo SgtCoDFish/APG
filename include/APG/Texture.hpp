@@ -104,7 +104,7 @@ public:
 	}
 
 	explicit Texture(const std::string &fileName, bool preserveSurface = false);
-	~Texture();
+	virtual ~Texture();
 
 	void bind() const;
 

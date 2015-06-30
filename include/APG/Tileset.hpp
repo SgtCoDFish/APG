@@ -74,6 +74,8 @@ public:
 		calculateHeightInTiles();
 	}
 
+	virtual ~Tileset() = default;
+
 	int32_t getTileWidth() const {
 		return tileWidth;
 	}

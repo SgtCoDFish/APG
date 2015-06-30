@@ -35,8 +35,7 @@ class Texture;
 
 class SpriteBase {
 public:
-	virtual ~SpriteBase() {
-	}
+	virtual ~SpriteBase() = default;
 	virtual Texture * getTexture() const = 0;
 
 	virtual inline int32_t getWidth() const = 0;

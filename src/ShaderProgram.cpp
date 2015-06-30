@@ -46,8 +46,7 @@
 #include "APG/VertexAttribute.hpp"
 #include "APG/VertexAttributeList.hpp"
 
-APG::ShaderProgram::ShaderProgram(const std::string &vertexShaderSource,
-		const std::string &fragmentShaderSource) {
+APG::ShaderProgram::ShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource) {
 	loadShader(vertexShaderSource, GL_VERTEX_SHADER);
 
 	if (hasError()) {
@@ -63,13 +62,13 @@ APG::ShaderProgram::ShaderProgram(const std::string &vertexShaderSource,
 	combineProgram();
 }
 
-std::unique_ptr<APG::ShaderProgram> APG::ShaderProgram::fromSource(
-		const std::string &vertexShaderSource, const std::string &fragmentShaderSource) {
+std::unique_ptr<APG::ShaderProgram> APG::ShaderProgram::fromSource(const std::string &vertexShaderSource,
+        const std::string &fragmentShaderSource) {
 	return std::make_unique<APG::ShaderProgram>(vertexShaderSource, fragmentShaderSource);
 }
 
-std::unique_ptr<APG::ShaderProgram> APG::ShaderProgram::fromFiles(
-		const std::string &vertexShaderFilename, const std::string &fragmentShaderFilename) {
+std::unique_ptr<APG::ShaderProgram> APG::ShaderProgram::fromFiles(const std::string &vertexShaderFilename,
+        const std::string &fragmentShaderFilename) {
 	const auto vertexSource = ShaderProgram::loadSourceFromFile(vertexShaderFilename);
 	const auto fragmentSource = ShaderProgram::loadSourceFromFile(fragmentShaderFilename);
 
@@ -90,10 +89,9 @@ void APG::ShaderProgram::use() {
 	glUseProgram(shaderProgram);
 }
 
-void APG::ShaderProgram::setVertexAttribute(const APG::VertexAttribute &vertexAttribute,
-		uint16_t stride) {
-	setFloatAttribute(vertexAttribute.getAlias().c_str(), vertexAttribute.getComponentCount(),
-			stride, vertexAttribute.getOffset(), false);
+void APG::ShaderProgram::setVertexAttribute(const APG::VertexAttribute &vertexAttribute, uint16_t stride) {
+	setFloatAttribute(vertexAttribute.getAlias().c_str(), vertexAttribute.getComponentCount(), stride,
+	        vertexAttribute.getOffset(), false);
 }
 
 void APG::ShaderProgram::setVertexAttributes(const VertexAttributeList &attributeList) {
@@ -103,7 +101,7 @@ void APG::ShaderProgram::setVertexAttributes(const VertexAttributeList &attribut
 }
 
 void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, uint8_t valueCount,
-		uint32_t strideInElements, uint32_t offsetInElements, bool normalize) {
+        uint32_t strideInElements, uint32_t offsetInElements, bool normalize) {
 	const auto attributeLocation = glGetAttribLocation(shaderProgram, attributeName);
 
 	if (attributeLocation == -1) {
@@ -115,7 +113,7 @@ void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, uin
 
 	glEnableVertexAttribArray(attributeLocation);
 	glVertexAttribPointer(attributeLocation, valueCount, GL_FLOAT, (normalize ? GL_TRUE : GL_FALSE),
-			strideInElements * sizeof(float), (void *) (sizeof(float) * offsetInElements));
+	        strideInElements * sizeof(float), (void *) (sizeof(float) * offsetInElements));
 
 	const auto error = glGetError();
 
@@ -128,8 +126,7 @@ void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, uin
 	}
 }
 
-void APG::ShaderProgram::setUniformf(const char * const uniformName,
-		std::initializer_list<float> vals) {
+void APG::ShaderProgram::setUniformf(const char * const uniformName, std::initializer_list<float> vals) {
 	const auto paramCount = vals.size();
 
 	std::vector<float> vec;
@@ -188,8 +185,7 @@ void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::mat4 m
 	glUniformMatrix4fv(uniLoc, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
-void APG::ShaderProgram::setUniformi(const char * const uniformName,
-		std::initializer_list<int32_t> vals) {
+void APG::ShaderProgram::setUniformi(const char * const uniformName, std::initializer_list<int32_t> vals) {
 	const auto paramCount = vals.size();
 
 	std::vector<int32_t> vec;
@@ -285,21 +281,11 @@ void APG::ShaderProgram::loadShader(const std::string &shaderSource, uint32_t ty
 	GLint logLength;
 	glGetShaderiv(*source, GL_INFO_LOG_LENGTH, &logLength);
 	if (logLength > 1) {
-		char *buffer = nullptr;
-
-		try {
-			buffer = new char[logLength];
-		} catch (std::bad_alloc &ba) {
-			setErrorState("Couldn't allocate buffer for shader info log.");
-			return;
-		}
+		char buffer[logLength];
 
 		glGetShaderInfoLog(*source, logLength, NULL, buffer);
 
 		statusStream << "Info log:\n" << buffer;
-
-		delete[] buffer;
-
 		statusStream << "Source:\n" << shaderSource << "\n\n";
 	}
 
@@ -338,19 +324,11 @@ void APG::ShaderProgram::combineProgram() {
 	glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &infoLogLength);
 
 	if (infoLogLength > 1) {
-		char *buffer = nullptr;
-
-		try {
-			buffer = new char[infoLogLength];
-		} catch (std::bad_alloc &ba) {
-			setErrorState("Could not allocate buffer for link info log.");
-			return;
-		}
+		char buffer[infoLogLength];
 
 		glGetProgramInfoLog(shaderProgram, infoLogLength, nullptr, buffer);
 
 		linkStatusStream << buffer;
-		delete[] buffer;
 	}
 
 	GLenum glerror;
@@ -386,8 +364,7 @@ uint32_t *APG::ShaderProgram::validateTypeAndGet(uint32_t type) {
 	case GL_GEOMETRY_SHADER:
 	case GL_TESS_CONTROL_SHADER:
 	case GL_TESS_EVALUATION_SHADER:
-		setErrorState(
-				"Geometry/Tesselation Evaluation/Tesselation Control shaders not supported by APG.");
+		setErrorState("Geometry/Tesselation Evaluation/Tesselation Control shaders not supported by APG.");
 		return nullptr;
 
 	default: {

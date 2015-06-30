@@ -114,16 +114,16 @@ void APG::TmxRenderer::loadTilesets() {
 						// the owned frame could appear multiple times so we add nullptr for each occurrence, then set it in the AnimatedSprite constructor
 						animSprite.addFrame(nullptr);
 					} else {
-						try {
+//						try {
 							// will fail always since sprites isn't init yet
 							// need to change animsprite constructor
-							animSprite.addFrame((Sprite *) sprites.at(frameHash));
-						} catch (std::out_of_range &oor) {
-							std::stringstream ss;
-							ss << "Invalid frame id when loading animated sprite: " << frameHash;
-							setErrorState(ss.str());
-							return;
-						}
+							animSprite.addFrame((Sprite *) sprites[frameHash]);
+//						} catch (std::out_of_range &oor) {
+//							std::stringstream ss;
+//							ss << "Invalid frame id when loading animated sprite: " << frameHash;
+//							setErrorState(ss.str());
+//							return;
+//						}
 					}
 				}
 

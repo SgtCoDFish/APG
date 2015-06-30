@@ -43,8 +43,7 @@ private:
 
 public:
 	explicit GLTmxRenderer(Tmx::Map * const map, SpriteBatch &batch);
-	virtual ~GLTmxRenderer() {
-	}
+	virtual ~GLTmxRenderer() = default;
 
 	virtual void renderAll(float deltaTime);
 	virtual void renderLayer(Tmx::Layer * const layer) override;
