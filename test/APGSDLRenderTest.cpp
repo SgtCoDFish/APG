@@ -41,10 +41,12 @@
 #include <GL/gl.h>
 
 #include <tmxparser/Tmx.h>
+
 #include "APG/Game.hpp"
 #include "APG/SXXDL.hpp"
-#include "APG/APGSDLRenderTest.hpp"
 #include "APG/SDLTmxRenderer.hpp"
+
+#include "test/APGSDLRenderTest.hpp"
 
 const std::string ASSET_PREFIX = "assets/";
 

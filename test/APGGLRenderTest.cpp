@@ -40,13 +40,14 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 
-#include "APG/APGGLRenderTest.hpp"
 #include "APG/Game.hpp"
 #include "APG/SDLGame.hpp"
 #include "APG/APGCommon.hpp"
 #include "APG/SXXDL.hpp"
 #include "APG/Buffer.hpp"
 #include "APG/Texture.hpp"
+
+#include "test/APGGLRenderTest.hpp"
 
 const char * APG::APGGLRenderTest::vertexShaderFilename = "assets/pass_vertex.glslv";
 const char * APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag.glslf";
