@@ -29,19 +29,24 @@
 #define INCLUDE_APG_INTERNAL_LOG_HPP_
 
 #ifndef NDEBUG
-#define APG_LOG(message) APG::internal::log(message, __FILE__, __LINE__);
+#define APG_LOG(message) APG::internal::log((message), __FILE__, __LINE__);
+
+#ifndef APG_NO_HARD_LOG
+#include <cstdlib>
+#endif
 
 #include <iostream>
 
 namespace APG {
 namespace internal {
 
-inline void log(const std::string &str, const char *filename, int line) {
-	log(str.c_str(), filename, line);
-}
-
 inline void log(const char *message, const char *filename, int line) {
-	std::cerr << "In " << filename << " (line " << line << ": " << message << std::endl;
+	std::cerr << "In \"" << filename << "\" (line " << line << "): " << message << std::endl;
+
+#ifndef APG_NO_HARD_LOG
+	std::cerr.flush();
+	std::exit(1);
+#endif
 }
 
 }

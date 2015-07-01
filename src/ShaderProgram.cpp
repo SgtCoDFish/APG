@@ -228,6 +228,9 @@ std::string APG::ShaderProgram::loadSourceFromFile(const std::string &filename) 
 	std::ifstream inStream(filename, std::ios::in);
 
 	if (!inStream.is_open()) {
+		std::stringstream ss;
+		ss << "Couldn't find " << filename;
+		APG_LOG(ss.str().c_str());
 		return "";
 	}
 
@@ -277,7 +280,7 @@ void APG::ShaderProgram::loadShader(const std::string &shaderSource, uint32_t ty
 	shaderInfoLog = shaderInfoLog + statusStream.str();
 
 	if (status != GL_TRUE) {
-		APG_LOG(shaderInfoLog);
+		APG_LOG(shaderInfoLog.c_str());
 		glDeleteShader(*source);
 		return;
 	}
@@ -323,7 +326,7 @@ void APG::ShaderProgram::combineProgram() {
 	linkInfoLog = linkInfoLog + linkStatusStream.str();
 
 	if (status != GL_TRUE) {
-		APG_LOG(linkInfoLog);
+		APG_LOG(linkInfoLog.c_str());
 		glDeleteProgram(shaderProgram);
 		return;
 	}

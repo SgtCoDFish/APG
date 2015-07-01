@@ -84,7 +84,9 @@ void APG::Texture::loadTexture(const std::string &fileName) {
 	auto surface = SXXDL::make_surface_ptr(IMG_Load(fileName.c_str()));
 
 	if (surface == nullptr) {
-		APG_LOG(std::string("Could not load ") + fileName);
+		std::stringstream ss;
+		ss << "Couldn't load: " << fileName;
+		APG_LOG(ss.str().c_str());
 		return;
 	}
 
@@ -107,7 +109,7 @@ void APG::Texture::loadTexture(const std::string &fileName) {
 		std::stringstream errStream;
 
 		errStream << "Bytes per color in " << fileName << " is invalid (" << numberOfColors << ").";
-		APG_LOG(errStream.str());
+		APG_LOG(errStream.str().c_str());
 		return;
 	}
 
@@ -131,7 +133,7 @@ void APG::Texture::loadTexture(const std::string &fileName) {
 			glError = glGetError();
 		}
 
-		APG_LOG(errStream.str());
+		APG_LOG(errStream.str().c_str());
 		return;
 	}
 

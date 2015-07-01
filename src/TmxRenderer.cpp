@@ -64,7 +64,9 @@ void APG::TmxRenderer::loadTilesets() {
 		auto &loadedTileset = tilesets.back();
 
 		if (loadedTileset == nullptr) {
-			APG_LOG(std::string("Couldn't load: ") + tilesetName);
+			std::stringstream ss;
+			ss << "Couldn't load: " << tilesetName;
+			APG_LOG(ss.str().c_str());
 			return;
 		}
 

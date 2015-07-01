@@ -48,7 +48,7 @@
 #include "APG/Buffer.hpp"
 #include "APG/Texture.hpp"
 
-const char *APG::APGGLRenderTest::vertexShaderFilename = "assets/pass_vertex.glslv";
+const char * APG::APGGLRenderTest::vertexShaderFilename = "assets/pass_vertex.glslv";
 const char * APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag.glslf";
 
 bool APG::APGGLRenderTest::init() {
@@ -129,8 +129,7 @@ int main(int argc, char *argv[]) {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
-	SDL_Window *window = SDL_CreateWindow(windowTitle.c_str(), 0, 0,
-	        windowWidth, windowHeight, sdlWindowFlags);
+	SDL_Window *window = SDL_CreateWindow(windowTitle.c_str(), 0, 0, windowWidth, windowHeight, sdlWindowFlags);
 
 	SDL_GLContext context = SDL_GL_CreateContext(window);
 
