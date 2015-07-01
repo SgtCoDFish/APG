@@ -61,14 +61,6 @@ bool APG::SDLGame::update(float deltaTime) {
 		handleEvent(eventCache);
 	}
 
-	if (hasError()) {
-		std::stringstream ss;
-		ss << "Error in SDLGame: " << getErrorMessage() << "\n";
-		setErrorState(ss.str().c_str());
-		quit();
-		return false;
-	}
-
 	render(deltaTime);
 
 	return false;

@@ -38,7 +38,7 @@
 #include <GL/glew.h>
 #include <GL/glu.h>
 
-#include "APG/ErrorBase.hpp"
+#include "APG/internal/Log.hpp"
 
 namespace APG {
 
@@ -62,7 +62,7 @@ enum DrawType {
 	DYNAMIC_DRAW = GL_DYNAMIC_DRAW, DYNAMIC_READ = GL_DYNAMIC_READ, DYNAMIC_COPY = GL_DYNAMIC_COPY,
 };
 
-template<typename T, int glType> class Buffer : public ErrorBase {
+template<typename T, int glType> class Buffer {
 protected:
 	uint32_t bufferID;
 
@@ -102,22 +102,21 @@ public:
 	}
 
 	void upload() {
-		if (!hasError()) {
-			glBufferData(bufferType, elementCount * sizeof(T), &(bufferData.front()), drawType);
+		glBufferData(bufferType, elementCount * sizeof(T), &(bufferData.front()), drawType);
 
-			GLenum glError = glGetError();
-			if (glError != GL_NO_ERROR) {
-				if (glError == GL_OUT_OF_MEMORY) {
-					setErrorState("Ran out of memory trying to upload buffer data.");
-					return;
-				} else {
-					std::stringstream ss;
-					ss << "OpenGL error:\n" << gluErrorString(glError);
-					setErrorState(ss.str());
-					return;
-				}
+		GLenum glError = glGetError();
+		if (glError != GL_NO_ERROR) {
+			if (glError == GL_OUT_OF_MEMORY) {
+				APG_LOG("Ran out of memory trying to upload buffer data.");
+				return;
+			} else {
+				std::stringstream ss;
+				ss << "OpenGL error: " << gluErrorString(glError);
+				APG_LOG(ss.str().c_str());
+				return;
 			}
 		}
+
 	}
 
 	const BufferType &getBufferType() const {

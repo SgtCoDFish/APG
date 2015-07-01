@@ -38,11 +38,13 @@
 #include "tmxparser/TmxTile.h"
 
 #include "APG/APGCommon.hpp"
-#include "APG/ErrorBase.hpp"
 #include "APG/Tileset.hpp"
 #include "APG/SXXDL.hpp"
 #include "APG/TmxRenderer.hpp"
 #include "APG/AnimatedSprite.hpp"
+
+#include "APG/internal/Assert.hpp"
+#include "APG/internal/Log.hpp"
 
 #include <glm/vec2.hpp>
 
@@ -62,7 +64,7 @@ void APG::TmxRenderer::loadTilesets() {
 		auto &loadedTileset = tilesets.back();
 
 		if (loadedTileset == nullptr) {
-			setErrorState(std::string("Couldn't load: ") + tilesetName);
+			APG_LOG(std::string("Couldn't load: ") + tilesetName);
 			return;
 		}
 

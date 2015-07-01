@@ -42,22 +42,15 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "APG/ShaderProgram.hpp"
-#include "APG/ErrorBase.hpp"
 #include "APG/VertexAttribute.hpp"
 #include "APG/VertexAttributeList.hpp"
 
+#include "APG/internal/Log.hpp"
+#include "APG/internal/Assert.hpp"
+
 APG::ShaderProgram::ShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource) {
 	loadShader(vertexShaderSource, GL_VERTEX_SHADER);
-
-	if (hasError()) {
-		return;
-	}
-
 	loadShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
-
-	if (hasError()) {
-		return;
-	}
 
 	combineProgram();
 }
@@ -82,10 +75,6 @@ APG::ShaderProgram::~ShaderProgram() {
 }
 
 void APG::ShaderProgram::use() {
-	if (hasError()) {
-		return;
-	}
-
 	glUseProgram(shaderProgram);
 }
 
@@ -107,7 +96,7 @@ void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, uin
 	if (attributeLocation == -1) {
 		std::stringstream ss;
 		ss << "Couldn't get attribute location: " << attributeName;
-		setErrorState(ss.str());
+		APG_LOG(ss.str().c_str());
 		return;
 	}
 
@@ -121,13 +110,15 @@ void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, uin
 		std::stringstream ss;
 		const char *errStr = (const char *) gluErrorString(error);
 		ss << "Error while setting float attribute \"" << attributeName << "\":\n" << errStr;
-		setErrorState(ss.str());
+		APG_LOG(ss.str().c_str());
 		return;
 	}
 }
 
 void APG::ShaderProgram::setUniformf(const char * const uniformName, std::initializer_list<float> vals) {
 	const auto paramCount = vals.size();
+
+	REQUIRE(paramCount >= 1 && paramCount <= 4, "Invalid parameter count in setUniformf");
 
 	std::vector<float> vec;
 
@@ -153,10 +144,6 @@ void APG::ShaderProgram::setUniformf(const char * const uniformName, std::initia
 	case 4:
 		glUniform4f(uniLoc, vec[0], vec[1], vec[2], vec[3]);
 		break;
-
-	default:
-		setErrorState("Call to setUniformf with invalid number of values.");
-		return;
 	}
 }
 
@@ -188,6 +175,8 @@ void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::mat4 m
 void APG::ShaderProgram::setUniformi(const char * const uniformName, std::initializer_list<int32_t> vals) {
 	const auto paramCount = vals.size();
 
+	REQUIRE(paramCount >= 1 && paramCount <= 4, "Invalid parameter count in setUniformf");
+
 	std::vector<int32_t> vec;
 
 	for (const auto &f : vals) {
@@ -212,10 +201,6 @@ void APG::ShaderProgram::setUniformi(const char * const uniformName, std::initia
 	case 4:
 		glUniform4i(uniLoc, vec[0], vec[1], vec[2], vec[3]);
 		break;
-
-	default:
-		setErrorState("Call to setUniformf with invalid number of values.");
-		return;
 	}
 }
 
@@ -292,16 +277,13 @@ void APG::ShaderProgram::loadShader(const std::string &shaderSource, uint32_t ty
 	shaderInfoLog = shaderInfoLog + statusStream.str();
 
 	if (status != GL_TRUE) {
-		setErrorState(shaderInfoLog);
+		APG_LOG(shaderInfoLog);
 		glDeleteShader(*source);
 		return;
 	}
 }
 
 void APG::ShaderProgram::combineProgram() {
-	if (hasError()) {
-		return;
-	}
 
 	shaderProgram = glCreateProgram();
 
@@ -341,7 +323,7 @@ void APG::ShaderProgram::combineProgram() {
 	linkInfoLog = linkInfoLog + linkStatusStream.str();
 
 	if (status != GL_TRUE) {
-		setErrorState(linkInfoLog);
+		APG_LOG(linkInfoLog);
 		glDeleteProgram(shaderProgram);
 		return;
 	}
@@ -364,11 +346,11 @@ uint32_t *APG::ShaderProgram::validateTypeAndGet(uint32_t type) {
 	case GL_GEOMETRY_SHADER:
 	case GL_TESS_CONTROL_SHADER:
 	case GL_TESS_EVALUATION_SHADER:
-		setErrorState("Geometry/Tesselation Evaluation/Tesselation Control shaders not supported by APG.");
+		APG_LOG("Geometry/Tesselation Evaluation/Tesselation Control shaders not supported by APG.");
 		return nullptr;
 
 	default: {
-		setErrorState("Invalid type passed to validateType.");
+		REQUIRE(false, "Invalid type passed to validateType for shader program.");
 		return nullptr;
 	}
 	}

@@ -32,7 +32,6 @@
 #include <unordered_map>
 
 #include "APG/APGCommon.hpp"
-#include "APG/ErrorBase.hpp"
 #include "APG/Tileset.hpp"
 #include "APG/SXXDL.hpp"
 #include "APG/AnimatedSprite.hpp"
@@ -55,7 +54,7 @@ namespace APG {
  * unit. This would generally be far more than you'd ever see, but things will break if
  * this happens so you should be aware.
  */
-class TmxRenderer: public ErrorBase {
+class TmxRenderer {
 protected:
 	static const uint64_t MAX_SPRITES_PER_UNIT = 1000000;
 

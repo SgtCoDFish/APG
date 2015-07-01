@@ -31,7 +31,6 @@
 #include <vector>
 
 #include "APG/APGCommon.hpp"
-#include "APG/ErrorBase.hpp"
 #include "APG/SXXDL.hpp"
 #include "APG/TmxRenderer.hpp"
 

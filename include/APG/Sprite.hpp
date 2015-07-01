@@ -33,7 +33,6 @@
 #include <memory>
 
 #include "APG/Buffer.hpp"
-#include "APG/ErrorBase.hpp"
 #include "APG/SpriteBase.hpp"
 
 namespace APG {

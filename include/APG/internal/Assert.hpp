@@ -36,7 +36,7 @@
 if(expr) {} \
 else \
 { \
-	APG::internal::require_impl(#expr, #orElse, __FILE__, __LINE__); \
+	APG::internal::require_impl(#expr, orElse, __FILE__, __LINE__); \
 }
 
 namespace APG {

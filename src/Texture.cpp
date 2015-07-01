@@ -45,6 +45,9 @@
 #include "APG/SXXDL.hpp"
 #include "APG/ShaderProgram.hpp"
 
+#include "APG/internal/Log.hpp"
+#include "APG/internal/Assert.hpp"
+
 std::atomic<uint32_t> APG::Texture::availableTextureUnit(0);
 uint32_t APG::Texture::TEXTURE_TARGETS[] = { GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2, GL_TEXTURE3,
 GL_TEXTURE4, GL_TEXTURE5, GL_TEXTURE6, GL_TEXTURE7, GL_TEXTURE8, GL_TEXTURE9,
@@ -81,7 +84,7 @@ void APG::Texture::loadTexture(const std::string &fileName) {
 	auto surface = SXXDL::make_surface_ptr(IMG_Load(fileName.c_str()));
 
 	if (surface == nullptr) {
-		setErrorState(std::string("Could not load ") + fileName);
+		APG_LOG(std::string("Could not load ") + fileName);
 		return;
 	}
 
@@ -104,7 +107,7 @@ void APG::Texture::loadTexture(const std::string &fileName) {
 		std::stringstream errStream;
 
 		errStream << "Bytes per color in " << fileName << " is invalid (" << numberOfColors << ").";
-		setErrorState(errStream.str());
+		APG_LOG(errStream.str());
 		return;
 	}
 
@@ -112,8 +115,7 @@ void APG::Texture::loadTexture(const std::string &fileName) {
 
 	tempBind();
 
-	glTexImage2D(GL_TEXTURE_2D, 0, glFormat, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-			surface->pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, glFormat, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
 
 	rebind();
 
@@ -129,7 +131,7 @@ void APG::Texture::loadTexture(const std::string &fileName) {
 			glError = glGetError();
 		}
 
-		setErrorState(errStream.str());
+		APG_LOG(errStream.str());
 		return;
 	}
 
@@ -162,10 +164,6 @@ void APG::Texture::rebind() {
 }
 
 void APG::Texture::bind() const {
-	if (hasError()) {
-		return;
-	}
-
 	glActiveTexture(textureUnitGL);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	uploadFilter();
@@ -199,14 +197,12 @@ void APG::Texture::setColor(glm::vec4 &color) {
 void APG::Texture::setFilter(TextureFilterType minFilter, TextureFilterType magFilter) {
 	tempBind();
 
-	if (magFilter == TextureFilterType::LINEAR_MIPMAP_LINEAR
-			|| magFilter == TextureFilterType::NEAREST_MIPMAP_LINEAR
-			|| magFilter == TextureFilterType::LINEAR_MIPMAP_NEAREST
-			|| magFilter == TextureFilterType::NEAREST_MIPMAP_NEAREST) {
-		setErrorState("Can't set mipmap filter for mag filter.");
-		rebind();
-		return;
-	}
+	REQUIRE(
+	        magFilter != TextureFilterType::LINEAR_MIPMAP_LINEAR
+	                && magFilter != TextureFilterType::NEAREST_MIPMAP_LINEAR
+	                && magFilter != TextureFilterType::LINEAR_MIPMAP_NEAREST
+	                && magFilter != TextureFilterType::NEAREST_MIPMAP_NEAREST,
+	        "Can't set mipmap filter for mag filter.");
 
 	this->minFilter = minFilter;
 	this->magFilter = magFilter;
@@ -229,7 +225,6 @@ void APG::Texture::generateMipMaps() {
 	rebind();
 }
 
-void APG::Texture::attachToShader(const char * const uniformName,
-		ShaderProgram * const program) const {
+void APG::Texture::attachToShader(const char * const uniformName, ShaderProgram * const program) const {
 	program->setUniformi(uniformName, textureUnitInt);
 }

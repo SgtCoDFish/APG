@@ -52,11 +52,6 @@ const char *APG::APGGLRenderTest::vertexShaderFilename = "assets/pass_vertex.gls
 const char * APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag.glslf";
 
 bool APG::APGGLRenderTest::init() {
-	if (hasError()) {
-		std::cerr << "Failed to initialise APGGLRenderTest.\n";
-		return false;
-	}
-
 	map = std::make_unique<Tmx::Map>();
 	map->ParseFile("assets/world1.tmx");
 
@@ -67,26 +62,26 @@ bool APG::APGGLRenderTest::init() {
 
 	shaderProgram = ShaderProgram::fromFiles(vertexShaderFilename, fragmentShaderFilename);
 
-	if (shaderProgram->hasError()) {
-		std::cout << "Shader Info Log\n---------------\n" << shaderProgram->getShaderInfoLog();
-		std::cout << "\nLink Info Log\n-------------\n" << shaderProgram->getLinkInfoLog() << std::endl;
-		std::cerr << "Couldn't create shader:\n" << shaderProgram->getErrorMessage() << std::endl;
-		return false;
-	}
+//	if (shaderProgram->hasError()) {
+//		std::cout << "Shader Info Log\n---------------\n" << shaderProgram->getShaderInfoLog();
+//		std::cout << "\nLink Info Log\n-------------\n" << shaderProgram->getLinkInfoLog() << std::endl;
+//		std::cerr << "Couldn't create shader:\n" << shaderProgram->getErrorMessage() << std::endl;
+//		return false;
+//	}
 
 	spriteBatch = std::make_unique<SpriteBatch>();
 
-	if (spriteBatch->hasError()) {
-		std::cout << "Couldn't create sprite batch:\n" << spriteBatch->getErrorMessage() << std::endl;
-		return false;
-	}
+//	if (spriteBatch->hasError()) {
+//		std::cout << "Couldn't create sprite batch:\n" << spriteBatch->getErrorMessage() << std::endl;
+//		return false;
+//	}
 
 	renderer = std::make_unique<GLTmxRenderer>(map.get(), *spriteBatch);
 
-	if (renderer->hasError() || renderer->getTilesetByID(0) == nullptr) {
-		std::cout << "Couldn't create GL tmx renderer:\n" << renderer->getErrorMessage() << std::endl;
-		return false;
-	}
+//	if (renderer->hasError() || renderer->getTilesetByID(0) == nullptr) {
+//		std::cout << "Couldn't create GL tmx renderer:\n" << renderer->getErrorMessage() << std::endl;
+//		return false;
+//	}
 
 	auto glError = glGetError();
 	if (glError != GL_NO_ERROR) {
@@ -104,12 +99,6 @@ bool APG::APGGLRenderTest::init() {
 void APG::APGGLRenderTest::render(float deltaTime) {
 	glClearColor(0.313725f, 0.674510f, 0.239216f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-
-	if (spriteBatch->hasError()) {
-		std::cerr << "Error in SpriteBatch:\n" << spriteBatch->getErrorMessage() << std::endl;
-		quit();
-		return;
-	}
 
 	renderer->renderAll(deltaTime);
 

@@ -37,7 +37,6 @@
 #include <GL/glew.h>
 #include <glm/vec4.hpp>
 
-#include "APG/ErrorBase.hpp"
 #include "APG/SXXDL.hpp"
 
 namespace APG {
@@ -60,7 +59,7 @@ enum TextureFilterType {
 
 class ShaderProgram;
 
-class Texture : public ErrorBase {
+class Texture {
 private:
 	static uint32_t TEXTURE_TARGETS[];
 	static std::atomic<uint32_t> availableTextureUnit;

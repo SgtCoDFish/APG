@@ -32,7 +32,6 @@
 #include <sstream>
 
 #include "APG/Sprite.hpp"
-#include "APG/ErrorBase.hpp"
 #include "APG/Texture.hpp"
 
 #include "APG/internal/Assert.hpp"

@@ -36,14 +36,12 @@
 
 #include <glm/glm.hpp>
 
-#include "APG/ErrorBase.hpp"
-
 namespace APG {
 
 class VertexAttribute;
 class VertexAttributeList;
 
-class ShaderProgram : public ErrorBase {
+class ShaderProgram final {
 private:
 	static std::string loadSourceFromFile(const std::string &filename);
 

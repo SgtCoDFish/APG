@@ -37,7 +37,6 @@
 
 #include <glm/vec2.hpp>
 
-#include "APG/ErrorBase.hpp"
 #include "APG/SpriteBatch.hpp"
 #include "APG/ShaderProgram.hpp"
 #include "APG/Buffer.hpp"
@@ -47,13 +46,15 @@
 #include "APG/VertexAttribute.hpp"
 #include "APG/Game.hpp"
 
+#include "APG/internal/Log.hpp"
+#include "APG/internal/Assert.hpp"
+
 const char * const APG::SpriteBatch::POSITION_ATTRIBUTE = "position";
 const char * const APG::SpriteBatch::COLOR_ATTRIBUTE = "color";
 const char * const APG::SpriteBatch::TEXCOORD_ATTRIBUTE = "texcoord";
 const uint32_t APG::SpriteBatch::DEFAULT_BUFFER_SIZE = 1000;
 
 APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program) :
-		ErrorBase(), //
 		bufferSize(bufferSize), //
 		vao(), //
 		vertexBuffer( { //
@@ -71,13 +72,6 @@ APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program
 		combinedMatrix(1.0f) {
 	if (program == nullptr) {
 		this->ownedShaderProgram = SpriteBatch::createDefaultShader();
-
-		if (ownedShaderProgram->hasError()) {
-			setErrorState(
-			        std::string("Couldn't create default SpriteBatch shader: ")
-			                + ownedShaderProgram->getErrorMessage());
-			return;
-		}
 
 		this->program = ownedShaderProgram.get();
 	} else {
@@ -171,14 +165,7 @@ void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32
 }
 
 void APG::SpriteBatch::draw(APG::SpriteBase * const sprite, float x, float y) {
-	if (hasError()) {
-		return;
-	}
-
-	if (sprite == nullptr) {
-		setErrorState("Null sprite passed to SpriteBatch::draw");
-		return;
-	}
+	REQUIRE(sprite != nullptr, "Cannot draw null sprite in SpriteBatch.");
 
 	if (sprite->getTexture() != lastTexture) {
 		switchTexture(sprite->getTexture());
@@ -231,7 +218,7 @@ void APG::SpriteBatch::draw(APG::SpriteBase * const sprite, float x, float y) {
 }
 
 void APG::SpriteBatch::flush() {
-	if (idx == 0 || hasError()) {
+	if (idx == 0) {
 		return;
 	}
 
@@ -241,12 +228,6 @@ void APG::SpriteBatch::flush() {
 	vertexBuffer.setData(vertices, idx);
 	vertexBuffer.bind(program);
 	indexBuffer.bind();
-
-	if (program->hasError()) {
-		setErrorState(std::string("Error in shader: ") + program->getErrorMessage());
-		idx = 0;
-		return;
-	}
 
 	//TODO: Fix hacky sizeof.
 	const int strideInBytes = (vertexBuffer.getAttributes().getStride() * sizeof(GLfloat));
@@ -259,10 +240,6 @@ void APG::SpriteBatch::flush() {
 }
 
 void APG::SpriteBatch::begin() {
-	if (hasError()) {
-		return;
-	}
-
 	drawing = true;
 	setupMatrices();
 	program->use();
@@ -272,12 +249,7 @@ void APG::SpriteBatch::begin() {
 }
 
 void APG::SpriteBatch::end() {
-	if (hasError()) {
-		return;
-	} else if (!drawing) {
-		setErrorState("Trying to end before a begin.");
-		return;
-	}
+	 REQUIRE(drawing, "Can't end before a begin in SpriteBatch.");
 
 	drawing = false;
 

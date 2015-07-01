@@ -34,7 +34,6 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "APG/ErrorBase.hpp"
 #include "APG/Buffer.hpp"
 #include "APG/Texture.hpp"
 #include "APG/ShaderProgram.hpp"
@@ -48,7 +47,7 @@ namespace APG {
 
 class Sprite;
 
-class SpriteBatch : public ErrorBase {
+class SpriteBatch {
 private:
 	static const char * const POSITION_ATTRIBUTE;
 	static const char * const COLOR_ATTRIBUTE;

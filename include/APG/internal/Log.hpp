@@ -25,36 +25,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef APGERRORBASE_HPP_
-#define APGERRORBASE_HPP_
+#ifndef INCLUDE_APG_INTERNAL_LOG_HPP_
+#define INCLUDE_APG_INTERNAL_LOG_HPP_
 
-#include <string>
+#ifndef NDEBUG
+#define APG_LOG(message) APG::internal::log(message, __FILE__, __LINE__);
+
+#include <iostream>
 
 namespace APG {
+namespace internal {
 
-class ErrorBase {
-private:
-	bool hasError_;
-	std::string message_;
-
-public:
-	ErrorBase() : hasError_{false}, message_{} {}
-	virtual ~ErrorBase() = default;
-
-	void setErrorState(const char *message);
-	void setErrorState(const std::string &message);
-
-	void unsetErrorState();
-
-	bool hasError() const {
-		return hasError_;
-	}
-
-	const std::string &getErrorMessage() {
-		return message_;
-	}
-};
-
+inline void log(const std::string &str, const char *filename, int line) {
+	log(str.c_str(), filename, line);
 }
 
-#endif /* APGERRORBASE_HPP_ */
+inline void log(const char *message, const char *filename, int line) {
+	std::cerr << "In " << filename << " (line " << line << ": " << message << std::endl;
+}
+
+}
+}
+
+#else
+#define APG_LOG(message) /* nothing */
+#endif
+
+#endif /* INCLUDE_APG_INTERNAL_LOG_HPP_ */

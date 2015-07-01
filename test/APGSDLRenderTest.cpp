@@ -49,11 +49,6 @@
 const std::string ASSET_PREFIX = "assets/";
 
 bool APGSDLRenderTest::init() {
-	if (hasError()) {
-		std::cerr << "Failed SDLGame initialisation:\n" << getErrorMessage() << std::endl;
-		return false;
-	}
-
 	renderer = SXXDL::make_renderer_ptr(
 			SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED));
 
@@ -74,11 +69,11 @@ bool APGSDLRenderTest::init() {
 
 	sdlTmxRenderer = std::make_unique<APG::SDLTmxRenderer>(map.get(), renderer);
 
-	if (sdlTmxRenderer->hasError()) {
-		std::cerr << "Error creating tmxRenderer: " << sdlTmxRenderer->getErrorMessage()
-				<< std::endl;
-		return false;
-	}
+//	if (sdlTmxRenderer->hasError()) {
+//		std::cerr << "Error creating tmxRenderer: " << sdlTmxRenderer->getErrorMessage()
+//				<< std::endl;
+//		return false;
+//	}
 
 	const auto tileset = sdlTmxRenderer->getTilesetByID(0);
 	std::cout << "TS1: (w, h) = (" << tileset->getWidth() << ", " << tileset->getHeight()

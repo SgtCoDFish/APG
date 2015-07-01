@@ -30,11 +30,9 @@
 
 #include <cstdint>
 
-#include "APG/ErrorBase.hpp"
-
 namespace APG {
 
-class Game : public ErrorBase {
+class Game {
 public:
 	static uint32_t screenWidth;
 	static uint32_t screenHeight;
