@@ -63,12 +63,15 @@ void APG::GLTmxRenderer::renderLayer(Tmx::Layer * const layer) {
 
 			const auto &tile = layer->GetTile(x, y);
 
-			if (tile.id == 0) {
+			if (tile.tilesetId == -1) {
 				continue;
 			}
 
 			const auto tileHash = calculateTileHash(tilesets[tile.tilesetId].get(), tile.id);
-//			std::cout << "Rendering hash #" << tileHash << std::endl;
+
+//			if (tileHash == 1000000) {
+//				std::cout << "Rendering hash #" << tileHash << std::endl;
+//			}
 
 			const auto ourSprite = sprites[tileHash];
 			batch.draw(ourSprite, tileX, tileY);

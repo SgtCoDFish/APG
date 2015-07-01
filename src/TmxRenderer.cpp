@@ -158,6 +158,6 @@ uint64_t APG::TmxRenderer::calculateTileHash(const Tileset *tileset, Tmx::Tile *
 }
 
 uint64_t APG::TmxRenderer::calculateTileHash(const Tileset *tileset, int tileID) const {
-	return MAX_SPRITES_PER_UNIT * (tileset->getGLTextureUnit() + 1) + tileID;
+	return MAX_SPRITES_PER_UNIT * (tileset->getGLTextureUnit() + 1) + tileID + 1;
 }
 

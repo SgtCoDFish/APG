@@ -62,26 +62,9 @@ bool APG::APGGLRenderTest::init() {
 
 	shaderProgram = ShaderProgram::fromFiles(vertexShaderFilename, fragmentShaderFilename);
 
-//	if (shaderProgram->hasError()) {
-//		std::cout << "Shader Info Log\n---------------\n" << shaderProgram->getShaderInfoLog();
-//		std::cout << "\nLink Info Log\n-------------\n" << shaderProgram->getLinkInfoLog() << std::endl;
-//		std::cerr << "Couldn't create shader:\n" << shaderProgram->getErrorMessage() << std::endl;
-//		return false;
-//	}
-
 	spriteBatch = std::make_unique<SpriteBatch>();
 
-//	if (spriteBatch->hasError()) {
-//		std::cout << "Couldn't create sprite batch:\n" << spriteBatch->getErrorMessage() << std::endl;
-//		return false;
-//	}
-
 	renderer = std::make_unique<GLTmxRenderer>(map.get(), *spriteBatch);
-
-//	if (renderer->hasError() || renderer->getTilesetByID(0) == nullptr) {
-//		std::cout << "Couldn't create GL tmx renderer:\n" << renderer->getErrorMessage() << std::endl;
-//		return false;
-//	}
 
 	auto glError = glGetError();
 	if (glError != GL_NO_ERROR) {

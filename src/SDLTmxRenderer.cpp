@@ -38,20 +38,18 @@
 #include "APG/SDLTmxRenderer.hpp"
 
 #include "APG/internal/Log.hpp"
+#include "APG/internal/Assert.hpp"
 
 APG::SDLTmxRenderer::SDLTmxRenderer(Tmx::Map * const map, SXXDL::renderer_ptr &renderer) :
 		TmxRenderer(map), renderer { renderer } {
 
-	if (map->GetOrientation() != Tmx::MapOrientation::TMX_MO_ORTHOGONAL) {
-		APG_LOG("SDLTmxRenderer only supports orthogonal maps.");
-		return;
-	}
+	REQUIRE(map->GetOrientation() == Tmx::MapOrientation::TMX_MO_ORTHOGONAL,
+	        "SDLTmxRenderer only supports orthogonal maps.");
 
 	for (const auto &tileset : tilesets) {
 		sdlTextures.emplace_back(
-				SXXDL::make_sdl_texture_ptr(
-						SDL_CreateTextureFromSurface(renderer.get(),
-								tileset->getPreservedSurface())));
+		        SXXDL::make_sdl_texture_ptr(
+		                SDL_CreateTextureFromSurface(renderer.get(), tileset->getPreservedSurface())));
 	}
 }
 
@@ -61,7 +59,6 @@ void APG::SDLTmxRenderer::renderLayer(Tmx::Layer *layer) {
 
 	auto src_rect = SDL_Rect { 0, 0, tile_width, tile_height };
 	auto dst_rect = SDL_Rect { 0, 0, tile_width, tile_height };
-
 
 	if (layer->GetVisible()) {
 		for (int y = 0; y < layer->GetHeight(); y++) {
