@@ -49,8 +49,7 @@
 const std::string ASSET_PREFIX = "assets/";
 
 bool APGSDLRenderTest::init() {
-	renderer = SXXDL::make_renderer_ptr(
-			SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED));
+	renderer = SXXDL::make_renderer_ptr(SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED));
 
 	if (renderer == nullptr) {
 		std::cerr << "Couldn't create renderer:\n" << SDL_GetError() << std::endl;
@@ -76,9 +75,8 @@ bool APGSDLRenderTest::init() {
 //	}
 
 	const auto tileset = sdlTmxRenderer->getTilesetByID(0);
-	std::cout << "TS1: (w, h) = (" << tileset->getWidth() << ", " << tileset->getHeight()
-			<< ").\nWIT: " << tileset->getWidthInTiles() << "\nHIT: " << tileset->getHeightInTiles()
-			<< "\n";
+	std::cout << "TS1: (w, h) = (" << tileset->getWidth() << ", " << tileset->getHeight() << ").\nWIT: "
+	        << tileset->getWidthInTiles() << "\nHIT: " << tileset->getHeightInTiles() << "\n";
 
 	return true;
 }
@@ -93,41 +91,76 @@ void APGSDLRenderTest::render(float deltaTime) {
 
 #ifdef APG_TEST_SDL
 int main(int argc, char *argv[]) {
-	APG::SDLGame::sdlWindowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
-	auto rpg = std::make_unique<APGSDLRenderTest>();
+	uint32_t sdlInitFlags = SDL_INIT_VIDEO | SDL_INIT_EVENTS;
+	uint32_t sdlImageInitFlags = IMG_INIT_PNG;
+	uint32_t sdlWindowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
-	if (!rpg->init()) {
+	if (SDL_Init(sdlInitFlags) < 0) {
+		std::cerr << "Couldn't initialise SDL: " << SDL_GetError() << std::endl;
 		return EXIT_FAILURE;
 	}
 
-	auto map = rpg->getMap();
+	if ((IMG_Init(sdlImageInitFlags) & sdlImageInitFlags) == 0) {
+		std::cerr << "Couldn't initialise SDL_image: " << IMG_GetError() << std::endl;
+		return EXIT_FAILURE;
+	}
 
-	std::cout << "Map width: " << map->GetWidth() << ", height: " << map->GetHeight() << ".\n";
-	std::cout << "Has " << map->GetNumLayers() << " layers.\n";
+	const std::string windowTitle("APG GLTmxRenderer Example");
+	const uint32_t windowWidth = 1280;
+	const uint32_t windowHeight = 720;
 
-	bool done = false;
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
-	auto startTime = std::chrono::high_resolution_clock::now();
-	std::vector<float> timesTaken;
-	while (!done) {
-		auto timeNow = std::chrono::high_resolution_clock::now();
-		float deltaTime =
-				std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count()
-						/ 1000.0f;
+	SDL_Window *window = SDL_CreateWindow(windowTitle.c_str(), 0, 0, windowWidth, windowHeight, sdlWindowFlags);
 
-		startTime = timeNow;
-		timesTaken.push_back(deltaTime);
+	SDL_GLContext context = SDL_GL_CreateContext(window);
 
-		done = rpg->update(deltaTime);
+	glewExperimental = GL_TRUE;
+	glewInit();
 
-		if (timesTaken.size() >= 1000) {
-			const float sum = std::accumulate(timesTaken.begin(), timesTaken.end(), 0.0f);
+	// reset all errors since apparently glew causes some.
+	auto error = glGetError();
+	while (error != GL_NO_ERROR) {
+		error = glGetError();
+	}
 
-			const float fps = 1 / (sum / timesTaken.size());
+	{
+		auto rpg = std::make_unique<APGSDLRenderTest>(window, windowWidth, windowHeight, context);
 
-			std::cout << "FPS: " << fps << std::endl;
+		if (!rpg->init()) {
+			return EXIT_FAILURE;
+		}
 
-			timesTaken.clear();
+		auto map = rpg->getMap();
+
+		std::cout << "Map width: " << map->GetWidth() << ", height: " << map->GetHeight() << ".\n";
+		std::cout << "Has " << map->GetNumLayers() << " layers.\n";
+
+		bool done = false;
+
+		auto startTime = std::chrono::high_resolution_clock::now();
+		std::vector<float> timesTaken;
+		while (!done) {
+			auto timeNow = std::chrono::high_resolution_clock::now();
+			float deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count()
+			        / 1000.0f;
+
+			startTime = timeNow;
+			timesTaken.push_back(deltaTime);
+
+			done = rpg->update(deltaTime);
+
+			if (timesTaken.size() >= 1000) {
+				const float sum = std::accumulate(timesTaken.begin(), timesTaken.end(), 0.0f);
+
+				const float fps = 1 / (sum / timesTaken.size());
+
+				std::cout << "FPS: " << fps << std::endl;
+
+				timesTaken.clear();
+			}
 		}
 	}
 
