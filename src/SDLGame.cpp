@@ -39,45 +39,11 @@
 
 #include "APG/SDLGame.hpp"
 
-uint32_t APG::SDLGame::sdlInitFlags = SDL_INIT_VIDEO | SDL_INIT_EVENTS;
-uint32_t APG::SDLGame::sdlImageInitFlags = IMG_INIT_PNG;
-uint32_t APG::SDLGame::sdlWindowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
+APG::SDLGame::SDLGame(SDL_Window *window, SDL_GLContext &context, uint32_t windowWidth, uint32_t windowHeight) :
+		Game(windowWidth, windowHeight) {
 
-APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
-		uint8_t glMajorVersion, uint8_t glMinorVersion) :
-		Game(windowWidth, windowHeight), windowTitle(std::string(windowTitle)) {
-	if (SDL_Init(sdlInitFlags) < 0) {
-		setErrorState((std::string("Couldn't initialise SDL: ") + SDL_GetError()));
-		return;
-	}
-
-	if ((IMG_Init(sdlImageInitFlags) & sdlImageInitFlags) == 0) {
-		setErrorState(std::string("Couldn't initialise SDL_image: ") + IMG_GetError());
-		return;
-	}
-
-	initGL(glMajorVersion, glMinorVersion);
-	initSDL(windowWidth, windowHeight);
-	initContextAndGlew();
-}
-
-APG::SDLGame::~SDLGame() {
-	if (glContext != nullptr) {
-		SDL_GL_DeleteContext(glContext);
-	}
-
-	IMG_Quit();
-	SDL_Quit();
-}
-
-void APG::SDLGame::initSDL(uint32_t windowWidth, uint32_t windowHeight) {
-	if (hasError()) {
-		return;
-	}
-
-	window = SXXDL::make_window_ptr(
-			SDL_CreateWindow(windowTitle.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-					windowWidth, windowHeight, sdlWindowFlags));
+	setWindow(window);
+	setGLContext(context);
 }
 
 void APG::SDLGame::handleEvent(SDL_Event &event) {
@@ -106,33 +72,6 @@ bool APG::SDLGame::update(float deltaTime) {
 	render(deltaTime);
 
 	return false;
-}
-
-void APG::SDLGame::initGL(uint8_t glMajorVersion, uint8_t glMinorVersion) {
-	if (hasError()) {
-		return;
-	}
-
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, glMajorVersion);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, glMinorVersion);
-}
-
-void APG::SDLGame::initContextAndGlew() {
-	if (hasError()) {
-		return;
-	}
-
-	glContext = SDL_GL_CreateContext(window.get());
-
-	glewExperimental = GL_TRUE;
-	glewInit();
-
-	// reset all errors since apparently glew causes some.
-	auto error = glGetError();
-	while (error != GL_NO_ERROR) {
-		error = glGetError();
-	}
 }
 
 void APG::SDLGame::quit() {

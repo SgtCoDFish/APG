@@ -39,6 +39,7 @@ private:
 
 public:
 	ErrorBase() : hasError_{false}, message_{} {}
+	virtual ~ErrorBase() = default;
 
 	void setErrorState(const char *message);
 	void setErrorState(const std::string &message);

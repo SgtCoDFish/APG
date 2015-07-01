@@ -57,6 +57,7 @@ private:
 
 public:
 	SDLTmxRenderer(Tmx::Map * const map, SXXDL::renderer_ptr &renderer);
+	virtual ~SDLTmxRenderer() = default;
 
 	void renderLayer(Tmx::Layer *layer) override;
 

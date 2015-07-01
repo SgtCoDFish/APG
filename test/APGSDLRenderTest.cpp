@@ -55,7 +55,7 @@ bool APGSDLRenderTest::init() {
 	}
 
 	renderer = SXXDL::make_renderer_ptr(
-			SDL_CreateRenderer(window.get(), -1, SDL_RENDERER_ACCELERATED));
+			SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED));
 
 	if (renderer == nullptr) {
 		std::cerr << "Couldn't create renderer:\n" << SDL_GetError() << std::endl;

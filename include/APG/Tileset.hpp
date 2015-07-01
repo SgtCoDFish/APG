@@ -56,19 +56,19 @@ private:
 	}
 
 public:
-	Tileset(const char * const fileName, Tmx::Map * const map) :
+	explicit Tileset(const char * const fileName, Tmx::Map * const map) :
 			Tileset(fileName, map->GetTileWidth(), map->GetTileHeight()) {
 	}
 
-	Tileset(const std::string &fileName, Tmx::Map * const map) :
+	explicit Tileset(const std::string &fileName, Tmx::Map * const map) :
 			Tileset(fileName, map->GetTileWidth(), map->GetTileHeight()) {
 	}
 
-	Tileset(const char * const fileName, int32_t tileWidth, int32_t tileHeight) :
+	explicit Tileset(const char * const fileName, int32_t tileWidth, int32_t tileHeight) :
 			Tileset(std::string(fileName), tileWidth, tileHeight) {
 	}
 
-	Tileset(const std::string &fileName, int32_t tileWidth, int32_t tileHeight) :
+	explicit Tileset(const std::string &fileName, int32_t tileWidth, int32_t tileHeight) :
 			Texture(fileName, true), tileWidth(tileWidth), tileHeight(tileHeight) {
 		calculateWidthInTiles();
 		calculateHeightInTiles();

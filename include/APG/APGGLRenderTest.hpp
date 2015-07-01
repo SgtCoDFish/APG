@@ -32,6 +32,8 @@
 #include <memory>
 #include <utility>
 
+#include <SDL2/SDL.h>
+
 #include "APG/Game.hpp"
 #include "APG/SDLGame.hpp"
 #include "APG/APGCommon.hpp"
@@ -48,10 +50,11 @@
 
 namespace APG {
 
-class APGGLRenderTest : public APG::SDLGame {
+class APGGLRenderTest final : public APG::SDLGame {
 private:
 	static const char *vertexShaderFilename;
 	static const char *fragmentShaderFilename;
+
 	std::unique_ptr<Tmx::Map> map;
 
 	std::unique_ptr<ShaderProgram> shaderProgram;
@@ -62,8 +65,8 @@ private:
 
 	std::unique_ptr<Sprite> sprite;
 public:
-	APGGLRenderTest(const std::string &title, uint32_t screenWidth, uint32_t screenHeight) :
-			SDLGame(title, screenWidth, screenHeight, 3, 2) {
+	explicit APGGLRenderTest(SDL_Window *window, uint32_t screenWidth, uint32_t screenHeight, SDL_GLContext context) :
+			SDLGame(window, context, screenWidth, screenHeight) {
 	}
 
 	virtual ~APGGLRenderTest() = default;

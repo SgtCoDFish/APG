@@ -39,13 +39,12 @@ public:
 	static uint32_t screenWidth;
 	static uint32_t screenHeight;
 
-	Game(uint32_t screenWidth = 1280, uint32_t screenHeight = 720) {
+	Game(uint32_t screenWidth, uint32_t screenHeight) {
 		Game::screenWidth = screenWidth;
 		Game::screenHeight = screenHeight;
 	}
 
-	virtual ~Game() {
-	}
+	virtual ~Game() = default;
 
 	/**
 	 * Should carry out initialisation of the game.

@@ -48,6 +48,7 @@ public:
 	VertexBufferObject(bool isStatic, std::initializer_list<VertexAttribute> initList);
 	VertexBufferObject(bool isStatic, std::initializer_list<VertexAttribute> initList,
 			float vertices[], int vertexCount);
+	virtual ~VertexBufferObject() = default;
 
 	inline const VertexAttributeList &getAttributes() const {
 		return attributeList;

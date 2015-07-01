@@ -35,6 +35,8 @@
 #include "APG/ErrorBase.hpp"
 #include "APG/Texture.hpp"
 
+#include "APG/internal/Assert.hpp"
+
 APG::Sprite::Sprite(Texture * const texture) :
 		Sprite(texture, 0, 0, texture->getWidth(), texture->getHeight()) {
 
@@ -43,21 +45,9 @@ APG::Sprite::Sprite(Texture * const texture) :
 APG::Sprite::Sprite(Texture * const texture, uint32_t texX, uint32_t texY, uint32_t width, uint32_t height) :
 		texture(texture), texX(texX), texY(texY), width(width), height(height) {
 
-	if (texture == nullptr) {
-		setErrorState("Null texture passed to Sprite::Sprite");
-		return;
-	}
+	REQUIRE(texture != nullptr, "Can't pass a null texture to Sprite::Sprite");
 
-	if (texX + width > texture->getWidth() || texY + height > texture->getHeight()) {
-		std::stringstream ss;
-
-		ss << "Invalid x/y/width/height when creating sprite.\n(x, y) = (" << texX << ", " << texY << ")\n(w, h) = ("
-		        << width << ", " << height << ").\nTexture size: (w, h) = (" << texture->getWidth() << ", "
-		        << texture->getHeight() << ")";
-
-		setErrorState(ss.str().c_str());
-		return;
-	}
+	REQUIRE(texX + width <= texture->getWidth() && texY + height <= texture->getHeight(), "Invalid texture sizes when creating sprite.");
 
 	calculateUV();
 }

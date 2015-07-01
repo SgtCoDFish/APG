@@ -38,7 +38,7 @@ enum class AttributeUsage {
 	POSITION, COLOR, TEXCOORD, NORMAL,
 };
 
-class VertexAttribute {
+class VertexAttribute final {
 private:
 	std::string alias;
 	AttributeUsage usage;
@@ -54,7 +54,7 @@ public:
 			bool normalized = false);
 	~VertexAttribute() = default;
 
-	std::string getAlias() const {
+	const std::string &getAlias() const {
 		return alias;
 	}
 

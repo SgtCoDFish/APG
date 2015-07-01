@@ -36,7 +36,7 @@
 
 namespace APG {
 
-class Mesh {
+class Mesh final {
 private:
 	VertexBufferObject vertexBuffer;
 	IndexBufferObject indexBuffer;
@@ -44,6 +44,7 @@ private:
 public:
 	Mesh(std::initializer_list<VertexAttribute> attList);
 	Mesh(bool staticVertices, bool staticIndices, std::initializer_list<VertexAttribute> attList);
+	~Mesh() = default;
 };
 
 }

@@ -36,7 +36,7 @@
 
 namespace APG {
 
-class VertexAttributeList {
+class VertexAttributeList final {
 private:
 	std::vector<VertexAttribute> attributes;
 
@@ -46,6 +46,8 @@ private:
 public:
 	explicit VertexAttributeList(std::initializer_list<VertexAttribute> initList);
 	explicit VertexAttributeList(std::vector<VertexAttribute> &attVec);
+
+	~VertexAttributeList() = default;
 
 	/**
 	 * @param attribute the attribute to be copied into this list.

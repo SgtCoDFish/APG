@@ -64,7 +64,7 @@ public:
 	static std::unique_ptr<APG::ShaderProgram> fromFiles(const std::string &vertexShaderFilename,
 			const std::string &fragmentShaderFilename);
 
-	~ShaderProgram();
+	virtual ~ShaderProgram();
 
 	void use();
 

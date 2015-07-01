@@ -73,6 +73,8 @@ public:
 	explicit AnimatedSprite(float frameDuration, Sprite &&firstFrame, std::vector<Sprite *> sprites,
 	        AnimationMode animationMode = AnimationMode::NORMAL);
 
+	virtual ~AnimatedSprite() = default;
+
 	void update(float deltaTime);
 
 	void addFrame(Sprite * frame);

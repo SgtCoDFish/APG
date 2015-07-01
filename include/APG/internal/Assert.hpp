@@ -25,58 +25,32 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SDLGAME_HPP_
-#define SDLGAME_HPP_
+#ifndef INCLUDE_APG_INTERNAL_ASSERT_HPP_
+#define INCLUDE_APG_INTERNAL_ASSERT_HPP_
 
-#include <cstdint>
+#ifndef NDEBUG
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include <cstdio>
 
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glew.h>
-
-#include "APG/Game.hpp"
-#include "APG/SXXDL.hpp"
-
-namespace APG {
-
-class SDLGame : public Game {
-protected:
-	SDL_Window *window = nullptr;
-	SDL_GLContext glContext = nullptr;
-
-	SDL_Event eventCache;
-
-	bool shouldQuit = false;
-
-	void handleEvent(SDL_Event &event);
-
-public:
-	SDLGame(SDL_Window *window, SDL_GLContext &context, uint32_t windowWidth, uint32_t windowHeight);
-	virtual ~SDLGame() = default;
-
-	bool update(float deltaTime) override;
-	void quit();
-
-	void setWindow(SDL_Window *window) {
-		this->window = window;
-	}
-
-	SDL_Window *getWindow() const {
-		return window;
-	}
-
-	void setGLContext(SDL_GLContext context) {
-		this->glContext = context;
-	}
-
-	SDL_GLContext getGLContext() const {
-		return glContext;
-	}
-};
-
+#define REQUIRE(expr, orElse) \
+if(expr) {} \
+else \
+{ \
+	APG::internal::require_impl(#expr, #orElse, __FILE__, __LINE__); \
 }
 
-#endif /* SDLGAME_HPP_ */
+namespace APG {
+namespace internal {
+
+inline void require_impl(const char *expression, const char *extra, const char *filename, int line) {
+	std::printf("Assertion failure in \"%s\" (line %d): %s (%s)\n", filename, line, expression, extra);
+}
+
+}
+}
+
+#else
+#define REQUIRE(expr, orElse) /* nothing */
+#endif
+
+#endif /* INCLUDE_APG_INTERNAL_ASSERT_HPP_ */

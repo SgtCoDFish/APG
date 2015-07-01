@@ -82,7 +82,7 @@ public:
 	static const uint32_t DEFAULT_BUFFER_SIZE;
 	explicit SpriteBatch(uint32_t bufferSize = DEFAULT_BUFFER_SIZE, ShaderProgram * const program =
 			nullptr);
-	~SpriteBatch() = default;
+	virtual ~SpriteBatch() = default;
 
 	void begin();
 	void end();

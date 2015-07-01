@@ -77,11 +77,11 @@ protected:
 	}
 
 public:
-	Buffer(BufferType bufferType, DrawType drawType) :
+	explicit Buffer(BufferType bufferType, DrawType drawType) :
 			Buffer { bufferType, drawType, nullptr, 0 } {
 	}
 
-	Buffer(BufferType bufferType, DrawType drawType, T * const data, uint64_t elementCount) :
+	explicit Buffer(BufferType bufferType, DrawType drawType, T * const data, uint64_t elementCount) :
 			bufferType { bufferType }, drawType { drawType } {
 		generateID();
 		bind();
@@ -92,7 +92,7 @@ public:
 		}
 	}
 
-	~Buffer() {
+	virtual ~Buffer() {
 		glDeleteBuffers(1, &bufferID);
 	}
 
@@ -183,6 +183,7 @@ public:
 	Buffer &operator=(const Buffer &other) = delete;
 };
 
+using DoubleBuffer = Buffer<double, GL_DOUBLE>;
 using FloatBuffer = Buffer<float, GL_FLOAT>;
 using UInt32Buffer = Buffer<uint32_t, GL_UNSIGNED_INT>;
 using UInt16Buffer = Buffer<uint16_t, GL_UNSIGNED_SHORT>;

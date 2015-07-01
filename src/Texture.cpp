@@ -124,7 +124,7 @@ void APG::Texture::loadTexture(const std::string &fileName) {
 		errStream << "Couldn't upload " << fileName << ": OpenGL Error:\n";
 
 		while (glError != GL_NO_ERROR) {
-			errStream << gluErrorString(glError);
+			errStream << gluErrorString(glError) << "\n";
 
 			glError = glGetError();
 		}

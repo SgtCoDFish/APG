@@ -34,6 +34,9 @@
 #include <vector>
 #include <numeric>
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+
 #include <GL/glew.h>
 #include <GL/gl.h>
 
@@ -66,25 +69,22 @@ bool APG::APGGLRenderTest::init() {
 
 	if (shaderProgram->hasError()) {
 		std::cout << "Shader Info Log\n---------------\n" << shaderProgram->getShaderInfoLog();
-		std::cout << "\nLink Info Log\n-------------\n" << shaderProgram->getLinkInfoLog()
-				<< std::endl;
+		std::cout << "\nLink Info Log\n-------------\n" << shaderProgram->getLinkInfoLog() << std::endl;
 		std::cerr << "Couldn't create shader:\n" << shaderProgram->getErrorMessage() << std::endl;
 		return false;
 	}
 
-	spriteBatch = std::make_unique<SpriteBatch>(SpriteBatch::DEFAULT_BUFFER_SIZE);
+	spriteBatch = std::make_unique<SpriteBatch>();
 
 	if (spriteBatch->hasError()) {
-		std::cout << "Couldn't create sprite batch:\n" << spriteBatch->getErrorMessage()
-				<< std::endl;
+		std::cout << "Couldn't create sprite batch:\n" << spriteBatch->getErrorMessage() << std::endl;
 		return false;
 	}
 
 	renderer = std::make_unique<GLTmxRenderer>(map.get(), *spriteBatch);
 
 	if (renderer->hasError() || renderer->getTilesetByID(0) == nullptr) {
-		std::cout << "Couldn't create GL tmx renderer:\n" << renderer->getErrorMessage()
-				<< std::endl;
+		std::cout << "Couldn't create GL tmx renderer:\n" << renderer->getErrorMessage() << std::endl;
 		return false;
 	}
 
@@ -113,45 +113,88 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 
 	renderer->renderAll(deltaTime);
 
-	SDL_GL_SwapWindow(window.get());
+	SDL_GL_SwapWindow(window);
 }
 
 #ifndef APG_TEST_SDL
 int main(int argc, char *argv[]) {
-	APG::SDLGame::sdlWindowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
+	uint32_t sdlInitFlags = SDL_INIT_VIDEO | SDL_INIT_EVENTS;
+	uint32_t sdlImageInitFlags = IMG_INIT_PNG;
+	uint32_t sdlWindowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
-	auto game = std::make_unique<APG::APGGLRenderTest>("APG GLTmxRenderer Example", 1280, 720);
-
-	if (!game->init()) {
+	if (SDL_Init(sdlInitFlags) < 0) {
+		std::cerr << "Couldn't initialise SDL: " << SDL_GetError() << std::endl;
 		return EXIT_FAILURE;
 	}
 
-	bool done = false;
-
-	auto startTime = std::chrono::high_resolution_clock::now();
-	std::vector<float> timesTaken;
-
-	while (!done) {
-		auto timeNow = std::chrono::high_resolution_clock::now();
-		float deltaTime =
-				std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count()
-						/ 1000.0f;
-
-		startTime = timeNow;
-		timesTaken.push_back(deltaTime);
-
-		done = game->update(deltaTime);
-
-		if (timesTaken.size() >= 100) {
-			const float sum = std::accumulate(timesTaken.begin(), timesTaken.end(), 0.0f);
-
-			const float fps = 1 / (sum / timesTaken.size());
-
-			std::cout << "FPS: " << fps << std::endl;
-
-			timesTaken.clear();
-		}
+	if ((IMG_Init(sdlImageInitFlags) & sdlImageInitFlags) == 0) {
+		std::cerr << "Couldn't initialise SDL_image: " << IMG_GetError() << std::endl;
+		return EXIT_FAILURE;
 	}
+
+	const std::string windowTitle("APG GLTmxRenderer Example");
+	const uint32_t windowWidth = 1280;
+	const uint32_t windowHeight = 720;
+
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+
+	SDL_Window *window = SDL_CreateWindow(windowTitle.c_str(), 0, 0,
+	        windowWidth, windowHeight, sdlWindowFlags);
+
+	SDL_GLContext context = SDL_GL_CreateContext(window);
+
+	glewExperimental = GL_TRUE;
+	glewInit();
+
+	// reset all errors since apparently glew causes some.
+	auto error = glGetError();
+	while (error != GL_NO_ERROR) {
+		error = glGetError();
+	}
+
+	{
+		auto game = std::make_unique<APG::APGGLRenderTest>(window, 1280, 720, context);
+
+		if (!game->init()) {
+			std::cerr << "Couldn't initialise game.\n";
+			return EXIT_FAILURE;
+		}
+
+		bool done = false;
+
+		auto startTime = std::chrono::high_resolution_clock::now();
+		std::vector<float> timesTaken;
+
+		while (!done) {
+			const auto timeNow = std::chrono::high_resolution_clock::now();
+			float deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count()
+			        / 1000.0f;
+
+			startTime = timeNow;
+			timesTaken.push_back(deltaTime);
+
+			done = game->update(deltaTime);
+
+			if (timesTaken.size() >= 100) {
+				const float sum = std::accumulate(timesTaken.begin(), timesTaken.end(), 0.0f);
+
+				const float fps = 1 / (sum / timesTaken.size());
+
+				std::cout << "FPS: " << fps << std::endl;
+
+				timesTaken.clear();
+			}
+		}
+		//
+	}
+
+	SDL_GL_DeleteContext(context);
+	SDL_DestroyWindow(window);
+
+	IMG_Quit();
+	SDL_Quit();
 
 	return EXIT_SUCCESS;
 }

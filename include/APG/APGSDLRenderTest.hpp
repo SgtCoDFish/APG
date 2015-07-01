@@ -36,7 +36,7 @@
 #include "APG/SXXDL.hpp"
 #include "APG/SDLTmxRenderer.hpp"
 
-class APGSDLRenderTest : public APG::SDLGame {
+class APGSDLRenderTest final : public APG::SDLGame {
 private:
 	SXXDL::renderer_ptr renderer = SXXDL::make_renderer_ptr(nullptr);
 
@@ -45,7 +45,9 @@ private:
 	std::unique_ptr<APG::SDLTmxRenderer> sdlTmxRenderer = nullptr;
 
 public:
-	APGSDLRenderTest() : SDLGame("APGSDLRenderTest", 1280, 720, 3, 2) {}
+	APGSDLRenderTest(SDL_Window *window, uint32_t windowWidth, uint32_t windowHeight, SDL_GLContext context) :
+			SDLGame(window, context, windowWidth, windowHeight) {
+	}
 	virtual ~APGSDLRenderTest() = default;
 
 	bool init() override;

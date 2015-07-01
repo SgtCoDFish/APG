@@ -45,6 +45,8 @@ public:
 					(isStatic ? DrawType::STATIC_DRAW : DrawType::DYNAMIC_DRAW), indices,
 					indexCount) {
 	}
+
+	virtual ~IndexBufferObject() = default;
 };
 
 }

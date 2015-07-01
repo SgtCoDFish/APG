@@ -32,13 +32,13 @@
 
 namespace APG {
 
-class VAO {
+class VAO final {
 private:
 	uint32_t vaoID;
 
 public:
 	VAO();
-	virtual ~VAO();
+	~VAO();
 
 	void bind() const;
 
