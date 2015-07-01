@@ -53,9 +53,15 @@ protected:
 	void calculateUV();
 
 public:
-	Sprite(Texture * const texture);
-	Sprite(Texture * const texture, uint32_t texX, uint32_t texY, uint32_t width, uint32_t height);
+	explicit Sprite(Texture * const texture);
+	explicit Sprite(Texture * const texture, uint32_t texX, uint32_t texY, uint32_t width, uint32_t height);
+
 	virtual ~Sprite() = default;
+
+	Sprite(Sprite &sprite) = default;
+	Sprite(Sprite &&sprite) = default;
+	Sprite &operator =(Sprite &sprite) = default;
+	Sprite &operator =(Sprite &&sprite) = default;
 
 	virtual Texture * getTexture() const override {
 		return texture;

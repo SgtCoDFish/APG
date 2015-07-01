@@ -63,7 +63,10 @@ private:
 
 	std::unique_ptr<GLTmxRenderer> renderer;
 
-	std::unique_ptr<Sprite> sprite;
+	std::unique_ptr<Texture> playerTexture;
+	std::vector<Sprite> playerFrames;
+	std::unique_ptr<AnimatedSprite> playerAnimation;
+
 public:
 	explicit APGGLRenderTest(SDL_Window *window, uint32_t screenWidth, uint32_t screenHeight, SDL_GLContext context) :
 			SDLGame(window, context, screenWidth, screenHeight) {

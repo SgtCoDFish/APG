@@ -67,6 +67,10 @@ bool APG::APGGLRenderTest::init() {
 
 	renderer = std::make_unique<GLTmxRenderer>(map.get(), *spriteBatch);
 
+	playerTexture = std::make_unique<Texture>("assets/player.png");
+	playerFrames = AnimatedSprite::splitTexture(playerTexture.get(), 32, 32, 0, 0, 4);
+	playerAnimation = std::make_unique<AnimatedSprite>(0.3f, playerFrames, AnimationMode::LOOP);
+
 	auto glError = glGetError();
 	if (glError != GL_NO_ERROR) {
 		while (glError != GL_NO_ERROR) {
@@ -85,6 +89,13 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	renderer->renderAll(deltaTime);
+	playerAnimation->update(deltaTime);
+
+	spriteBatch->begin();
+
+	spriteBatch->draw(playerAnimation.get(), 64.0f, 64.0f);
+
+	spriteBatch->end();
 
 	SDL_GL_SwapWindow(window);
 }

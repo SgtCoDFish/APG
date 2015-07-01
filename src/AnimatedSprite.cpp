@@ -35,6 +35,7 @@
 #include "tmxparser/TmxTile.h"
 
 #include "APG/AnimatedSprite.hpp"
+#include "APG/Texture.hpp"
 
 #include "APG/internal/Assert.hpp"
 
@@ -64,6 +65,19 @@ APG::AnimatedSprite::AnimatedSprite(float frameDuration, std::initializer_list<S
 	setAnimationMode(animationMode);
 }
 
+APG::AnimatedSprite::AnimatedSprite(float frameDuration, std::vector<Sprite> &sprites, AnimationMode animationMode) :
+		secondsPerFrame { frameDuration } {
+	REQUIRE(sprites.size() > 0, "Can't initialise an animated sprite with an empty sprite list.");
+
+	initializeFromSpriteFrame(&(sprites.front()));
+
+	for (auto &sprite : sprites) {
+		addFrame(&sprite);
+	}
+
+	setAnimationMode(animationMode);
+}
+
 APG::AnimatedSprite::AnimatedSprite(float frameDuration, std::vector<SpriteBase *> &sprites,
         AnimationMode animationMode) :
 		secondsPerFrame { frameDuration } {
@@ -85,7 +99,6 @@ void APG::AnimatedSprite::addFrame(SpriteBase * frame) {
 	frames.emplace_back(frame);
 
 	frameCount++;
-//	std::cout << "Added new animation frame: " << frames.back()->getHash() << ", count is now " << frameCount << ", frame has ID " << frame->getHash() << "\n";
 }
 
 void APG::AnimatedSprite::update(float deltaTime) {
@@ -93,8 +106,11 @@ void APG::AnimatedSprite::update(float deltaTime) {
 
 	switch (animationMode) {
 	case AnimationMode::NORMAL:
-	case AnimationMode::REVERSED:
 		handleNormalMode_();
+		break;
+
+	case AnimationMode::REVERSED:
+		handleReversedMode_();
 		break;
 
 	case AnimationMode::LOOP:
@@ -112,7 +128,7 @@ void APG::AnimatedSprite::update(float deltaTime) {
 }
 
 APG::SpriteBase *APG::AnimatedSprite::getFrame(uint32_t frameNumber) const {
-	REQUIRE(frameNumber >= 0 && frameNumber <= frameCount, "Invalid frame number passed to getFrame.");
+	REQUIRE((int32_t)frameNumber >= 0 && (int32_t)frameNumber <= frameCount, "Invalid frame number passed to getFrame.");
 	return frames[frameNumber];
 }
 
@@ -120,7 +136,7 @@ APG::SpriteBase *APG::AnimatedSprite::getCurrentFrame() const {
 	return frames[currentFrame];
 }
 
-void APG::AnimatedSprite::setAnimationMode(APG::AnimationMode mode) {
+APG::AnimatedSprite &APG::AnimatedSprite::setAnimationMode(APG::AnimationMode mode) {
 	this->animationMode = mode;
 
 	switch (this->animationMode) {
@@ -143,44 +159,84 @@ void APG::AnimatedSprite::setAnimationMode(APG::AnimationMode mode) {
 		animDir = 1;
 		break;
 	}
+
+	return *this;
+}
+
+void APG::AnimatedSprite::progress_() {
+	if (animTime > secondsPerFrame) {
+		animTime -= secondsPerFrame;
+		currentFrame += animDir;
+	}
 }
 
 void APG::AnimatedSprite::handleNormalMode_() {
-	if (currentFrame < frameCount) {
-		if (animTime > secondsPerFrame) {
-			animTime -= secondsPerFrame;
-			currentFrame += animDir;
-		}
-	} else {
-		animTime = 0.0f;
+	progress_();
+
+	if(currentFrame >= frameCount) {
+		currentFrame = frameCount - 1;
 	}
 }
 
 void APG::AnimatedSprite::handleLoopMode_() {
-	handleNormalMode_();
+	progress_();
 
-	if (currentFrame == frameCount) {
+	if(currentFrame >= frameCount) {
 		currentFrame = 0;
 	}
 }
 
 void APG::AnimatedSprite::handleLoopPingPongMode_() {
-	handleNormalMode_();
+	progress_();
 
-	if (currentFrame == frameCount - 1) {
+	if (currentFrame >= frameCount) {
 		animDir = -1;
-	} else if (currentFrame == 0) {
+		currentFrame = frameCount - 1;
+	} else if (currentFrame <= 0) {
 		animDir = 1;
+		currentFrame = 0;
 	}
 }
 
-void APG::AnimatedSprite::initializeFromSpriteFrame(SpriteBase * sprite) {
+void APG::AnimatedSprite::handleReversedMode_() {
+	progress_();
+
+	if(currentFrame <= 0) {
+		currentFrame = 0;
+	}
+}
+
+void APG::AnimatedSprite::initializeFromSpriteFrame(const SpriteBase * sprite) {
 	this->width = sprite->getWidth();
 	this->height = sprite->getHeight();
-	this->u = sprite->getU();
-	this->v = sprite->getV();
-	this->u2 = sprite->getU2();
-	this->v2 = sprite->getV2();
 	this->texture = sprite->getTexture();
+}
+
+std::vector<APG::Sprite> APG::AnimatedSprite::splitTexture(Texture * texture, uint32_t tileWidth, uint32_t tileHeight,
+        uint32_t xStart, uint32_t yStart, int32_t frameCount, uint32_t xSeparation) {
+	const auto textureWidth = texture->getWidth();
+	const auto textureHeight = texture->getHeight();
+
+	REQUIRE(textureWidth >= (xStart + tileWidth + xSeparation) && textureHeight >= (yStart + tileHeight),
+	        "Texture to split must be bigger than the tiles being extracted and tiles must fit inside the texture..");
+
+	if (frameCount == -1) {
+		frameCount = (texture->getWidth() - xStart) / (tileWidth + xSeparation);
+	}
+
+	REQUIRE(frameCount >= 1, "Cannot have 0 frames in a split texture.");
+
+	std::vector<Sprite> loadedFrames;
+	loadedFrames.reserve(frameCount);
+
+	for (uint32_t i = 0u; i < (uint32_t) frameCount; ++i) {
+		const auto x = xStart + i * (tileWidth + xSeparation);
+		const auto y = yStart;
+		std::cout << "Frame #" << (i + 1) << " at (x, y) = (" << x << ", " << y << ").\n";
+
+		loadedFrames.emplace_back(texture, x, y, tileWidth, tileHeight);
+	}
+
+	return loadedFrames;
 }
 
