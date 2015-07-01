@@ -63,7 +63,7 @@ void APG::TmxRenderer::loadTilesets() {
 	 * We need to reserve space for our sprites or the vectors will be
 	 * dynamically reallocated and we'll be left with a load of broken pointers.
 	 */
-	reserveSpriteSpace(map);
+	reserveSpriteSpace();
 
 	for (const auto &tileset : map->GetTilesets()) {
 		REQUIRE(tileset->GetTileWidth() == tileWidth && tileset->GetTileHeight() == tileHeight,
