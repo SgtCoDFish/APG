@@ -74,6 +74,8 @@ public:
 	bool init() override;
 	void render(float deltaTime) override;
 
+	void handleEvent(SDL_Event &event) override;
+
 	const Tmx::Map *getMap() const {
 		return map.get();
 	}

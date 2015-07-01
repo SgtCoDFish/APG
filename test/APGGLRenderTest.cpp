@@ -89,6 +89,28 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	SDL_GL_SwapWindow(window);
 }
 
+void APG::APGGLRenderTest::handleEvent(SDL_Event &event) {
+	static glm::vec2 pos(0.0f, 0.0f);
+
+	switch (event.type) {
+	case SDL_KEYDOWN: {
+		if (event.key.keysym.sym == SDLK_UP) {
+			pos.y -= 32.0f;
+		} else if (event.key.keysym.sym == SDLK_DOWN) {
+			pos.y += 32.0f;
+		}
+
+		renderer->setPosition(pos);
+		break;
+	}
+
+	default: {
+		SDLGame::handleEvent(event);
+		break;
+	}
+	}
+}
+
 #ifndef APG_TEST_SDL
 int main(int argc, char *argv[]) {
 	uint32_t sdlInitFlags = SDL_INIT_VIDEO | SDL_INIT_EVENTS;

@@ -51,7 +51,7 @@ protected:
 
 	bool shouldQuit = false;
 
-	void handleEvent(SDL_Event &event);
+	virtual void handleEvent(SDL_Event &event);
 
 public:
 	SDLGame(SDL_Window *window, SDL_GLContext &context, uint32_t windowWidth, uint32_t windowHeight);
