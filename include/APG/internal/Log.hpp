@@ -29,7 +29,9 @@
 #define INCLUDE_APG_INTERNAL_LOG_HPP_
 
 #ifndef NDEBUG
-#define APG_LOG(message) APG::internal::log((message), __FILE__, __LINE__);
+#define APG_LOG(message) do { \
+APG::internal::log((message), __FILE__, __LINE__); \
+} while(0)
 
 #ifndef APG_NO_HARD_LOG
 #include <cstdlib>

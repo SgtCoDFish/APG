@@ -61,11 +61,11 @@ public:
 		return texture;
 	}
 
-	virtual inline int32_t getWidth() const override {
+	virtual inline uint32_t getWidth() const override {
 		return width;
 	}
 
-	virtual inline int32_t getHeight() const override {
+	virtual inline uint32_t getHeight() const override {
 		return height;
 	}
 

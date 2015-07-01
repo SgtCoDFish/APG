@@ -36,51 +36,60 @@
 
 #include "APG/AnimatedSprite.hpp"
 
-APG::AnimatedSprite::AnimatedSprite(float frameDuration, Sprite &&firstFrame, AnimationMode animationMode) :
-		secondsPerFrame { frameDuration }, firstFrame { std::move(firstFrame) } {
+#include "APG/internal/Assert.hpp"
+
+APG::AnimatedSprite::AnimatedSprite(float frameDuration, Sprite * firstFrame, AnimationMode animationMode) :
+		secondsPerFrame { frameDuration } {
+
+	initializeFromSpriteFrame(firstFrame);
+	addFrame(firstFrame);
 	setAnimationMode(animationMode);
 }
 
-APG::AnimatedSprite::AnimatedSprite(float frameDuration, Sprite &&firstFrame, std::initializer_list<Sprite *> sprites,
+APG::AnimatedSprite::AnimatedSprite(float frameDuration, std::initializer_list<SpriteBase *> &sprites,
         AnimationMode animationMode) :
-		secondsPerFrame { frameDuration }, firstFrame { std::move(firstFrame) } {
-	for (Sprite *sprite : sprites) {
+		secondsPerFrame { frameDuration } {
+	REQUIRE(sprites.size() > 0, "Can't initialise an animated sprite with an empty sprite list.");
+
+	bool first = true;
+	for (auto sprite : sprites) {
+		if (first) {
+			initializeFromSpriteFrame(sprite);
+			first = false;
+		}
+
 		addFrame(sprite);
 	}
 
 	setAnimationMode(animationMode);
 }
 
-APG::AnimatedSprite::AnimatedSprite(float frameDuration, Sprite &&firstFrame, std::vector<Sprite *> sprites,
+APG::AnimatedSprite::AnimatedSprite(float frameDuration, std::vector<SpriteBase *> &sprites,
         AnimationMode animationMode) :
-		secondsPerFrame { frameDuration }, firstFrame { std::move(firstFrame) } {
-	for (Sprite *sprite : sprites) {
+		secondsPerFrame { frameDuration } {
+	REQUIRE(sprites.size() > 0, "Can't initialise an animated sprite with an empty sprite list.");
+	initializeFromSpriteFrame(sprites.front());
+
+	for (auto sprite : sprites) {
 		addFrame(sprite);
 	}
 
 	setAnimationMode(animationMode);
 }
 
-void APG::AnimatedSprite::addFrame(Sprite * frame) {
+void APG::AnimatedSprite::addFrame(SpriteBase * frame) {
+	REQUIRE(frame->getWidth() == this->width && frame->getHeight() == this->height,
+	        "Frame dimensions must match existing frames for animated sprites.");
+	REQUIRE(frame->getTexture() == this->texture, "Cannot have an animation spanning two different textures.");
+
 	frames.emplace_back(frame);
 
 	frameCount++;
-	framesDirty = true;
-//	std::cout << "Added new frame: " << frames.back()->getHash() << "\n";
+//	std::cout << "Added new animation frame: " << frames.back()->getHash() << ", count is now " << frameCount << ", frame has ID " << frame->getHash() << "\n";
 }
 
 void APG::AnimatedSprite::update(float deltaTime) {
 	animTime += deltaTime;
-
-	if (framesDirty) {
-		framesDirty = false;
-
-		for (auto &frame : frames) {
-			if (frame == nullptr) {
-				frame = &firstFrame;
-			}
-		}
-	}
 
 	switch (animationMode) {
 	case AnimationMode::NORMAL:
@@ -97,15 +106,17 @@ void APG::AnimatedSprite::update(float deltaTime) {
 		break;
 
 	default:
+		REQUIRE(false, "Unsupported animation type in update()");
 		break;
 	}
 }
 
-APG::Sprite *APG::AnimatedSprite::getFrame(uint32_t frameNumber) const {
+APG::SpriteBase *APG::AnimatedSprite::getFrame(uint32_t frameNumber) const {
+	REQUIRE(frameNumber >= 0 && frameNumber <= frameCount, "Invalid frame number passed to getFrame.");
 	return frames[frameNumber];
 }
 
-APG::Sprite *APG::AnimatedSprite::getCurrentFrame() const {
+APG::SpriteBase *APG::AnimatedSprite::getCurrentFrame() const {
 	return frames[currentFrame];
 }
 
@@ -158,8 +169,18 @@ void APG::AnimatedSprite::handleLoopPingPongMode_() {
 
 	if (currentFrame == frameCount - 1) {
 		animDir = -1;
-	} else if(currentFrame == 0) {
+	} else if (currentFrame == 0) {
 		animDir = 1;
 	}
+}
+
+void APG::AnimatedSprite::initializeFromSpriteFrame(SpriteBase * sprite) {
+	this->width = sprite->getWidth();
+	this->height = sprite->getHeight();
+	this->u = sprite->getU();
+	this->v = sprite->getV();
+	this->u2 = sprite->getU2();
+	this->v2 = sprite->getV2();
+	this->texture = sprite->getTexture();
 }
 

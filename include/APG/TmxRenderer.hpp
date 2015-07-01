@@ -68,15 +68,19 @@ protected:
 	glm::vec2 position { 0.0f, 0.0f };
 
 	void loadTilesets();
-	uint64_t calculateTileHash(const Tileset *tileset, Tmx::Tile * const tile) const;
-	uint64_t calculateTileHash(const Tileset *tileset, int tileID) const;
+
+	uint64_t calculateTileGID(Tmx::Tileset *tileset, int tileID);
+	uint64_t calculateTileGID(Tmx::Tileset *tileset, Tmx::Tile *tile);
+
+private:
+	void reserveSpriteSpace();
 
 public:
 	explicit TmxRenderer(Tmx::Map *map);
 
 	virtual ~TmxRenderer() = default;
 
-	virtual void renderLayer(Tmx::Layer * const layer) = 0;
+	virtual void renderLayer(Tmx::TileLayer * const layer) = 0;
 	void renderAll(float deltaTime);
 
 	const Tmx::Map *getMap() {

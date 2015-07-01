@@ -46,7 +46,7 @@ void APG::GLTmxRenderer::renderAll(float deltaTime) {
 	batch.end();
 }
 
-void APG::GLTmxRenderer::renderLayer(Tmx::Layer * const layer) {
+void APG::GLTmxRenderer::renderLayer(Tmx::TileLayer * const layer) {
 //	std::cout << "Rendering layer \"" << layer->GetName() << "\"\n";
 
 	if (!layer->IsVisible()) {
@@ -67,11 +67,7 @@ void APG::GLTmxRenderer::renderLayer(Tmx::Layer * const layer) {
 				continue;
 			}
 
-			const auto tileHash = calculateTileHash(tilesets[tile.tilesetId].get(), tile.id);
-
-//			if (tileHash == 1000000) {
-//				std::cout << "Rendering hash #" << tileHash << std::endl;
-//			}
+			const auto tileHash = tile.gid;
 
 			const auto ourSprite = sprites[tileHash];
 			batch.draw(ourSprite, tileX, tileY);

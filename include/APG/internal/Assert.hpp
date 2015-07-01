@@ -33,11 +33,13 @@
 #include <cstdio>
 
 #define REQUIRE(expr, orElse) \
+	do { \
 if(expr) {} \
 else \
 { \
 	APG::internal::require_impl(#expr, orElse, __FILE__, __LINE__); \
-}
+} \
+} while(0)
 
 namespace APG {
 namespace internal {

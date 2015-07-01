@@ -2,6 +2,11 @@
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="32" tileheight="32">
  <tileset firstgid="1" name="maptiles" tilewidth="32" tileheight="32">
   <image source="world1tileset.png" width="352" height="256"/>
+  <tile id="0">
+   <properties>
+    <property name="is_bush_start" value="true"/>
+   </properties>
+  </tile>
   <tile id="44">
    <properties>
     <property name="torch" value="true"/>

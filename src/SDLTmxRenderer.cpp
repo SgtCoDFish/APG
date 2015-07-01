@@ -53,14 +53,14 @@ APG::SDLTmxRenderer::SDLTmxRenderer(Tmx::Map * const map, SXXDL::renderer_ptr &r
 	}
 }
 
-void APG::SDLTmxRenderer::renderLayer(Tmx::Layer *layer) {
+void APG::SDLTmxRenderer::renderLayer(Tmx::TileLayer *layer) {
 	const auto tile_width = map->GetTileWidth();
 	const auto tile_height = map->GetTileHeight();
 
 	auto src_rect = SDL_Rect { 0, 0, tile_width, tile_height };
 	auto dst_rect = SDL_Rect { 0, 0, tile_width, tile_height };
 
-	if (layer->GetVisible()) {
+	if (layer->IsVisible()) {
 		for (int y = 0; y < layer->GetHeight(); y++) {
 			for (int x = 0; x < layer->GetWidth(); x++) {
 

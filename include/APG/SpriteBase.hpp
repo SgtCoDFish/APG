@@ -38,9 +38,9 @@ public:
 	virtual ~SpriteBase() = default;
 	virtual Texture * getTexture() const = 0;
 
-	virtual inline int32_t getWidth() const = 0;
+	virtual inline uint32_t getWidth() const = 0;
 
-	virtual inline int32_t getHeight() const = 0;
+	virtual inline uint32_t getHeight() const = 0;
 
 	virtual inline float getU() const = 0;
 	virtual inline float getV() const = 0;

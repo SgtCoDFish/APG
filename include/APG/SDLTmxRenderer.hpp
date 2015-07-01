@@ -58,7 +58,7 @@ public:
 	SDLTmxRenderer(Tmx::Map * const map, SXXDL::renderer_ptr &renderer);
 	virtual ~SDLTmxRenderer() = default;
 
-	void renderLayer(Tmx::Layer *layer) override;
+	void renderLayer(Tmx::TileLayer *layer) override;
 
 	// disallow copying because we own resources.
 	SDLTmxRenderer(SDLTmxRenderer &other) = delete;

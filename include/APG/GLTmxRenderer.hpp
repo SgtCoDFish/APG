@@ -46,7 +46,7 @@ public:
 	virtual ~GLTmxRenderer() = default;
 
 	virtual void renderAll(float deltaTime);
-	virtual void renderLayer(Tmx::Layer * const layer) override;
+	virtual void renderLayer(Tmx::TileLayer * const layer) override;
 };
 
 }
