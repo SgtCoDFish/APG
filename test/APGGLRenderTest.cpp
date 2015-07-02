@@ -122,7 +122,6 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	SDL_GL_SwapWindow(window);
 }
 
-#ifndef APG_TEST_SDL
 int main(int argc, char *argv[]) {
 	uint32_t sdlInitFlags = SDL_INIT_VIDEO | SDL_INIT_EVENTS;
 	uint32_t sdlImageInitFlags = IMG_INIT_PNG;
@@ -203,4 +202,3 @@ int main(int argc, char *argv[]) {
 
 	return EXIT_SUCCESS;
 }
-#endif

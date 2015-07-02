@@ -10,28 +10,19 @@ set(VERSION_PATCH 0)
 set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 message("Conifguring APG version ${VERSION}.")
 
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+find_package(SDL2 REQUIRED)
+find_package(SDL2_image REQUIRED)
+
+find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
+
+find_package(TmxParser REQUIRED)
+
 file(GLOB_RECURSE APG_SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 file(GLOB_RECURSE APG_HEADERS ${PROJECT_SOURCE_DIR}/include/*.hpp)
-
-if(NOT DEFINED TMXPARSER_INCLUDE_DIR)
-    message("No tmxparser include dir specified")
-else()
-    include_directories($TMXPARSER_INCLUDE_DIR)
-endif()
-
-if(NOT DEFINED TMXPARSER_LIBRARIES)
-    message("No tmxparser library specified")
-else()
-    link_directories($TMXPARSER_LIBRARIES)
-endif()
-
-
-include(FindPkgConfig)
-pkg_search_module(SDL2 REQUIRED sdl2)
-pkg_search_module(SDL2IMAGE REQUIRED SDL2_image)
-
-find_package(OpenGL)
-find_package(GLUT)
+file(GLOB_RECURSE APG_TEST_ASSETS ${PROJECT_SOURCE_DIR}/assets/*)
 
 set(CMAKE_CXX_COMPILER_ARG1 "-std=c++1y")
 set(CMAKE_CXX_FLAGS_BASE "-Wall -Wextra -Wno-unused-parameter -fPIC")
@@ -39,7 +30,7 @@ set(CMAKE_CXX_FLAGS_BASE "-Wall -Wextra -Wno-unused-parameter -fPIC")
 set(APG_DEBUG_FLAGS "-g3 -O0")
 set(APG_RELEASE_FLAGS "-g0 -O3")
 
-include_directories("include")
+include_directories("include" ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} ${TMXPARSER_INCLUDE_DIR})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS}")
 add_library(APG-d ${APG_SOURCES})
@@ -47,19 +38,25 @@ add_library(APG-d ${APG_SOURCES})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_RELEASE_FLAGS}")
 add_library(APG ${APG_SOURCES})
 
-set (SDLRENDERTEST_SOURCES
-    test/APGSDLRenderTest.cpp)
+if ( (NOT EXCLUDE_SDL_TEST) OR (NOT EXCLUDE_GL_TEST) ) 
+	file(MAKE_DIRECTORY assets)
+	file(COPY ${APG_TEST_ASSETS} DESTINATION assets)
+endif ( (NOT EXCLUDE_SDL_TEST) OR (NOT EXCLUDE_GL_TEST) )
 
-set (GLRENDERTEST_SOURCES
-    test/APGGLRenderTest.cpp)
+if( NOT EXCLUDE_SDL_TEST)
+	set (SDLRENDERTEST_FLAGS "")
+	set (SDLRENDERTEST_SOURCES test/APGSDLRenderTest.cpp)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS} ${SDLRENDERTEST_FLAGS}")
+	
+	add_executable(SDLRenderTest ${SDLRENDERTEST_SOURCES})
+	target_link_libraries(SDLRenderTest APG-d ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${TMXPARSER_LIBRARY})
+endif ( NOT EXCLUDE_SDL_TEST )
 
-set (GLRENDERTESTTEST_FLAGS "")
-set (SDLRENDERTEST_FLAGS "-DAPG_TEST_SDL")
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS} ${SDLRENDERTEST_FLAGS}")
-add_executable(SDLRenderTest EXCLUDE_FROM_ALL ${SDLRENDERTEST_SOURCES})
-target_link_libraries(SDLRenderTest APG-d SDL2 SDL2_image GL GLU GLEW tmxparser)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS} ${GLRENDERTEST_FLAGS}")
-add_executable(GLRenderTest EXCLUDE_FROM_ALL ${GLRENDERTEST_SOURCES})
-target_link_libraries(GLRenderTest APG-d SDL2 SDL2_image GL GLU GLEW tmxparser)
+if( NOT EXCLUDE_GL_TEST )
+	set (GLRENDERTESTTEST_FLAGS "")
+	set (GLRENDERTEST_SOURCES test/APGGLRenderTest.cpp)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS} ${GLRENDERTEST_FLAGS}")
+	
+	add_executable(GLRenderTest ${GLRENDERTEST_SOURCES})
+	target_link_libraries(GLRenderTest APG-d ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${TMXPARSER_LIBRARY})
+endif ( NOT EXCLUDE_GL_TEST )

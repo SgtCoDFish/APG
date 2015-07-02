@@ -91,7 +91,6 @@ void APGSDLRenderTest::render(float deltaTime) {
 	SDL_RenderPresent(renderer.get());
 }
 
-#ifdef APG_TEST_SDL
 int main(int argc, char *argv[]) {
 	uint32_t sdlInitFlags = SDL_INIT_VIDEO | SDL_INIT_EVENTS;
 	uint32_t sdlImageInitFlags = IMG_INIT_PNG;
@@ -168,4 +167,3 @@ int main(int argc, char *argv[]) {
 
 	return EXIT_SUCCESS;
 }
-#endif
