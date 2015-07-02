@@ -232,11 +232,10 @@ std::vector<APG::Sprite> APG::AnimatedSprite::splitTexture(Texture * texture, ui
 	for (uint32_t i = 0u; i < (uint32_t) frameCount; ++i) {
 		const auto x = xStart + i * (tileWidth + xSeparation);
 		const auto y = yStart;
-		std::cout << "Frame #" << (i + 1) << " at (x, y) = (" << x << ", " << y << ").\n";
 
 		loadedFrames.emplace_back(texture, x, y, tileWidth, tileHeight);
 	}
 
-	return loadedFrames;
+	return std::move(loadedFrames);
 }
 

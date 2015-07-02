@@ -68,7 +68,7 @@ bool APG::APGGLRenderTest::init() {
 	renderer = std::make_unique<GLTmxRenderer>(map.get(), *spriteBatch);
 
 	playerTexture = std::make_unique<Texture>("assets/player.png");
-	playerFrames = AnimatedSprite::splitTexture(playerTexture.get(), 32, 32, 0, 0, 4);
+	playerFrames = AnimatedSprite::splitTexture(playerTexture.get(), 32, 32, 0, 64, 4);
 	playerAnimation = std::make_unique<AnimatedSprite>(0.3f, playerFrames, AnimationMode::LOOP);
 
 	auto glError = glGetError();
@@ -91,35 +91,35 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	renderer->renderAll(deltaTime);
 	playerAnimation->update(deltaTime);
 
+	static float playerX = 128.0f, playerY = 128.0f;
+
+	// will move the player quickly
+	if (inputManager.isKeyPressed(SDL_SCANCODE_UP)) {
+		playerY -= 32.0f;
+	} else if (inputManager.isKeyPressed(SDL_SCANCODE_DOWN)) {
+		playerY += 32.0f;
+	} else if (inputManager.isKeyPressed(SDL_SCANCODE_LEFT)) {
+		playerX -= 32.0f;
+	} else if (inputManager.isKeyPressed(SDL_SCANCODE_RIGHT)) {
+		playerX += 32.0f;
+	}
+
+	// will move the player once per press
+	if (inputManager.isKeyJustPressed(SDL_SCANCODE_W)) {
+		playerY -= 32.0f;
+	} else if (inputManager.isKeyJustPressed(SDL_SCANCODE_S)) {
+		playerY += 32.0f;
+	} else if (inputManager.isKeyJustPressed(SDL_SCANCODE_A)) {
+		playerX -= 32.0f;
+	} else if (inputManager.isKeyJustPressed(SDL_SCANCODE_D)) {
+		playerX += 32.0f;
+	}
+
 	spriteBatch->begin();
-
-	spriteBatch->draw(playerAnimation.get(), 64.0f, 64.0f);
-
+	spriteBatch->draw(playerAnimation.get(), playerX, playerY);
 	spriteBatch->end();
 
 	SDL_GL_SwapWindow(window);
-}
-
-void APG::APGGLRenderTest::handleEvent(SDL_Event &event) {
-	static glm::vec2 pos(0.0f, 0.0f);
-
-	switch (event.type) {
-	case SDL_KEYDOWN: {
-		if (event.key.keysym.sym == SDLK_UP) {
-			pos.y -= 32.0f;
-		} else if (event.key.keysym.sym == SDLK_DOWN) {
-			pos.y += 32.0f;
-		}
-
-		renderer->setPosition(pos);
-		break;
-	}
-
-	default: {
-		SDLGame::handleEvent(event);
-		break;
-	}
-	}
 }
 
 #ifndef APG_TEST_SDL

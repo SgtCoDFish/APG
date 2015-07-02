@@ -39,6 +39,7 @@
 
 #include "APG/Game.hpp"
 #include "APG/SXXDL.hpp"
+#include "APG/SDLInputManager.hpp"
 
 namespace APG {
 
@@ -53,8 +54,10 @@ protected:
 
 	virtual void handleEvent(SDL_Event &event);
 
+	SDLInputManager inputManager;
+
 public:
-	SDLGame(SDL_Window *window, SDL_GLContext &context, uint32_t windowWidth, uint32_t windowHeight);
+	explicit SDLGame(SDL_Window *window, SDL_GLContext &context, uint32_t windowWidth, uint32_t windowHeight);
 	virtual ~SDLGame() = default;
 
 	bool update(float deltaTime) override;
@@ -74,6 +77,10 @@ public:
 
 	SDL_GLContext getGLContext() const {
 		return glContext;
+	}
+
+	virtual const InputManager *input() const override {
+		return &inputManager;
 	}
 };
 

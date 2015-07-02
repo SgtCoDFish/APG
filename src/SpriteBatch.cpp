@@ -162,6 +162,7 @@ void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32
 //		verticesf[i * 5 + 3] = verticest[i].u;
 //		verticesf[i * 5 + 4] = verticest[i].v;
 //	}
+	APG_LOG("Not implemented yet.");
 }
 
 void APG::SpriteBatch::draw(APG::SpriteBase * const sprite, float x, float y) {

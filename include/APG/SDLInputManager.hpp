@@ -25,52 +25,39 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef INCLUDE_APG_SDLINPUTMANAGER_HPP_
+#define INCLUDE_APG_SDLINPUTMANAGER_HPP_
+
 #include <cstdint>
 
-#include <string>
-#include <sstream>
+#include <array>
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 
-#include <GL/glew.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include "APG/InputManager.hpp"
 
-#include "APG/SDLGame.hpp"
-#include "APG/SDLInputManager.hpp"
+namespace APG {
 
-APG::SDLGame::SDLGame(SDL_Window *window, SDL_GLContext &context, uint32_t windowWidth, uint32_t windowHeight) :
-		Game(windowWidth, windowHeight) {
-	setWindow(window);
-	setGLContext(context);
+class SDLInputManager: public InputManager {
+private:
+	std::array<bool, SDL_Scancode::SDL_NUM_SCANCODES> justPressed;
+	std::array<bool, SDL_Scancode::SDL_NUM_SCANCODES> canJustPress;
+	const uint8_t *keyState = nullptr;
+
+public:
+	explicit SDLInputManager();
+	virtual ~SDLInputManager() = default;
+
+	virtual void update(float deltaTime) override;
+
+	virtual bool isKeyPressed(SDL_Scancode key) const;
+	virtual bool isKeyJustPressed(SDL_Scancode key) const;
+
+	void handleInputEvent(SDL_Event &event);
+
+	bool isSDLKeyCodePressed(SDL_Scancode keysym) const;
+};
+
 }
 
-void APG::SDLGame::handleEvent(SDL_Event &event) {
-	if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
-		inputManager.handleInputEvent(event);
-	} else if (event.type == SDL_QUIT) {
-		quit();
-	}
-}
-
-bool APG::SDLGame::update(float deltaTime) {
-	if (shouldQuit) {
-		return true;
-	}
-
-	inputManager.update(deltaTime);
-
-	while (SDL_PollEvent(&eventCache)) {
-		handleEvent(eventCache);
-	}
-
-
-	render(deltaTime);
-
-	return false;
-}
-
-void APG::SDLGame::quit() {
-	shouldQuit = true;
-}
+#endif /* INCLUDE_APG_SDLINPUTMANAGER_HPP_ */

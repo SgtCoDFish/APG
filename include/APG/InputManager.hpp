@@ -25,52 +25,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <cstdint>
-
-#include <string>
-#include <sstream>
+#ifndef INCLUDE_APG_INPUTMANAGER_HPP_
+#define INCLUDE_APG_INPUTMANAGER_HPP_
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 
-#include <GL/glew.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
+namespace APG {
 
-#include "APG/SDLGame.hpp"
-#include "APG/SDLInputManager.hpp"
+class InputManager {
+protected:
+	static constexpr float JUST_PRESSED_THRESHOLD = 0.0001f;
 
-APG::SDLGame::SDLGame(SDL_Window *window, SDL_GLContext &context, uint32_t windowWidth, uint32_t windowHeight) :
-		Game(windowWidth, windowHeight) {
-	setWindow(window);
-	setGLContext(context);
+public:
+	virtual ~InputManager() = default;
+
+	virtual void update(float deltaTime) = 0;
+
+	virtual bool isKeyPressed(SDL_Scancode key) const = 0;
+	virtual bool isKeyJustPressed(SDL_Scancode key) const = 0;
+};
+
 }
 
-void APG::SDLGame::handleEvent(SDL_Event &event) {
-	if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
-		inputManager.handleInputEvent(event);
-	} else if (event.type == SDL_QUIT) {
-		quit();
-	}
-}
-
-bool APG::SDLGame::update(float deltaTime) {
-	if (shouldQuit) {
-		return true;
-	}
-
-	inputManager.update(deltaTime);
-
-	while (SDL_PollEvent(&eventCache)) {
-		handleEvent(eventCache);
-	}
-
-
-	render(deltaTime);
-
-	return false;
-}
-
-void APG::SDLGame::quit() {
-	shouldQuit = true;
-}
+#endif /* INCLUDE_APG_INPUTMANAGER_HPP_ */

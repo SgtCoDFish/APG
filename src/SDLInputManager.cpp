@@ -27,50 +27,42 @@
 
 #include <cstdint>
 
-#include <string>
-#include <sstream>
-
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 
-#include <GL/glew.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-
-#include "APG/SDLGame.hpp"
 #include "APG/SDLInputManager.hpp"
 
-APG::SDLGame::SDLGame(SDL_Window *window, SDL_GLContext &context, uint32_t windowWidth, uint32_t windowHeight) :
-		Game(windowWidth, windowHeight) {
-	setWindow(window);
-	setGLContext(context);
-}
+APG::SDLInputManager::SDLInputManager() {
+	keyState = SDL_GetKeyboardState(nullptr);
 
-void APG::SDLGame::handleEvent(SDL_Event &event) {
-	if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
-		inputManager.handleInputEvent(event);
-	} else if (event.type == SDL_QUIT) {
-		quit();
+	for(auto &f : canJustPress) {
+		f = true;
 	}
 }
 
-bool APG::SDLGame::update(float deltaTime) {
-	if (shouldQuit) {
-		return true;
+void APG::SDLInputManager::update(float deltaTime) {
+	for (auto &f : justPressed) {
+		f = false;
 	}
-
-	inputManager.update(deltaTime);
-
-	while (SDL_PollEvent(&eventCache)) {
-		handleEvent(eventCache);
-	}
-
-
-	render(deltaTime);
-
-	return false;
 }
 
-void APG::SDLGame::quit() {
-	shouldQuit = true;
+void APG::SDLInputManager::handleInputEvent(SDL_Event &event) {
+	const auto key = event.key.keysym.scancode;
+	if (event.type == SDL_KEYDOWN && canJustPress[key]) {
+		justPressed[key] = true;
+		canJustPress[key] = false;
+	} else if(event.type == SDL_KEYUP) {
+		canJustPress[key] = true;
+	}
+}
+
+bool APG::SDLInputManager::isKeyPressed(SDL_Scancode key) const {
+	return isSDLKeyCodePressed(key);
+}
+
+bool APG::SDLInputManager::isKeyJustPressed(SDL_Scancode key) const {
+	return justPressed[key];
+}
+
+bool APG::SDLInputManager::isSDLKeyCodePressed(SDL_Scancode keysym) const {
+	return keyState[keysym];
 }

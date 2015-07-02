@@ -30,6 +30,8 @@
 
 #include <cstdint>
 
+#include "APG/InputManager.hpp"
+
 namespace APG {
 
 class Game {
@@ -62,6 +64,8 @@ public:
 	 * @param deltaTime the amount of time elapsed since the last frame.
 	 */
 	virtual void render(float deltaTime) = 0;
+
+	virtual const InputManager *input() const = 0;
 };
 
 }
