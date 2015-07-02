@@ -43,9 +43,9 @@
 
 namespace APG {
 
-class SDLGame : public Game {
+class SDLGame: public Game {
 protected:
-	SDL_Window *window = nullptr;
+	SXXDL::window_ptr window = SXXDL::make_window_ptr(nullptr);
 	SDL_GLContext glContext = nullptr;
 
 	SDL_Event eventCache;
@@ -57,22 +57,30 @@ protected:
 	SDLInputManager inputManager;
 
 public:
-	explicit SDLGame(SDL_Window *window, SDL_GLContext &context, uint32_t windowWidth, uint32_t windowHeight);
+	/**
+	 * Defaults to SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS
+	 */
+	static uint32_t SDL_INIT_FLAGS;
+
+	/**
+	 * Defaults to IMG_INIT_PNG.
+	 */
+	static uint32_t SDL_IMAGE_INIT_FLAGS;
+
+	/**
+	 * Defaults to SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL.
+	 */
+	static uint32_t SDL_WINDOW_FLAGS;
+
+	explicit SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
+	        uint8_t glContextMajor = 3, uint8_t glContextMinor = 2);
 	virtual ~SDLGame() = default;
 
 	bool update(float deltaTime) override;
 	void quit();
 
-	void setWindow(SDL_Window *window) {
-		this->window = window;
-	}
-
 	SDL_Window *getWindow() const {
-		return window;
-	}
-
-	void setGLContext(SDL_GLContext context) {
-		this->glContext = context;
+		return window.get();
 	}
 
 	SDL_GLContext getGLContext() const {

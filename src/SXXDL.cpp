@@ -42,3 +42,4 @@ SXXDL::sdl_texture_ptr SXXDL::make_sdl_texture_ptr(SDL_Texture *texture) {
 SXXDL::renderer_ptr SXXDL::make_renderer_ptr(SDL_Renderer *renderer) {
 	return renderer_ptr(renderer, SDL_DestroyRenderer);
 }
+

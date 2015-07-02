@@ -45,8 +45,9 @@ private:
 	std::unique_ptr<APG::SDLTmxRenderer> sdlTmxRenderer = nullptr;
 
 public:
-	APGSDLRenderTest(SDL_Window *window, uint32_t windowWidth, uint32_t windowHeight, SDL_GLContext context) :
-			SDLGame(window, context, windowWidth, windowHeight) {
+	APGSDLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
+	        uint8_t glContextMajor = 3, uint8_t glContextMinor = 2) :
+			SDLGame(windowTitle, windowWidth, windowHeight, glContextMajor, glContextMinor) {
 	}
 	virtual ~APGSDLRenderTest() = default;
 
