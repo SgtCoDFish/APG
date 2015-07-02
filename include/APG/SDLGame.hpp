@@ -74,7 +74,7 @@ public:
 
 	explicit SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
 	        uint8_t glContextMajor = 3, uint8_t glContextMinor = 2);
-	virtual ~SDLGame() = default;
+	virtual ~SDLGame();
 
 	bool update(float deltaTime) override;
 	void quit();

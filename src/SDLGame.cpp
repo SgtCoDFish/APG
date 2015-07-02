@@ -87,6 +87,12 @@ APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint
 	}
 }
 
+APG::SDLGame::~SDLGame() {
+	SDL_GL_DeleteContext(glContext);
+	IMG_Quit();
+	SDL_Quit();
+}
+
 void APG::SDLGame::handleEvent(SDL_Event &event) {
 	if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
 		inputManager.handleInputEvent(event);
