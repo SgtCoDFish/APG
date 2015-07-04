@@ -73,7 +73,7 @@ public:
 	static uint32_t SDL_WINDOW_FLAGS;
 
 	explicit SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
-	        uint8_t glContextMajor = 3, uint8_t glContextMinor = 2);
+	        uint8_t glContextMajor = 3, uint8_t glContextMinor = 2, uint32_t windowX = SDL_WINDOWPOS_UNDEFINED, uint32_t windowY = SDL_WINDOWPOS_UNDEFINED);
 	virtual ~SDLGame();
 
 	bool update(float deltaTime) override;

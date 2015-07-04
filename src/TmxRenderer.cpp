@@ -117,6 +117,7 @@ void APG::TmxRenderer::loadTilesets() {
 				std::cout << "\tHas property \"" << property.first << "\", value = \"" << property.second << "\".\n";
 			}
 
+#ifndef APG_IGNORE_ANIMATED_TILES
 			if (tile->IsAnimated()) {
 				std::cout << "\tAnimated tile, has " << tile->GetFrameCount() << " tiles, duration = "
 				        << tile->GetTotalDuration() << "ms.\n";
@@ -138,6 +139,7 @@ void APG::TmxRenderer::loadTilesets() {
 				loadedAnimatedSprites.emplace_back(0.3f, framePointers, AnimationMode::LOOP);
 				sprites[tileGID] = &(loadedAnimatedSprites.back());
 			}
+#endif
 		}
 	}
 

@@ -91,7 +91,7 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	renderer->renderAll(deltaTime);
 	playerAnimation->update(deltaTime);
 
-	static float playerX = 128.0f, playerY = 128.0f;
+	static float playerX = 128.0f, playerY = 128.0f- ((float) playerAnimation->getHeight() / 4.0f);
 
 	// will move the player quickly
 	if (inputManager.isKeyPressed(SDL_SCANCODE_UP)) {
