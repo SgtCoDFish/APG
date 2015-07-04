@@ -30,3 +30,12 @@ make -jN # where N is the number of cores you have
 ```
 
 If you don't care about the render tests, you can use `cmake -DEXCLUDE_SDL_TEST=TRUE ..` or `cmake -DEXCLUDE_GL_TEST=TRUE ..` or both exclusions. By default, both tests are built as well as the libraries.
+
+Usage Notes - Logging
+---------------------
+
+The library depends on easylogging++ which is included by source. To use the library, you simply need to: `#include "easylogging++.h"` in your files. *Important:* In your file which contains your main function you must include the line `INITIALIZE_EASYLOGGINGPP` directly after you include the function.
+
+It's also recommended that you use the function `START_EASYLOGGINGPP(argc, argv);` on your first line of your main function.
+
+For more information on easylogging++, visit [the GitHub repository.](https://github.com/easylogging/easyloggingpp)
