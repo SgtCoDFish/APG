@@ -126,6 +126,10 @@ void APG::TmxRenderer::loadTilesets() {
 				std::vector<SpriteBase *> framePointers;
 				framePointers.reserve(frames.size());
 
+				// TODO: This ignores per-frame durations in the file, should be improved.
+				// length is stored in ms, convert to seconds
+				float length = (float) tile->GetTotalDuration() / 1000.0f;
+
 				for (const auto &frame : frames) {
 					const auto gid = calculateTileGID(tileset, frame.GetTileID());
 
@@ -135,8 +139,7 @@ void APG::TmxRenderer::loadTilesets() {
 					framePointers.emplace_back(sprites[gid]);
 				}
 
-				// TODO: This ignores per-frame durations in the file, should be improved.
-				loadedAnimatedSprites.emplace_back(0.3f, framePointers, AnimationMode::LOOP);
+				loadedAnimatedSprites.emplace_back(length, framePointers, AnimationMode::LOOP);
 				sprites[tileGID] = &(loadedAnimatedSprites.back());
 			}
 #endif
