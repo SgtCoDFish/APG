@@ -45,7 +45,6 @@
 #include "APG/VertexAttribute.hpp"
 #include "APG/VertexAttributeList.hpp"
 
-#include "APG/internal/Log.hpp"
 #include "APG/internal/Assert.hpp"
 
 APG::ShaderProgram::ShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource) {
@@ -94,9 +93,7 @@ void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, uin
 	const auto attributeLocation = glGetAttribLocation(shaderProgram, attributeName);
 
 	if (attributeLocation == -1) {
-		std::stringstream ss;
-		ss << "Couldn't get attribute location: " << attributeName;
-		APG_LOG(ss.str().c_str());
+		el::Loggers::getLogger("default")->error("Couldn't get attribute location \"%v\"", attributeName);
 		return;
 	}
 
@@ -107,10 +104,7 @@ void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, uin
 	const auto error = glGetError();
 
 	if (error != GL_NO_ERROR) {
-		std::stringstream ss;
-		const char *errStr = (const char *) gluErrorString(error);
-		ss << "Error while setting float attribute \"" << attributeName << "\":\n" << errStr;
-		APG_LOG(ss.str().c_str());
+		el::Loggers::getLogger("default")->error("Error while setting float attribute: %v.", gluErrorString(error));
 		return;
 	}
 }
@@ -228,9 +222,7 @@ std::string APG::ShaderProgram::loadSourceFromFile(const std::string &filename) 
 	std::ifstream inStream(filename, std::ios::in);
 
 	if (!inStream.is_open()) {
-		std::stringstream ss;
-		ss << "Couldn't find " << filename;
-		APG_LOG(ss.str().c_str());
+		el::Loggers::getLogger("default")->fatal("Couldn't find shader file: %v", filename);
 		return "";
 	}
 
@@ -280,7 +272,7 @@ void APG::ShaderProgram::loadShader(const std::string &shaderSource, uint32_t ty
 	shaderInfoLog = shaderInfoLog + statusStream.str();
 
 	if (status != GL_TRUE) {
-		APG_LOG(shaderInfoLog.c_str());
+		el::Loggers::getLogger("default")->error("Shader error log: %v", shaderInfoLog);
 		glDeleteShader(*source);
 		return;
 	}
@@ -326,7 +318,7 @@ void APG::ShaderProgram::combineProgram() {
 	linkInfoLog = linkInfoLog + linkStatusStream.str();
 
 	if (status != GL_TRUE) {
-		APG_LOG(linkInfoLog.c_str());
+		el::Loggers::getLogger("default")->error("Link error log: %v", linkInfoLog);
 		glDeleteProgram(shaderProgram);
 		return;
 	}
@@ -349,11 +341,12 @@ uint32_t *APG::ShaderProgram::validateTypeAndGet(uint32_t type) {
 	case GL_GEOMETRY_SHADER:
 	case GL_TESS_CONTROL_SHADER:
 	case GL_TESS_EVALUATION_SHADER:
-		APG_LOG("Geometry/Tesselation Evaluation/Tesselation Control shaders not supported by APG.");
+		el::Loggers::getLogger("default")->fatal(
+		        "Geometry/Tesselation Evaluation/Tesselation Control shaders not supported by APG.");
 		return nullptr;
 
 	default: {
-		REQUIRE(false, "Invalid type passed to validateType for shader program.");
+		el::Loggers::getLogger("default")->fatal("Invalid type passed to validateType for shader program.");
 		return nullptr;
 	}
 	}

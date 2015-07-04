@@ -28,7 +28,6 @@
 #include <cstdint>
 
 #include <string>
-#include <sstream>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -37,28 +36,27 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#include "easylogging++.h"
+
 #include "APG/SDLGame.hpp"
 #include "APG/SDLInputManager.hpp"
-
-#include "APG/internal/Log.hpp"
 
 uint32_t APG::SDLGame::SDL_INIT_FLAGS = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS;
 uint32_t APG::SDLGame::SDL_IMAGE_INIT_FLAGS = IMG_INIT_PNG;
 uint32_t APG::SDLGame::SDL_WINDOW_FLAGS = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
 APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
-        uint8_t glContextMajor, uint8_t glContextMinor, uint32_t windowX, uint32_t windowY) :
+        uint32_t glContextMajor, uint32_t glContextMinor, uint32_t windowX, uint32_t windowY) :
 		APG::Game(windowWidth, windowHeight) {
+	const auto logger = el::Loggers::getLogger("default");
+	logger->info("Initialising APG with OpenGL version %v.%v.", glContextMajor, glContextMinor);
+
 	if (SDL_Init(SDL_INIT_FLAGS) < 0) {
-		std::stringstream ss;
-		ss << "Couldn't initialise SDL: " << SDL_GetError() << std::endl;
-		APG_LOG(ss.str().c_str());
+		logger->fatal("Couldn't initialise SDL: %v", SDL_GetError());
 	}
 
 	if ((IMG_Init(SDL_IMAGE_INIT_FLAGS) & SDL_IMAGE_INIT_FLAGS) == 0) {
-		std::stringstream ss;
-		ss << "Couldn't initialise SDL_image: " << IMG_GetError() << std::endl;
-		APG_LOG(ss.str().c_str());
+		logger->fatal("Couldn't initialise SDL_image: %v", IMG_GetError());
 	}
 
 	window = SXXDL::make_window_ptr(
@@ -66,9 +64,7 @@ APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint
 	                windowHeight, SDL_WINDOW_FLAGS));
 
 	if (window == nullptr) {
-		std::stringstream ss;
-		ss << "Couldn't create window: " << SDL_GetError() << std::endl;
-		APG_LOG(ss.str().c_str());
+		logger->fatal("Couldn't create SDL window: %v", SDL_GetError());
 	}
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -80,6 +76,7 @@ APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint
 	glewExperimental = GL_TRUE;
 	glewInit();
 
+	logger->verbose(9, "OpenGL errors have been reset (probably as a workaround for any bugs with glew)");
 	// reset all errors because some are caused by glew even upon successful setup.
 	auto error = glGetError();
 	while (error != GL_NO_ERROR) {

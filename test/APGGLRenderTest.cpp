@@ -40,6 +40,9 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 
+#include "easylogging++.h"
+INITIALIZE_EASYLOGGINGPP
+
 #include "APG/Game.hpp"
 #include "APG/SDLGame.hpp"
 #include "APG/APGCommon.hpp"
@@ -53,11 +56,13 @@ const char * APG::APGGLRenderTest::vertexShaderFilename = "assets/pass_vertex.gl
 const char * APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag.glslf";
 
 bool APG::APGGLRenderTest::init() {
+	const auto logger = el::Loggers::getLogger("default");
+
 	map = std::make_unique<Tmx::Map>();
 	map->ParseFile("assets/world1.tmx");
 
 	if (map->HasError()) {
-		std::cerr << "Error loading map: " << map->GetErrorText() << std::endl;
+		logger->fatal("Error loading map: %v", map->GetErrorText());
 		return false;
 	}
 
@@ -74,7 +79,7 @@ bool APG::APGGLRenderTest::init() {
 	auto glError = glGetError();
 	if (glError != GL_NO_ERROR) {
 		while (glError != GL_NO_ERROR) {
-			std::cerr << "Error in gl: " << gluErrorString(glError) << std::endl;
+			logger->fatal("Error in OpenGL while loading: ", gluErrorString(glError));
 			glError = glGetError();
 		}
 
@@ -91,7 +96,7 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	renderer->renderAll(deltaTime);
 	playerAnimation->update(deltaTime);
 
-	static float playerX = 128.0f, playerY = 128.0f- ((float) playerAnimation->getHeight() / 4.0f);
+	static float playerX = 128.0f, playerY = 128.0f - ((float) playerAnimation->getHeight() / 4.0f);
 
 	// will move the player quickly
 	if (inputManager.isKeyPressed(SDL_SCANCODE_UP)) {
@@ -123,20 +128,15 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 }
 
 int main(int argc, char *argv[]) {
+	START_EASYLOGGINGPP(argc, argv);
+
 	const std::string windowTitle("APG GLTmxRenderer Example");
 	const uint32_t windowWidth = 1280;
 	const uint32_t windowHeight = 720;
 
-	// reset all errors since apparently glew causes some.
-	auto error = glGetError();
-	while (error != GL_NO_ERROR) {
-		error = glGetError();
-	}
-
 	auto game = std::make_unique<APG::APGGLRenderTest>(windowTitle, windowWidth, windowHeight);
 
 	if (!game->init()) {
-		std::cerr << "Couldn't initialise game.\n";
 		return EXIT_FAILURE;
 	}
 
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
 
 			const float fps = 1 / (sum / timesTaken.size());
 
-			std::cout << "FPS: " << fps << std::endl;
+			el::Loggers::getLogger("default")->info("FPS: ", fps);
 
 			timesTaken.clear();
 		}

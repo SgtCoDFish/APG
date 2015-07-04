@@ -32,6 +32,8 @@
 
 #include <cstdio>
 
+#include "easylogging++.h"
+
 #define REQUIRE(expr, orElse) \
 	do { \
 if(expr) {} \
@@ -45,7 +47,7 @@ namespace APG {
 namespace internal {
 
 inline void require_impl(const char *expression, const char *extra, const char *filename, int line) {
-	std::printf("Assertion failure in \"%s\" (line %d): %s (%s)\n", filename, line, expression, extra);
+	el::Loggers::getLogger("default")->error("Assertion failure in \"%v\" (line %v): %v (%v)\n", filename, line, expression, extra);
 }
 
 }

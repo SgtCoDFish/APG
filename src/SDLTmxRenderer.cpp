@@ -37,7 +37,6 @@
 #include "APG/TmxRenderer.hpp"
 #include "APG/SDLTmxRenderer.hpp"
 
-#include "APG/internal/Log.hpp"
 #include "APG/internal/Assert.hpp"
 
 APG::SDLTmxRenderer::SDLTmxRenderer(Tmx::Map * const map, SXXDL::renderer_ptr &renderer) :
@@ -84,7 +83,9 @@ void APG::SDLTmxRenderer::renderLayer(Tmx::TileLayer *layer) {
 				dst_rect.y = (int) position.y + y * tile_height;
 
 				if (SDL_RenderCopy(renderer.get(), sdl_tileset.get(), &src_rect, &dst_rect) < 0) {
-					APG_LOG(SDL_GetError());
+					el::Loggers::getLogger("default")->error(
+					        "Couldn't render in tmx renderer; failed at tile %v, tileset \"%v\"", tile_id,
+					        current_tileset->getFileName());
 					return;
 				}
 			}

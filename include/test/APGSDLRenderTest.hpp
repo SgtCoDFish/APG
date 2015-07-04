@@ -46,7 +46,7 @@ private:
 
 public:
 	APGSDLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
-	        uint8_t glContextMajor = 3, uint8_t glContextMinor = 2) :
+	        uint32_t glContextMajor = 3, uint32_t glContextMinor = 2) :
 			SDLGame(windowTitle, windowWidth, windowHeight, glContextMajor, glContextMinor) {
 	}
 	virtual ~APGSDLRenderTest() = default;

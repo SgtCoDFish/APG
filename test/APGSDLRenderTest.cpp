@@ -27,7 +27,6 @@
 
 #include <cstdlib>
 
-#include <iostream>
 #include <memory>
 #include <chrono>
 #include <vector>
@@ -42,6 +41,9 @@
 
 #include <tmxparser/Tmx.h>
 
+#include "easylogging++.h"
+INITIALIZE_EASYLOGGINGPP
+
 #include "APG/Game.hpp"
 #include "APG/SXXDL.hpp"
 #include "APG/SDLTmxRenderer.hpp"
@@ -51,10 +53,11 @@
 const std::string ASSET_PREFIX = "assets/";
 
 bool APGSDLRenderTest::init() {
+	const auto logger = el::Loggers::getLogger("default");
 	renderer = SXXDL::make_renderer_ptr(SDL_CreateRenderer(window.get(), -1, SDL_RENDERER_ACCELERATED));
 
 	if (renderer == nullptr) {
-		std::cerr << "Couldn't create renderer:\n" << SDL_GetError() << std::endl;
+		logger->fatal("Couldn't create SDL_Renderer: %v", SDL_GetError());
 		return false;
 	}
 
@@ -64,7 +67,7 @@ bool APGSDLRenderTest::init() {
 	map->ParseFile(ASSET_PREFIX + "world1.tmx");
 
 	if (map->HasError()) {
-		std::cerr << "Error loading map: " << map->GetErrorText() << std::endl;
+		logger->fatal("Error loading tmx map: %v", map->GetErrorText());
 		return false;
 	}
 
@@ -82,9 +85,13 @@ void APGSDLRenderTest::render(float deltaTime) {
 }
 
 int main(int argc, char *argv[]) {
+	START_EASYLOGGINGPP(argc, argv);
+
 	const std::string windowTitle("APG GLTmxRenderer Example");
 	const uint32_t windowWidth = 1280;
 	const uint32_t windowHeight = 720;
+
+	const auto logger = el::Loggers::getLogger("default");
 
 	auto rpg = std::make_unique<APGSDLRenderTest>(windowTitle, windowWidth, windowHeight);
 
@@ -94,8 +101,8 @@ int main(int argc, char *argv[]) {
 
 	auto map = rpg->getMap();
 
-	std::cout << "Map width: " << map->GetWidth() << ", height: " << map->GetHeight() << ".\n";
-	std::cout << "Has " << map->GetNumLayers() << " layers.\n";
+	logger->info("Map loaded, (w, h) = (%v, %v), with %v layers.", map->GetWidth(), map->GetHeight(),
+	        map->GetNumLayers());
 
 	bool done = false;
 
@@ -116,11 +123,10 @@ int main(int argc, char *argv[]) {
 
 			const float fps = 1 / (sum / timesTaken.size());
 
-			std::cout << "FPS: " << fps << std::endl;
+			logger->info("FPS: ", fps);
 
 			timesTaken.clear();
 		}
-
 	}
 
 	return EXIT_SUCCESS;

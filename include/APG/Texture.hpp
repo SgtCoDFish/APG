@@ -61,6 +61,8 @@ class ShaderProgram;
 
 class Texture {
 private:
+	std::string fileName;
+
 	static uint32_t TEXTURE_TARGETS[];
 	static std::atomic<uint32_t> availableTextureUnit;
 
@@ -73,7 +75,7 @@ private:
 	uint32_t textureUnitGL = 0;
 
 	void generateTextureID();
-	void loadTexture(const std::string &fileName);
+	void loadTexture();
 
 	uint32_t width = 0;
 	uint32_t height = 0;
@@ -140,6 +142,10 @@ public:
 
 	inline uint32_t getGLTextureUnit() const {
 		return textureUnitInt;
+	}
+
+	const std::string &getFileName() const {
+		return fileName;
 	}
 };
 

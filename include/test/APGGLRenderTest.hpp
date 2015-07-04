@@ -69,8 +69,8 @@ private:
 
 public:
 	explicit APGGLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
-	        uint8_t glContextMajor = 3, uint8_t glContextMinor = 2, uint32_t windowX = SDL_WINDOWPOS_CENTERED, uint32_t windowY = SDL_WINDOWPOS_CENTERED) :
-			SDLGame(windowTitle, screenWidth, screenHeight, glContextMajor, glContextMinor, windowX, windowY) {
+	        uint32_t glContextMajor = 3, uint32_t glContextMinor = 2, uint32_t windowX = SDL_WINDOWPOS_CENTERED, uint32_t windowY = SDL_WINDOWPOS_CENTERED) :
+			SDLGame(windowTitle, windowWidth, windowHeight, glContextMajor, glContextMinor, windowX, windowY) {
 	}
 
 	virtual ~APGGLRenderTest() = default;

@@ -7,6 +7,9 @@ lib/*
 bin/*
 bin
 
+logs/*
+logs
+
 Debug
 Release
 Debug-GL

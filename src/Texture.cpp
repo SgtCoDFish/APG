@@ -29,8 +29,6 @@
 
 #include <atomic>
 #include <string>
-#include <sstream>
-#include <iostream>
 
 #include <GL/glew.h>
 #include <GL/gl.h>
@@ -45,7 +43,6 @@
 #include "APG/SXXDL.hpp"
 #include "APG/ShaderProgram.hpp"
 
-#include "APG/internal/Log.hpp"
 #include "APG/internal/Assert.hpp"
 
 std::atomic<uint32_t> APG::Texture::availableTextureUnit(0);
@@ -57,19 +54,18 @@ GL_TEXTURE22, GL_TEXTURE23, GL_TEXTURE24, GL_TEXTURE25, GL_TEXTURE26, GL_TEXTURE
 GL_TEXTURE28, GL_TEXTURE29, GL_TEXTURE30, GL_TEXTURE31 };
 
 APG::Texture::Texture(const std::string &fileName, bool preserveSurface) :
-		preserveSurface(preserveSurface), //
-		preservedSurface(SXXDL::make_surface_ptr(nullptr)), //
-		sWrap(APG::TextureWrapType::CLAMP_TO_EDGE), //
-		tWrap(APG::TextureWrapType::CLAMP_TO_EDGE), //
-		minFilter(APG::TextureFilterType::LINEAR), //
-		magFilter(APG::TextureFilterType::LINEAR) {
+		fileName { fileName }, //
+		preserveSurface { preserveSurface }, //
+		preservedSurface { SXXDL::make_surface_ptr(nullptr) }, //
+		sWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
+		tWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
+		minFilter { APG::TextureFilterType::LINEAR }, //
+		magFilter { APG::TextureFilterType::LINEAR } {
 	textureUnitInt = availableTextureUnit++;
 	textureUnitGL = TEXTURE_TARGETS[textureUnitInt];
 
 	generateTextureID();
-	loadTexture(fileName);
-
-	std::cout << "Loaded texture \"" << fileName << "\" at GL unit: GL_TEXTURE" << textureUnitInt << "\n";
+	loadTexture();
 }
 
 APG::Texture::~Texture() {
@@ -80,13 +76,12 @@ void APG::Texture::generateTextureID() {
 	glGenTextures(1, &textureID);
 }
 
-void APG::Texture::loadTexture(const std::string &fileName) {
+void APG::Texture::loadTexture() {
+	const auto logger = el::Loggers::getLogger("default");
 	auto surface = SXXDL::make_surface_ptr(IMG_Load(fileName.c_str()));
 
 	if (surface == nullptr) {
-		std::stringstream ss;
-		ss << "Couldn't load: " << fileName;
-		APG_LOG(ss.str().c_str());
+		logger->fatal("Couldn't load %v, SDL_image error: %v", fileName, IMG_GetError());
 		return;
 	}
 
@@ -106,10 +101,7 @@ void APG::Texture::loadTexture(const std::string &fileName) {
 			glFormat = GL_BGR;
 		}
 	} else {
-		std::stringstream errStream;
-
-		errStream << "Bytes per color in " << fileName << " is invalid (" << numberOfColors << ").";
-		APG_LOG(errStream.str().c_str());
+		logger->fatal("Invalid bytes per color value in %v (%v is invalid, only 4 or 3 supported.)", fileName, numberOfColors);
 		return;
 	}
 
@@ -124,16 +116,12 @@ void APG::Texture::loadTexture(const std::string &fileName) {
 	auto glError = glGetError();
 
 	if (glError != GL_NO_ERROR) {
-		std::stringstream errStream;
-		errStream << "Couldn't upload " << fileName << ": OpenGL Error:\n";
-
 		while (glError != GL_NO_ERROR) {
-			errStream << gluErrorString(glError) << "\n";
+			logger->fatal("GL error while uploading texture: %v", gluErrorString(glError));
 
 			glError = glGetError();
 		}
 
-		APG_LOG(errStream.str().c_str());
 		return;
 	}
 
@@ -146,10 +134,12 @@ void APG::Texture::loadTexture(const std::string &fileName) {
 	if (preserveSurface) {
 		preservedSurface = std::move(surface);
 	}
+
+	logger->info("Loaded texture \"%v\" at unit GL_TEXTURE%v\"", fileName, textureUnitInt);
 }
 
 void APG::Texture::tempBind() {
-	// NOTE: consider using the EXT_direct_state_access extension if available
+	// TODO: consider using the EXT_direct_state_access extension if available
 	// using glTextureParameteri(id, texType, paramName, paramVal)
 	// http://www.opengl.org/registry/specs/EXT/direct_state_access.txt
 

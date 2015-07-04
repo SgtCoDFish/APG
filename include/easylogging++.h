@@ -853,7 +853,7 @@ const struct {
                 "Generally due to a corruption in the code or to an attempt to execute data." }, { SIGSEGV, "SIGSEGV",
                 "Invalid access to memory",
                 "Program is trying to read an invalid (unallocated, deleted or corrupted) or inaccessible memory." }, {
-                SIGINT, "SIGINT", "Interactive attention signal",
+        SIGINT, "SIGINT", "Interactive attention signal",
                 "Interruption generated (generally) by user or operating system." }, };
 static const int kCrashSignalsCount = sizeof(kCrashSignals) / sizeof(kCrashSignals[0]);
 }  // namespace consts
@@ -3041,9 +3041,10 @@ private:
 		ELPP_UNUSED(confName);
 		typename std::map<Level, Conf_T>::const_iterator it = confMap->find(level);
 		if (it == confMap->end()) {
-			try {
+
+			if (confMap->find(Level::Global) != confMap->end()) {
 				return confMap->at(Level::Global);
-			} catch (...) {
+			} else {
 				ELPP_INTERNAL_ERROR("Unable to get configuration [" << confName << "] for level ["
 						<< LevelHelper::convertToString(level) << "]"
 						<< std::endl << "Please ensure you have properly configured logger.", false);
@@ -3058,9 +3059,9 @@ private:
 		ELPP_UNUSED(confName);
 		typename std::map<Level, Conf_T>::iterator it = confMap->find(level);
 		if (it == confMap->end()) {
-			try {
+			if (confMap->find(Level::Global) != confMap->end()) {
 				return confMap->at(Level::Global);
-			} catch (...) {
+			} else {
 				ELPP_INTERNAL_ERROR("Unable to get configuration [" << confName << "] for level ["
 						<< LevelHelper::convertToString(level) << "]"
 						<< std::endl << "Please ensure you have properly configured logger.", false);
@@ -5239,7 +5240,7 @@ private:
 										}
 									}
 									b << *s++;
-								} ELPP_INTERNAL_ERROR("Too many arguments provided. Unable to handle. Please provide more format specifiers", false);
+								}ELPP_INTERNAL_ERROR("Too many arguments provided. Unable to handle. Please provide more format specifiers", false);
 							}
 							template<typename T>
 							inline void Logger::log_(Level level, int vlevel, const T& log) {

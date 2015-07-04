@@ -30,7 +30,6 @@
 
 #include <cstdint>
 
-#include <sstream>
 #include <string>
 #include <vector>
 #include <array>
@@ -38,7 +37,7 @@
 #include <GL/glew.h>
 #include <GL/glu.h>
 
-#include "APG/internal/Log.hpp"
+#include "easylogging++.h"
 
 namespace APG {
 
@@ -102,17 +101,18 @@ public:
 	}
 
 	void upload() {
-		glBufferData(bufferType, elementCount * sizeof(T), &(bufferData.front()), drawType);
+		// TODO: This should be improved.
+		const auto bufferSize = elementCount * sizeof(T);
+		glBufferData(bufferType, bufferSize, &(bufferData.front()), drawType);
 
 		GLenum glError = glGetError();
 		if (glError != GL_NO_ERROR) {
 			if (glError == GL_OUT_OF_MEMORY) {
-				APG_LOG("Ran out of memory trying to upload buffer data.");
+				el::Loggers::getLogger("default")->error(
+				        "Ran out of memory trying to upload buffer data with buffer size = %vB", bufferSize);
 				return;
 			} else {
-				std::stringstream ss;
-				ss << "OpenGL error: " << gluErrorString(glError);
-				APG_LOG(ss.str().c_str());
+				el::Loggers::getLogger("default")->error("OpenGL error occurred: %v.", gluErrorString(glError));
 				return;
 			}
 		}

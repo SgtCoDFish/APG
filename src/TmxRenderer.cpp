@@ -30,7 +30,6 @@
 #include <vector>
 #include <unordered_map>
 #include <utility>
-#include <iostream>
 #include <string>
 
 #include "tmxparser/TmxMap.h"
@@ -39,6 +38,8 @@
 #include "tmxparser/TmxImage.h"
 #include "tmxparser/TmxTile.h"
 
+#include "easylogging++.h"
+
 #include "APG/APGCommon.hpp"
 #include "APG/Tileset.hpp"
 #include "APG/SXXDL.hpp"
@@ -46,7 +47,6 @@
 #include "APG/AnimatedSprite.hpp"
 
 #include "APG/internal/Assert.hpp"
-#include "APG/internal/Log.hpp"
 
 #include <glm/vec2.hpp>
 
@@ -56,12 +56,22 @@ APG::TmxRenderer::TmxRenderer(Tmx::Map *map) :
 }
 
 void APG::TmxRenderer::loadTilesets() {
+	const auto logger = el::Loggers::getLogger("default");
+
 	const auto tileWidth = map->GetTileWidth();
 	const auto tileHeight = map->GetTileHeight();
 
+	logger->info("Loading map %v with (tileWidth, tileHeight) = (%vpx, %vpx)", map->GetFilename(), tileWidth,
+	        tileHeight);
+
+#ifdef APG_IGNORE_ANIMATED_TILES
+	logger->info("Note: APG_IGNORE_ANIMATED_TILES is set, so animated tiles might be ignored.");
+#endif
+
 	/*
 	 * We need to reserve space for our sprites or the vectors will be
-	 * dynamically reallocated and we'll be left with a load of broken pointers.
+	 * dynamically reallocated during loading,
+	 * and we'll be left with a load of broken pointers.
 	 */
 	reserveSpriteSpace();
 
@@ -72,18 +82,11 @@ void APG::TmxRenderer::loadTilesets() {
 
 		const auto tilesetName = map->GetFilepath() + tileset->GetImage()->GetSource();
 
-		std::cout << "Loading tileset " << tilesetName << " with first GID = " << tileset->GetFirstGid() << " and "
-		        << tileset->GetTiles().size() << " special tiles.\n";
+		logger->info("Loading tileset %v (first GID = %v, has %v special tiles)", tilesetName, tileset->GetFirstGid(),
+		        tileset->GetTiles().size());
 
 		tilesets.emplace_back(tileset_ptr(new Tileset(tilesetName, map)));
 		auto &loadedTileset = tilesets.back();
-
-		if (loadedTileset == nullptr) {
-			std::stringstream ss;
-			ss << "Couldn't load: " << tilesetName;
-			APG_LOG(ss.str().c_str());
-			return;
-		}
 
 		/*
 		 * Note that tileset->GetTiles() only returns tiles which have something special about them, e.g. a property or an animation.
@@ -111,32 +114,35 @@ void APG::TmxRenderer::loadTilesets() {
 		for (const auto &tile : tileset->GetTiles()) {
 			const auto tileGID = calculateTileGID(tileset, tile);
 
-			std::cout << "Loading special data for tile #" << tileGID << std::endl;
+			logger->info("Special tile #%v has %v properties.", tileGID, tile->GetProperties().GetSize());
 
-			for (const auto &property : tile->GetProperties().GetList()) {
-				std::cout << "\tHas property \"" << property.first << "\", value = \"" << property.second << "\".\n";
+			if (el::Loggers::verboseLevel() >= 1) {
+				for (const auto &property : tile->GetProperties().GetList()) {
+					logger->verbose(1, "Property \"%v\" = \"%v\"", property.first, property.second);
+				}
 			}
 
 #ifndef APG_IGNORE_ANIMATED_TILES
 			if (tile->IsAnimated()) {
-				std::cout << "\tAnimated tile, has " << tile->GetFrameCount() << " tiles, duration = "
-				        << tile->GetTotalDuration() << "ms.\n";
+				logger->verbose(1, "Animated tile has %v tiles, with total duration %vms.", tile->GetFrameCount(), tile->GetTotalDuration());
 
 				const auto &frames = tile->GetFrames();
 				std::vector<SpriteBase *> framePointers;
 				framePointers.reserve(frames.size());
 
 				// TODO: This ignores per-frame durations in the file, should be improved.
-				// length is stored in ms, convert to seconds
+				// Length is stored in ms, convert to seconds
 				float length = (float) tile->GetTotalDuration() / 1000.0f;
+				unsigned int framesLoaded = 0;
 
 				for (const auto &frame : frames) {
 					const auto gid = calculateTileGID(tileset, frame.GetTileID());
+					logger->verbose(2, "Frame #%v: ID %v, GID %v, duration = %vms.", framesLoaded, frame.GetTileID(), gid, frame.GetDuration());
 
 					REQUIRE(sprites.find(gid) != sprites.end(), "Animation frame not loaded into sprites array.");
-					std::cout << "\t > Frame has id = " << frame.GetTileID() << ", gid = " << gid << ".\n";
 
 					framePointers.emplace_back(sprites[gid]);
+					++framesLoaded;
 				}
 
 				loadedAnimatedSprites.emplace_back(length, framePointers, AnimationMode::LOOP);
@@ -145,8 +151,6 @@ void APG::TmxRenderer::loadTilesets() {
 #endif
 		}
 	}
-
-	std::cout << "Loaded " << tilesets.size() << " tilesets.\n";
 }
 
 void APG::TmxRenderer::renderAll(float deltaTime) {

@@ -27,10 +27,7 @@
 
 #include <cstdint>
 
-#include <iostream>
-
 #include <string>
-#include <sstream>
 #include <utility>
 #include <memory>
 #include <vector>
@@ -46,7 +43,6 @@
 #include "APG/VertexAttribute.hpp"
 #include "APG/Game.hpp"
 
-#include "APG/internal/Log.hpp"
 #include "APG/internal/Assert.hpp"
 
 const char * const APG::SpriteBatch::POSITION_ATTRIBUTE = "position";
@@ -62,7 +58,6 @@ APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program
 		        VertexAttribute(COLOR_ATTRIBUTE, AttributeUsage::COLOR, 4), //
 		        VertexAttribute(TEXCOORD_ATTRIBUTE, AttributeUsage::TEXCOORD, 2) //
 		        }),//
-
 		indexBuffer(false), //
 		vertices(bufferSize, 0.0f), //
 		color(1.0f, 1.0f, 1.0f, 1.0f), //
@@ -162,7 +157,7 @@ void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32
 //		verticesf[i * 5 + 3] = verticest[i].u;
 //		verticesf[i * 5 + 4] = verticest[i].v;
 //	}
-	APG_LOG("Not implemented yet.");
+	REQUIRE(false, "Extended SpriteBatch::draw not implemented yet.");
 }
 
 void APG::SpriteBatch::draw(APG::SpriteBase * const sprite, float x, float y) {
@@ -250,7 +245,7 @@ void APG::SpriteBatch::begin() {
 }
 
 void APG::SpriteBatch::end() {
-	 REQUIRE(drawing, "Can't end before a begin in SpriteBatch.");
+	REQUIRE(drawing, "Can't end before a begin in SpriteBatch.");
 
 	drawing = false;
 
