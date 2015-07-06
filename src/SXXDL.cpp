@@ -25,6 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
+
+#include "easylogging++.h"
+
 #include "APG/SXXDL.hpp"
 
 SXXDL::window_ptr SXXDL::make_window_ptr(SDL_Window *window) {
@@ -48,6 +53,8 @@ SXXDL::mixer::sound_ptr SXXDL::mixer::make_sound_ptr(Mix_Chunk *chunk) {
 }
 
 SXXDL::mixer::music_ptr SXXDL::mixer::make_music_ptr(Mix_Music *music) {
+//	el::Loggers::getLogger("default")->info("Creating music_ptr!");
+//	return music_ptr(music,
+//	        [](Mix_Music *music) {el::Loggers::getLogger("default")->info("Freeing music_ptr!"); Mix_FreeMusic(music);});
 	return music_ptr(music, Mix_FreeMusic);
 }
-

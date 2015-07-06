@@ -47,11 +47,21 @@ APG::AudioManager::music_handle APG::SDLAudioManager::loadMusicFile(const std::s
 	const auto logger = el::Loggers::getLogger("default");
 	logger->info("Loading music file \"%v\".", filename);
 
-	const auto handle = getNextMusicHandle();
+	auto sdlMusic = SXXDL::mixer::make_music_ptr(Mix_LoadMUS(filename.c_str()));
 
-	// LOAD
+	if (sdlMusic == nullptr) {
+		logger->fatal("Couldn't load \"%v\", error: %v.", filename, Mix_GetError());
+		return -1;
+	} else {
+		const auto handle = getNextMusicHandle();
+		logger->info("Loaded \"%v\" at handle %v.", filename, handle);
 
-	return handle;
+		loadedMusic.emplace(handle, std::move(sdlMusic));
+
+		logger->verbose(9, "Total loaded music files: %v", loadedMusic.size());
+
+		return handle;
+	}
 }
 
 APG::AudioManager::sound_handle APG::SDLAudioManager::loadSoundFile(const std::string &filename) {
@@ -65,10 +75,16 @@ APG::AudioManager::sound_handle APG::SDLAudioManager::loadSoundFile(const std::s
 	return handle;
 }
 
-void APG::SDLAudioManager::freeMusic(const music_handle &handle) {
-	// FREE
+void APG::SDLAudioManager::freeMusic(music_handle &handle) {
+	loadedMusic.erase(handle);
+	handle = -1;
 }
 
-void APG::SDLAudioManager::freeSound(const sound_handle &handle) {
-	// FREE
+void APG::SDLAudioManager::freeSound(sound_handle &handle) {
+	handle = -1;
+}
+
+void APG::SDLAudioManager::playMusic(const music_handle &handle) {
+	const auto &song = loadedMusic.find(handle);
+	Mix_PlayMusic((*song).second.get(), 0);
 }

@@ -39,10 +39,6 @@
 
 namespace APG {
 
-class SoundClip {
-
-};
-
 /**
  * Handles everything audio related in the engine. Loaded music and sounds will persist until the manager is destroyed;
  * if you're running into memory issues, you can delete sooner however.
@@ -54,8 +50,8 @@ class SoundClip {
  */
 class AudioManager {
 public:
-	using music_handle = uint32_t;
-	using sound_handle = uint32_t;
+	using music_handle = int32_t;
+	using sound_handle = int32_t;
 
 	static_assert(std::is_copy_constructible<music_handle>(), "Music handle type must be copy constructible.");
 	static_assert(std::is_copy_constructible<sound_handle>(), "Sound handle type must be copy constructible.");
@@ -76,8 +72,10 @@ public:
 	virtual music_handle loadMusicFile(const std::string &filename) = 0;
 	virtual sound_handle loadSoundFile(const std::string &filename) = 0;
 
-	virtual void freeMusic(const music_handle &handle) = 0;
-	virtual void freeSound(const sound_handle &handle) = 0;
+	virtual void freeMusic(music_handle &handle) = 0;
+	virtual void freeSound(sound_handle &handle) = 0;
+
+	virtual void playMusic(const music_handle &handle) = 0;
 };
 
 }

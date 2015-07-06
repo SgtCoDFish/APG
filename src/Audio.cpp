@@ -48,15 +48,15 @@ APG::AudioManager::music_handle APG::AudioManager::getNextMusicHandle() {
 APG::AudioManager::sound_handle APG::AudioManager::getNextSoundHandle() {
 	const auto retval = availableSoundHandles.front();
 	availableSoundHandles.pop_front();
-	return retval;;
+	return retval;
 }
 
 void APG::AudioManager::fillDefaultQueues() {
-	for(music_handle i = 0u; i < 256u; ++i) {
+	for(music_handle i = 0; i < 256; ++i) {
 		availableMusicHandles.push_back(i);
 	}
 
-	for(sound_handle i = 0u; i < 256u; ++i) {
+	for(sound_handle i = 0; i < 256; ++i) {
 		availableSoundHandles.push_back(i);
 	}
 }

@@ -39,6 +39,10 @@ add_library(APG-d ${APG_SOURCES})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_RELEASE_FLAGS}")
 add_library(APG ${APG_SOURCES})
 
+if ( EXISTS "assets/test_music.ogg" )
+    add_definitions(-DAPG_GL_TEST_AUDIO)
+endif ( EXISTS "assets/test_music.ogg" )
+
 if ( (NOT EXCLUDE_SDL_TEST) OR (NOT EXCLUDE_GL_TEST) ) 
 	file(MAKE_DIRECTORY assets)
 	file(COPY ${APG_TEST_ASSETS} DESTINATION assets)

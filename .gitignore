@@ -32,3 +32,6 @@ build/
 
 /Debug-sanitize/
 /Debug-GL/
+
+assets/test_music.ogg
+

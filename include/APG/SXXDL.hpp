@@ -24,8 +24,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SXXDL_HPP_
-#define SXXDL_HPP_
+#ifndef SXXDL_INCLUDE_HPP_
+#define SXXDL_INCLUDE_HPP_
 
 #include <memory>
 
@@ -46,11 +46,12 @@ renderer_ptr make_renderer_ptr(SDL_Renderer *renderer);
 
 namespace mixer {
 
-using sound_ptr = std::unique_ptr<Mix_Chunk, void (*)(Mix_Chunk *)>;
-using music_ptr = std::unique_ptr<Mix_Music, void(*)(Mix_Music *)>;
 
-sound_ptr make_sound_ptr(Mix_Chunk *chunk);
+using music_ptr = std::unique_ptr<Mix_Music, void(*)(Mix_Music *)>;
+using sound_ptr = std::unique_ptr<Mix_Chunk, void (*)(Mix_Chunk *)>;
+
 music_ptr make_music_ptr(Mix_Music *music);
+sound_ptr make_sound_ptr(Mix_Chunk *chunk);
 
 }
 

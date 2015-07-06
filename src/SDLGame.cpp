@@ -76,14 +76,8 @@ APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint
 	inputManager = std::make_unique<SDLInputManager>();
 	audioManager = std::make_unique<SDLAudioManager>();
 
-	const auto sdlWindow = SDL_CreateWindow(windowTitle.c_str(), windowX, windowY, windowWidth, windowHeight,
-	        SDL_WINDOW_FLAGS);
-
-	if (sdlWindow == nullptr) {
-		logger->fatal("Couldn't create window: %v", SDL_GetError());
-	}
-
-	window = SXXDL::make_window_ptr(sdlWindow);
+	window = SXXDL::make_window_ptr(
+	        SDL_CreateWindow(windowTitle.c_str(), windowX, windowY, windowWidth, windowHeight, SDL_WINDOW_FLAGS));
 
 	if (window == nullptr) {
 		logger->fatal("Couldn't create SDL window: %v", SDL_GetError());
@@ -98,12 +92,13 @@ APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint
 	glewExperimental = GL_TRUE;
 	glewInit();
 
-	logger->verbose(9, "OpenGL errors have been reset (probably as a workaround for any bugs with glew)");
 	// reset all errors because some are caused by glew even upon successful setup.
 	auto error = glGetError();
 	while (error != GL_NO_ERROR) {
 		error = glGetError();
 	}
+
+	logger->verbose(9, "OpenGL errors have been reset (probably as a workaround for any bugs with glew)");
 }
 
 APG::SDLGame::~SDLGame() {

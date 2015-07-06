@@ -28,13 +28,20 @@
 #ifndef INCLUDE_APG_SDLAUDIOMANAGER_HPP_
 #define INCLUDE_APG_SDLAUDIOMANAGER_HPP_
 
+#include <unordered_map>
+
 #include <SDL2/SDL_mixer.h>
 
+#include "APG/SXXDL.hpp"
 #include "APG/Audio.hpp"
 
 namespace APG {
 
 class SDLAudioManager: public AudioManager {
+private:
+	std::unordered_map<music_handle, SXXDL::mixer::music_ptr> loadedMusic;
+	std::unordered_map<sound_handle, SXXDL::mixer::sound_ptr> loadedSounds;
+
 public:
 	explicit SDLAudioManager(int frequency = MIX_DEFAULT_FREQUENCY, uint16_t format = MIX_DEFAULT_FORMAT);
 	virtual ~SDLAudioManager();
@@ -42,8 +49,10 @@ public:
 	virtual music_handle loadMusicFile(const std::string &filename) override;
 	virtual sound_handle loadSoundFile(const std::string &filename) override;
 
-	virtual void freeMusic(const music_handle &handle) override;
-	virtual void freeSound(const sound_handle &handle) override;
+	virtual void freeMusic(music_handle &handle) override;
+	virtual void freeSound(sound_handle &handle) override;
+
+	virtual void playMusic(const music_handle &handle) override;
 };
 
 }
