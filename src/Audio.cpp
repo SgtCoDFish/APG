@@ -25,19 +25,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_APG_AUDIOMANAGER_HPP_
-#define INCLUDE_APG_AUDIOMANAGER_HPP_
+#include <cstdint>
+
+#include <string>
+#include <deque>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 
-namespace APG {
+#include "APG/Audio.hpp"
 
-class AudioManager {
-public:
-
-};
-
+APG::AudioManager::AudioManager() {
+	fillDefaultQueues();
 }
 
-#endif /* INCLUDE_APG_AUDIOMANAGER_HPP_ */
+APG::AudioManager::music_handle APG::AudioManager::getNextMusicHandle() {
+	const auto retval = availableMusicHandles.front();
+	availableMusicHandles.pop_front();
+	return retval;
+}
+
+APG::AudioManager::sound_handle APG::AudioManager::getNextSoundHandle() {
+	const auto retval = availableSoundHandles.front();
+	availableSoundHandles.pop_front();
+	return retval;;
+}
+
+void APG::AudioManager::fillDefaultQueues() {
+	for(music_handle i = 0u; i < 256u; ++i) {
+		availableMusicHandles.push_back(i);
+	}
+
+	for(sound_handle i = 0u; i < 256u; ++i) {
+		availableSoundHandles.push_back(i);
+	}
+}
