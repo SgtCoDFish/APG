@@ -34,15 +34,18 @@
 
 namespace APG {
 
+/**
+ * Note that only one Game is expected to be made, and the public static screen size variables will be wrong if you create more than one.
+ */
 class Game {
+protected:
+	void setupLoggingDefault();
+
 public:
 	static uint32_t screenWidth;
 	static uint32_t screenHeight;
 
-	Game(uint32_t screenWidth, uint32_t screenHeight) {
-		Game::screenWidth = screenWidth;
-		Game::screenHeight = screenHeight;
-	}
+	explicit Game(uint32_t screenWidth, uint32_t screenHeight);
 
 	virtual ~Game() = default;
 

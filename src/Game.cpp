@@ -27,7 +27,25 @@
 
 #include <cstdint>
 
+#include "easylogging++.h"
+
 #include "APG/Game.hpp"
 
 uint32_t APG::Game::screenWidth = 1280;
 uint32_t APG::Game::screenHeight = 720;
+
+APG::Game::Game(uint32_t screenWidth, uint32_t screenHeight) {
+	Game::screenWidth = screenWidth;
+	Game::screenHeight = screenHeight;
+
+	setupLoggingDefault();
+	el::Loggers::getLogger("default")->verbose(9, "Logging initialised.");
+}
+
+void APG::Game::setupLoggingDefault() {
+	auto conf = el::Configurations();
+
+	conf.setToDefault();
+	conf.setGlobally(el::ConfigurationType::Format, "%datetime{%h:%m:%s,%g} - %level - %msg");
+	el::Loggers::reconfigureLogger("default", conf);
+}
