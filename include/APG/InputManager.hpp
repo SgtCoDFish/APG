@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2015 Ashley Davis (SgtCoDFish)
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without

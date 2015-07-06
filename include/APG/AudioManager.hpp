@@ -25,39 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_APG_SDLINPUTMANAGER_HPP_
-#define INCLUDE_APG_SDLINPUTMANAGER_HPP_
-
-#include <cstdint>
-
-#include <array>
+#ifndef INCLUDE_APG_AUDIOMANAGER_HPP_
+#define INCLUDE_APG_AUDIOMANAGER_HPP_
 
 #include <SDL2/SDL.h>
-
-#include "APG/InputManager.hpp"
+#include <SDL2/SDL_mixer.h>
 
 namespace APG {
 
-class SDLInputManager: public InputManager {
-private:
-	std::array<bool, SDL_Scancode::SDL_NUM_SCANCODES> justPressed;
-	std::array<bool, SDL_Scancode::SDL_NUM_SCANCODES> canJustPress;
-	const uint8_t *keyState = nullptr;
-
+class AudioManager {
 public:
-	explicit SDLInputManager();
-	virtual ~SDLInputManager() = default;
 
-	virtual void update(float deltaTime) override;
-
-	virtual bool isKeyPressed(SDL_Scancode key) const;
-	virtual bool isKeyJustPressed(SDL_Scancode key) const;
-
-	void handleInputEvent(SDL_Event &event);
-
-	bool isSDLKeyCodePressed(SDL_Scancode keysym) const;
 };
 
 }
 
-#endif /* INCLUDE_APG_SDLINPUTMANAGER_HPP_ */
+#endif /* INCLUDE_APG_AUDIOMANAGER_HPP_ */

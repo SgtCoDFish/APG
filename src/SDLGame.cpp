@@ -31,6 +31,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 
 #include <GL/glew.h>
 #include <GL/gl.h>
@@ -43,6 +44,7 @@
 
 uint32_t APG::SDLGame::SDL_INIT_FLAGS = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS;
 uint32_t APG::SDLGame::SDL_IMAGE_INIT_FLAGS = IMG_INIT_PNG;
+uint32_t APG::SDLGame::SDL_MIXER_INIT_FLAGS = MIX_INIT_OGG;
 uint32_t APG::SDLGame::SDL_WINDOW_FLAGS = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
 APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
@@ -53,15 +55,24 @@ APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint
 
 	if (SDL_Init(SDL_INIT_FLAGS) < 0) {
 		logger->fatal("Couldn't initialise SDL: %v", SDL_GetError());
+	} else {
+		logger->verbose(1, "Successfully initialised SDL2.");
 	}
 
-	if ((IMG_Init(SDL_IMAGE_INIT_FLAGS) & SDL_IMAGE_INIT_FLAGS) == 0) {
+	if ((IMG_Init(SDL_IMAGE_INIT_FLAGS) & SDL_IMAGE_INIT_FLAGS) != SDL_IMAGE_INIT_FLAGS) {
 		logger->fatal("Couldn't initialise SDL_image: %v", IMG_GetError());
+	} else {
+		logger->verbose(1, "Successfully initialised SDL2_image.");
+	}
+
+	if ((Mix_Init(SDL_MIXER_INIT_FLAGS) & SDL_MIXER_INIT_FLAGS) != SDL_MIXER_INIT_FLAGS) {
+		logger->fatal("Couldn't initialise SDL_mixer: %v", Mix_GetError());
+	} else {
+		logger->verbose(1, "Successfully initialised SDL2_mixer.");
 	}
 
 	window = SXXDL::make_window_ptr(
-	        SDL_CreateWindow(windowTitle.c_str(), windowX, windowY, windowWidth,
-	                windowHeight, SDL_WINDOW_FLAGS));
+	        SDL_CreateWindow(windowTitle.c_str(), windowX, windowY, windowWidth, windowHeight, SDL_WINDOW_FLAGS));
 
 	if (window == nullptr) {
 		logger->fatal("Couldn't create SDL window: %v", SDL_GetError());
@@ -86,6 +97,7 @@ APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint
 
 APG::SDLGame::~SDLGame() {
 	SDL_GL_DeleteContext(glContext);
+	Mix_Quit();
 	IMG_Quit();
 	SDL_Quit();
 }

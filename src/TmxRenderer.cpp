@@ -82,7 +82,7 @@ void APG::TmxRenderer::loadTilesets() {
 
 		const auto tilesetName = map->GetFilepath() + tileset->GetImage()->GetSource();
 
-		logger->info("Loading tileset %v (first GID = %v, has %v special tiles)", tilesetName, tileset->GetFirstGid(),
+		logger->info("Loading tileset \"%v\" (first GID = %v, has %v special tiles)", tilesetName, tileset->GetFirstGid(),
 		        tileset->GetTiles().size());
 
 		tilesets.emplace_back(tileset_ptr(new Tileset(tilesetName, map)));

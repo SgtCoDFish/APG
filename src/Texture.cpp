@@ -135,7 +135,7 @@ void APG::Texture::loadTexture() {
 		preservedSurface = std::move(surface);
 	}
 
-	logger->info("Loaded texture \"%v\" at unit GL_TEXTURE%v\"", fileName, textureUnitInt);
+	logger->info("Loaded texture \"%v\" at unit GL_TEXTURE%v", fileName, textureUnitInt);
 }
 
 void APG::Texture::tempBind() {

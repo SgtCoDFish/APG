@@ -32,6 +32,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -66,6 +67,11 @@ public:
 	 * Defaults to IMG_INIT_PNG.
 	 */
 	static uint32_t SDL_IMAGE_INIT_FLAGS;
+
+	/**
+	 * Defaults to MIX_INIT_OGG
+	 */
+	static uint32_t SDL_MIXER_INIT_FLAGS;
 
 	/**
 	 * Defaults to SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL.
