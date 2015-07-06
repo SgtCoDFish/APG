@@ -71,6 +71,8 @@ APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint
 		logger->verbose(1, "Successfully initialised SDL2_mixer.");
 	}
 
+	logSDLVersions();
+
 	window = SXXDL::make_window_ptr(
 	        SDL_CreateWindow(windowTitle.c_str(), windowX, windowY, windowWidth, windowHeight, SDL_WINDOW_FLAGS));
 
@@ -128,4 +130,30 @@ bool APG::SDLGame::update(float deltaTime) {
 
 void APG::SDLGame::quit() {
 	shouldQuit = true;
+}
+
+void APG::SDLGame::logSDLVersions() const {
+	const auto logger = el::Loggers::getLogger("default");
+
+	SDL_version compiledVersion, sdlLinkedVersion;
+
+	SDL_VERSION(&compiledVersion);
+	SDL_GetVersion(&sdlLinkedVersion);
+
+	debugSDLVersion(logger, "SDL", compiledVersion, sdlLinkedVersion);
+
+	SDL_IMAGE_VERSION(&compiledVersion);
+	const auto imgVersion = IMG_Linked_Version();
+	debugSDLVersion(logger, "SDL_image", compiledVersion, *imgVersion);
+
+	SDL_MIXER_VERSION(&compiledVersion);
+	const auto mixVersion = Mix_Linked_Version();
+	debugSDLVersion(logger, "SDL_mixer", compiledVersion, *mixVersion);
+}
+
+void APG::SDLGame::debugSDLVersion(el::Logger * const logger, const char *libraryName,
+        const SDL_version &compiledVersion, const SDL_version &linkedVersion) const {
+	logger->verbose(9, "%v compiled with version %v.%v.%v, linked with version %v.%v.%v", libraryName,
+	        (uint32_t) compiledVersion.major, (uint32_t) compiledVersion.minor, (uint32_t) compiledVersion.patch,
+	        (uint32_t) linkedVersion.major, (uint32_t) linkedVersion.minor, (uint32_t) linkedVersion.patch);
 }

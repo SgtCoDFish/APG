@@ -38,6 +38,8 @@
 #include <GL/glu.h>
 #include <GL/glew.h>
 
+#include "easylogging++.h"
+
 #include "APG/Game.hpp"
 #include "APG/SXXDL.hpp"
 #include "APG/SDLInputManager.hpp"
@@ -79,7 +81,8 @@ public:
 	static uint32_t SDL_WINDOW_FLAGS;
 
 	explicit SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
-	        uint32_t glContextMajor = 3, uint32_t glContextMinor = 2, uint32_t windowX = SDL_WINDOWPOS_UNDEFINED, uint32_t windowY = SDL_WINDOWPOS_UNDEFINED);
+	        uint32_t glContextMajor = 3, uint32_t glContextMinor = 2, uint32_t windowX = SDL_WINDOWPOS_UNDEFINED,
+	        uint32_t windowY = SDL_WINDOWPOS_UNDEFINED);
 	virtual ~SDLGame();
 
 	bool update(float deltaTime) override;
@@ -96,6 +99,11 @@ public:
 	virtual const InputManager *input() const override {
 		return &inputManager;
 	}
+
+private:
+	void logSDLVersions() const;
+	void debugSDLVersion(el::Logger * const logger, const char *libraryName, const SDL_version &compiledVersion,
+	        const SDL_version &linkedVersion) const;
 };
 
 }
