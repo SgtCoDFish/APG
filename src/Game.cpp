@@ -47,6 +47,6 @@ void APG::Game::setupLoggingDefault() {
 
 	conf.setToDefault();
 	conf.setGlobally(el::ConfigurationType::Format, "%datetime{%h:%m:%s.%g} [%levshort ] - %msg");
-	conf.set(el::Level::Verbose, el::ConfigurationType::Format, "%datetime{%h:%m:%s,%g} [%levshort%vlevel] - %msg");
+	conf.set(el::Level::Verbose, el::ConfigurationType::Format, "%datetime{%h:%m:%s.%g} [%levshort%vlevel] - %msg");
 	el::Loggers::reconfigureLogger("default", conf);
 }

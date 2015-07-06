@@ -30,9 +30,9 @@
 
 #include <cstdint>
 
-#include "APG/InputManager.hpp"
-
 namespace APG {
+class InputManager;
+class AudioManager;
 
 /**
  * Note that only one Game is expected to be made, and the public static screen size variables will be wrong if you create more than one.
@@ -69,6 +69,7 @@ public:
 	virtual void render(float deltaTime) = 0;
 
 	virtual const InputManager *input() const = 0;
+	virtual const AudioManager *audio() const = 0;
 };
 
 }

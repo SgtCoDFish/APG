@@ -73,8 +73,17 @@ APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint
 
 	logSDLVersions();
 
-	window = SXXDL::make_window_ptr(
-	        SDL_CreateWindow(windowTitle.c_str(), windowX, windowY, windowWidth, windowHeight, SDL_WINDOW_FLAGS));
+	inputManager = std::make_unique<SDLInputManager>();
+	audioManager = std::make_unique<SDLAudioManager>();
+
+	const auto sdlWindow = SDL_CreateWindow(windowTitle.c_str(), windowX, windowY, windowWidth, windowHeight,
+	        SDL_WINDOW_FLAGS);
+
+	if (sdlWindow == nullptr) {
+		logger->fatal("Couldn't create window: %v", SDL_GetError());
+	}
+
+	window = SXXDL::make_window_ptr(sdlWindow);
 
 	if (window == nullptr) {
 		logger->fatal("Couldn't create SDL window: %v", SDL_GetError());
@@ -106,7 +115,7 @@ APG::SDLGame::~SDLGame() {
 
 void APG::SDLGame::handleEvent(SDL_Event &event) {
 	if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
-		inputManager.handleInputEvent(event);
+		inputManager->handleInputEvent(event);
 	} else if (event.type == SDL_QUIT) {
 		quit();
 	}
@@ -117,7 +126,7 @@ bool APG::SDLGame::update(float deltaTime) {
 		return true;
 	}
 
-	inputManager.update(deltaTime);
+	inputManager->update(deltaTime);
 
 	while (SDL_PollEvent(&eventCache)) {
 		handleEvent(eventCache);

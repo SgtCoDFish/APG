@@ -28,14 +28,16 @@
 #ifndef INCLUDE_APG_SDLAUDIOMANAGER_HPP_
 #define INCLUDE_APG_SDLAUDIOMANAGER_HPP_
 
+#include <SDL2/SDL_mixer.h>
+
 #include "APG/Audio.hpp"
 
 namespace APG {
 
 class SDLAudioManager: public AudioManager {
 public:
-	explicit SDLAudioManager();
-	virtual ~SDLAudioManager() = default;
+	explicit SDLAudioManager(int frequency = MIX_DEFAULT_FREQUENCY, uint16_t format = MIX_DEFAULT_FORMAT);
+	virtual ~SDLAudioManager();
 
 	virtual music_handle loadMusicFile(const std::string &filename) override;
 	virtual sound_handle loadSoundFile(const std::string &filename) override;

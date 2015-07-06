@@ -43,6 +43,7 @@
 #include "APG/Game.hpp"
 #include "APG/SXXDL.hpp"
 #include "APG/SDLInputManager.hpp"
+#include "APG/SDLAudioManager.hpp"
 
 namespace APG {
 
@@ -57,11 +58,14 @@ protected:
 
 	virtual void handleEvent(SDL_Event &event);
 
-	SDLInputManager inputManager;
+	std::unique_ptr<SDLInputManager> inputManager = nullptr;
+	std::unique_ptr<SDLAudioManager> audioManager = nullptr;
 
 public:
 	/**
-	 * Defaults to SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS
+	 * Defaults to SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS.
+	 *
+	 * Without these defaults at least, initialization will probably fail.
 	 */
 	static uint32_t SDL_INIT_FLAGS;
 
@@ -97,7 +101,11 @@ public:
 	}
 
 	virtual const InputManager *input() const override {
-		return &inputManager;
+		return inputManager.get();
+	}
+
+	virtual const AudioManager *audio() const override {
+		return audioManager.get();
 	}
 
 private:

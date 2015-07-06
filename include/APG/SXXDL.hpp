@@ -30,6 +30,7 @@
 #include <memory>
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 
 namespace SXXDL {
 
@@ -42,6 +43,16 @@ window_ptr make_window_ptr(SDL_Window *window);
 surface_ptr make_surface_ptr(SDL_Surface *surface);
 sdl_texture_ptr make_sdl_texture_ptr(SDL_Texture *texture);
 renderer_ptr make_renderer_ptr(SDL_Renderer *renderer);
+
+namespace mixer {
+
+using sound_ptr = std::unique_ptr<Mix_Chunk, void (*)(Mix_Chunk *)>;
+using music_ptr = std::unique_ptr<Mix_Music, void(*)(Mix_Music *)>;
+
+sound_ptr make_sound_ptr(Mix_Chunk *chunk);
+music_ptr make_music_ptr(Mix_Music *music);
+
+}
 
 }
 

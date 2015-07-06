@@ -99,24 +99,24 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	static float playerX = 128.0f, playerY = 128.0f - ((float) playerAnimation->getHeight() / 4.0f);
 
 	// will move the player quickly
-	if (inputManager.isKeyPressed(SDL_SCANCODE_UP)) {
+	if (inputManager->isKeyPressed(SDL_SCANCODE_UP)) {
 		playerY -= 32.0f;
-	} else if (inputManager.isKeyPressed(SDL_SCANCODE_DOWN)) {
+	} else if (inputManager->isKeyPressed(SDL_SCANCODE_DOWN)) {
 		playerY += 32.0f;
-	} else if (inputManager.isKeyPressed(SDL_SCANCODE_LEFT)) {
+	} else if (inputManager->isKeyPressed(SDL_SCANCODE_LEFT)) {
 		playerX -= 32.0f;
-	} else if (inputManager.isKeyPressed(SDL_SCANCODE_RIGHT)) {
+	} else if (inputManager->isKeyPressed(SDL_SCANCODE_RIGHT)) {
 		playerX += 32.0f;
 	}
 
 	// will move the player once per press
-	if (inputManager.isKeyJustPressed(SDL_SCANCODE_W)) {
+	if (inputManager->isKeyJustPressed(SDL_SCANCODE_W)) {
 		playerY -= 32.0f;
-	} else if (inputManager.isKeyJustPressed(SDL_SCANCODE_S)) {
+	} else if (inputManager->isKeyJustPressed(SDL_SCANCODE_S)) {
 		playerY += 32.0f;
-	} else if (inputManager.isKeyJustPressed(SDL_SCANCODE_A)) {
+	} else if (inputManager->isKeyJustPressed(SDL_SCANCODE_A)) {
 		playerX -= 32.0f;
-	} else if (inputManager.isKeyJustPressed(SDL_SCANCODE_D)) {
+	} else if (inputManager->isKeyJustPressed(SDL_SCANCODE_D)) {
 		playerX += 32.0f;
 	}
 

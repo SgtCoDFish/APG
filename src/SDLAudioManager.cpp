@@ -29,6 +29,20 @@
 
 #include "APG/SDLAudioManager.hpp"
 
+APG::SDLAudioManager::SDLAudioManager(int frequency, uint16_t format) {
+	const auto logger = el::Loggers::getLogger("default");
+	if (Mix_OpenAudio(frequency, format, 2, 1024) == -1) {
+		logger->fatal("Couldn't open audio for SDL_mixer: %v", Mix_GetError());
+		return;
+	}
+
+	logger->info("Successfully started SDL_mixer.");
+}
+
+APG::SDLAudioManager::~SDLAudioManager() {
+	Mix_CloseAudio();
+}
+
 APG::AudioManager::music_handle APG::SDLAudioManager::loadMusicFile(const std::string &filename) {
 	const auto logger = el::Loggers::getLogger("default");
 	logger->info("Loading music file \"%v\".", filename);
