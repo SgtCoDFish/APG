@@ -1,3 +1,7 @@
+# Based heavily on FindSDL2_image.cmake from the same directory
+# The license for this file is the same as for that file.
+# Modified by Ashley Davis (https://github.com/SgtCoDFish)
+
 FIND_PATH(SDL2_MIXER_INCLUDE_DIR SDL_mixer.h
 	HINTS
 	${SDL2}
