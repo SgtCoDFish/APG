@@ -114,7 +114,7 @@ void APG::TmxRenderer::loadTilesets() {
 		for (const auto &tile : tileset->GetTiles()) {
 			const auto tileGID = calculateTileGID(tileset, tile);
 
-			logger->info("Special tile #%v has %v properties.", tileGID, tile->GetProperties().GetSize());
+			logger->verbose(1, "Special tile #%v has %v properties.", tileGID, tile->GetProperties().GetSize());
 
 			if (el::Loggers::verboseLevel() >= 1) {
 				for (const auto &property : tile->GetProperties().GetList()) {
