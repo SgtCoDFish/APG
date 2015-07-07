@@ -28,6 +28,7 @@
 #ifndef APG__BUFFER_HPP_
 #define APG__BUFFER_HPP_
 
+#include "APG/APGeasylogging.hpp"
 #include <cstdint>
 
 #include <string>
@@ -37,7 +38,6 @@
 #include <GL/glew.h>
 #include <GL/glu.h>
 
-#include "easylogging++.h"
 
 namespace APG {
 

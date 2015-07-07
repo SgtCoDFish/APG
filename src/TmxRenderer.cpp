@@ -38,7 +38,7 @@
 #include "tmxparser/TmxImage.h"
 #include "tmxparser/TmxTile.h"
 
-#include "easylogging++.h"
+#include "APG/APGeasylogging.hpp"
 
 #include "APG/APGCommon.hpp"
 #include "APG/Tileset.hpp"

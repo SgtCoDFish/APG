@@ -27,7 +27,7 @@
 
 #include <chrono>
 
-#include "easylogging++.h"
+#include "APG/APGeasylogging.hpp"
 INITIALIZE_EASYLOGGINGPP
 
 #include "APG/SDLGame.hpp"

@@ -25,7 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "easylogging++.h"
+#include "APG/APGeasylogging.hpp"
 
 #include "APG/SDLAudioManager.hpp"
 

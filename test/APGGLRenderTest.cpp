@@ -40,7 +40,7 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 
-#include "easylogging++.h"
+#include "APG/APGeasylogging.hpp"
 INITIALIZE_EASYLOGGINGPP
 
 #include "APG/Game.hpp"

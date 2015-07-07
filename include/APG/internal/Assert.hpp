@@ -32,7 +32,7 @@
 
 #include <cstdio>
 
-#include "easylogging++.h"
+#include "APG/APGeasylogging.hpp"
 
 #define REQUIRE(expr, orElse) \
 	do { \

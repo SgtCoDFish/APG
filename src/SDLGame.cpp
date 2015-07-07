@@ -37,7 +37,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-#include "easylogging++.h"
+#include "APG/APGeasylogging.hpp"
 
 #include "APG/SDLGame.hpp"
 #include "APG/SDLInputManager.hpp"

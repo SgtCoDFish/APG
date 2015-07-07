@@ -33,11 +33,11 @@
 #include <string>
 #include <memory>
 
-#include "easylogging++.h"
-
 #include "tmxparser/TmxMap.h"
 #include "tmxparser/TmxTileset.h"
 #include "tmxparser/TmxImage.h"
+
+#include "APG/APGeasylogging.hpp"
 
 #include "APG/Texture.hpp"
 

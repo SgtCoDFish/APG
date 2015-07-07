@@ -26,8 +26,7 @@
  */
 
 #include <cstdint>
-
-#include "easylogging++.h"
+#include "APG/APGeasylogging.hpp"
 
 #include "APG/Game.hpp"
 
