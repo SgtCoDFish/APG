@@ -86,10 +86,6 @@ bool APG::APGGLRenderTest::init() {
 		return false;
 	}
 
-#ifdef APG_GL_TEST_AUDIO
-	logger->info("Note: audio test enabled. Use P and SPACE to test.");
-#endif
-
 	return true;
 }
 
@@ -123,20 +119,6 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	} else if (inputManager->isKeyJustPressed(SDL_SCANCODE_D)) {
 		playerX += 32.0f;
 	}
-
-#ifdef APG_GL_TEST_AUDIO
-	if(inputManager->isKeyJustPressed(SDL_SCANCODE_P)) {
-		if(testHandle == -1) {
-			testHandle = audioManager->loadMusicFile("assets/test_music.ogg");
-		} else {
-			audioManager->freeMusic(testHandle);
-		}
-	}
-
-	if (inputManager->isKeyJustPressed(SDL_SCANCODE_SPACE) && testHandle != -1) {
-		audioManager->playMusic(testHandle);
-	}
-#endif
 
 	spriteBatch->begin();
 	spriteBatch->draw(playerAnimation.get(), playerX, playerY);

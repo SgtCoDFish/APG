@@ -25,64 +25,71 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef APGGLRENDERTEST_HPP_
-#define APGGLRENDERTEST_HPP_
+#include <chrono>
 
-#include <string>
-#include <memory>
-#include <utility>
+#include "easylogging++.h"
+INITIALIZE_EASYLOGGINGPP
 
-#include <SDL2/SDL.h>
-
-#include "APG/Game.hpp"
 #include "APG/SDLGame.hpp"
-#include "APG/APGCommon.hpp"
-#include "APG/SXXDL.hpp"
-#include "APG/ShaderProgram.hpp"
-#include "APG/GLTmxRenderer.hpp"
-#include "APG/Buffer.hpp"
-#include "APG/VAO.hpp"
-#include "APG/Texture.hpp"
-#include "APG/SpriteBatch.hpp"
-#include "APG/Sprite.hpp"
 
-#include "tmxparser/TmxMap.h"
+#include "test/APGAudioTest.hpp"
 
-namespace APG {
-
-class APGGLRenderTest final : public APG::SDLGame {
-private:
-	static const char *vertexShaderFilename;
-	static const char *fragmentShaderFilename;
-
-	std::unique_ptr<Tmx::Map> map;
-
-	std::unique_ptr<ShaderProgram> shaderProgram;
-
-	std::unique_ptr<SpriteBatch> spriteBatch;
-
-	std::unique_ptr<GLTmxRenderer> renderer;
-
-	std::unique_ptr<Texture> playerTexture;
-	std::vector<Sprite> playerFrames;
-	std::unique_ptr<AnimatedSprite> playerAnimation;
-
-public:
-	explicit APGGLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
-	        uint32_t glContextMajor = 3, uint32_t glContextMinor = 2, uint32_t windowX = SDL_WINDOWPOS_CENTERED, uint32_t windowY = SDL_WINDOWPOS_CENTERED) :
-			SDLGame(windowTitle, windowWidth, windowHeight, glContextMajor, glContextMinor, windowX, windowY) {
-	}
-
-	virtual ~APGGLRenderTest() = default;
-
-	bool init() override;
-	void render(float deltaTime) override;
-
-	const Tmx::Map *getMap() const {
-		return map.get();
-	}
-};
-
+bool APG::APGAudioTest::init() {
+	return true;
 }
 
-#endif /* APGGLRENDERTEST_HPP_ */
+void APG::APGAudioTest::render(float deltaTime) {
+	(testHandle == -1 ? clearToRed() : clearToGreen());
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	if (inputManager->isKeyJustPressed(SDL_SCANCODE_P)) {
+		if (testHandle == -1) {
+			testHandle = audioManager->loadMusicFile("assets/test_music.ogg");
+		} else {
+			audioManager->freeMusic(testHandle);
+		}
+	}
+
+	if (inputManager->isKeyJustPressed(SDL_SCANCODE_SPACE) && testHandle != -1) {
+		audioManager->playMusic(testHandle);
+	}
+
+	SDL_GL_SwapWindow(window.get());
+}
+
+void APG::APGAudioTest::clearToRed() {
+	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+}
+
+void APG::APGAudioTest::clearToGreen() {
+	glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+}
+
+int main(int argc, char **argv) {
+	START_EASYLOGGINGPP(argc, argv);
+
+	const auto logger = el::Loggers::getLogger("default");
+
+	{
+		const auto game = std::make_unique<APG::APGAudioTest>();
+		if (!game->init()) {
+			logger->fatal("Couldn't init audio test.");
+		}
+
+		auto startTime = std::chrono::high_resolution_clock::now();
+
+		logger->info("To test: press P to load/unload music, space to play/pause/resume.");
+
+		while (true) {
+			const auto timeNow = std::chrono::high_resolution_clock::now();
+			const float deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count()
+			        / 1000.0f;
+
+			if (game->update(deltaTime)) {
+				break;
+			}
+		}
+	}
+
+	return EXIT_SUCCESS;
+}

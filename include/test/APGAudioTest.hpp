@@ -25,64 +25,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef APGGLRENDERTEST_HPP_
-#define APGGLRENDERTEST_HPP_
+#ifndef INCLUDE_TEST_APGAUDIOTEST_HPP_
+#define INCLUDE_TEST_APGAUDIOTEST_HPP_
 
-#include <string>
-#include <memory>
-#include <utility>
+#include <cstdint>
 
-#include <SDL2/SDL.h>
-
-#include "APG/Game.hpp"
 #include "APG/SDLGame.hpp"
-#include "APG/APGCommon.hpp"
-#include "APG/SXXDL.hpp"
-#include "APG/ShaderProgram.hpp"
-#include "APG/GLTmxRenderer.hpp"
-#include "APG/Buffer.hpp"
-#include "APG/VAO.hpp"
-#include "APG/Texture.hpp"
-#include "APG/SpriteBatch.hpp"
-#include "APG/Sprite.hpp"
-
-#include "tmxparser/TmxMap.h"
 
 namespace APG {
 
-class APGGLRenderTest final : public APG::SDLGame {
+class APGAudioTest : public SDLGame {
 private:
-	static const char *vertexShaderFilename;
-	static const char *fragmentShaderFilename;
+	AudioManager::music_handle testHandle = -1;
 
-	std::unique_ptr<Tmx::Map> map;
-
-	std::unique_ptr<ShaderProgram> shaderProgram;
-
-	std::unique_ptr<SpriteBatch> spriteBatch;
-
-	std::unique_ptr<GLTmxRenderer> renderer;
-
-	std::unique_ptr<Texture> playerTexture;
-	std::vector<Sprite> playerFrames;
-	std::unique_ptr<AnimatedSprite> playerAnimation;
+	inline void clearToRed();
+	inline void clearToGreen();
 
 public:
-	explicit APGGLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
-	        uint32_t glContextMajor = 3, uint32_t glContextMinor = 2, uint32_t windowX = SDL_WINDOWPOS_CENTERED, uint32_t windowY = SDL_WINDOWPOS_CENTERED) :
-			SDLGame(windowTitle, windowWidth, windowHeight, glContextMajor, glContextMinor, windowX, windowY) {
+	explicit APGAudioTest(const uint32_t windowWidth = 1280u, const uint32_t windowHeight = 720u) : SDLGame("APG Audio Test", windowWidth, windowHeight) {
+
 	}
 
-	virtual ~APGGLRenderTest() = default;
+	virtual ~APGAudioTest() = default;
 
 	bool init() override;
 	void render(float deltaTime) override;
-
-	const Tmx::Map *getMap() const {
-		return map.get();
-	}
 };
 
 }
 
-#endif /* APGGLRENDERTEST_HPP_ */
+#endif /* INCLUDE_TEST_APGAUDIOTEST_HPP_ */
