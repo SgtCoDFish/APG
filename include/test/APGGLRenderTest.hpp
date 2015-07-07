@@ -55,13 +55,16 @@ private:
 	static const char *vertexShaderFilename;
 	static const char *fragmentShaderFilename;
 
-	std::unique_ptr<Tmx::Map> map;
+	std::unique_ptr<Tmx::Map> map1;
+	std::unique_ptr<Tmx::Map> map2;
 
 	std::unique_ptr<ShaderProgram> shaderProgram;
 
 	std::unique_ptr<SpriteBatch> spriteBatch;
 
-	std::unique_ptr<GLTmxRenderer> renderer;
+	std::unique_ptr<GLTmxRenderer> rendererOne;
+	std::unique_ptr<GLTmxRenderer> rendererTwo;
+	GLTmxRenderer *currentRenderer = nullptr;
 
 	std::unique_ptr<Texture> playerTexture;
 	std::vector<Sprite> playerFrames;
@@ -79,7 +82,7 @@ public:
 	void render(float deltaTime) override;
 
 	const Tmx::Map *getMap() const {
-		return map.get();
+		return map1.get();
 	}
 };
 

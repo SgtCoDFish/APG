@@ -58,11 +58,19 @@ const char * APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag.gls
 bool APG::APGGLRenderTest::init() {
 	const auto logger = el::Loggers::getLogger("default");
 
-	map = std::make_unique<Tmx::Map>();
-	map->ParseFile("assets/sample_indoor.tmx");
+	map1 = std::make_unique<Tmx::Map>();
+	map1->ParseFile("assets/sample_indoor.tmx");
 
-	if (map->HasError()) {
-		logger->fatal("Error loading map: %v", map->GetErrorText());
+	if (map1->HasError()) {
+		logger->fatal("Error loading map1: %v", map1->GetErrorText());
+		return false;
+	}
+
+	map2 = std::make_unique<Tmx::Map>();
+	map2->ParseFile("assets/world1.tmx");
+
+	if (map2->HasError()) {
+		logger->fatal("Error loading map2: %v", map2->GetErrorText());
 		return false;
 	}
 
@@ -70,7 +78,9 @@ bool APG::APGGLRenderTest::init() {
 
 	spriteBatch = std::make_unique<SpriteBatch>();
 
-	renderer = std::make_unique<GLTmxRenderer>(map.get(), *spriteBatch);
+	rendererOne = std::make_unique<GLTmxRenderer>(map1.get(), *spriteBatch);
+	rendererTwo = std::make_unique<GLTmxRenderer>(map2.get(), *spriteBatch);
+	currentRenderer = rendererOne.get();
 
 	playerTexture = std::make_unique<Texture>("assets/player.png");
 	playerFrames = AnimatedSprite::splitTexture(playerTexture.get(), 32, 32, 0, 64, 4);
@@ -93,7 +103,7 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	glClearColor(0.313725f, 0.674510f, 0.239216f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	renderer->renderAll(deltaTime);
+	currentRenderer->renderAll(deltaTime);
 	playerAnimation->update(deltaTime);
 
 	static float playerX = 128.0f, playerY = 128.0f - ((float) playerAnimation->getHeight() / 4.0f);
@@ -118,6 +128,14 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 		playerX -= 32.0f;
 	} else if (inputManager->isKeyJustPressed(SDL_SCANCODE_D)) {
 		playerX += 32.0f;
+	}
+
+	if (inputManager->isKeyJustPressed(SDL_SCANCODE_SPACE)) {
+		if (currentRenderer == rendererOne.get()) {
+			currentRenderer = rendererTwo.get();
+		} else {
+			currentRenderer = rendererOne.get();
+		}
 	}
 
 	spriteBatch->begin();
