@@ -65,7 +65,7 @@ void APG::TmxRenderer::loadTilesets() {
 	        tileHeight);
 
 #ifdef APG_IGNORE_ANIMATED_TILES
-	logger->info("Note: APG_IGNORE_ANIMATED_TILES is set, so animated tiles might be ignored.");
+	logger->info("Note: APG_IGNORE_ANIMATED_TILES is set.");
 #endif
 
 	/*
@@ -78,15 +78,16 @@ void APG::TmxRenderer::loadTilesets() {
 	for (const auto &tileset : map->GetTilesets()) {
 		REQUIRE(tileset->GetTileWidth() == tileWidth && tileset->GetTileHeight() == tileHeight,
 		        "Only tilesets with tile size consistent with the map are currently supported.");
-		REQUIRE(tileset->GetSpacing() == 0, "Only tilesets with 0 spacing between tiles are currently supported.");
 
 		const auto tilesetName = map->GetFilepath() + tileset->GetImage()->GetSource();
 
-		logger->info("Loading tileset \"%v\" (first GID = %v, has %v special tiles)", tilesetName, tileset->GetFirstGid(),
-		        tileset->GetTiles().size());
+		logger->info("Loading tileset \"%v\" (first GID = %v, has %v special tiles, spacing = %vpx)", tilesetName,
+		        tileset->GetFirstGid(), tileset->GetTiles().size(), tileset->GetSpacing());
 
-		tilesets.emplace_back(tileset_ptr(new Tileset(tilesetName, map)));
+		tilesets.emplace_back(std::make_unique<Tileset>(tilesetName, tileset));
 		auto &loadedTileset = tilesets.back();
+
+		const auto spacing = loadedTileset->getSpacing();
 
 		/*
 		 * Note that tileset->GetTiles() only returns tiles which have something special about them, e.g. a property or an animation.
@@ -96,18 +97,26 @@ void APG::TmxRenderer::loadTilesets() {
 		 * The GIDs start at 1 for the first tileset, and increase by 1 going right.
 		 * When the right edge of the image is reached, we go down and back to the left of the image.
 		 */
+		uint32_t tileID = 0, x = 0, y = 0;
+		while(true) {
+			const auto tileGID = calculateTileGID(tileset, tileID);
 
-		for (uint32_t y = 0; y < loadedTileset->getHeight(); y += tileHeight) {
-			for (uint32_t x = 0; x < loadedTileset->getWidth(); x += tileWidth) {
-				const auto tileID = (x / tileWidth) + (y / tileHeight) * loadedTileset->getWidthInTiles();
-				const auto tileGID = calculateTileGID(tileset, tileID);
+			loadedSprites.emplace_back(loadedTileset.get(), x, y, tileWidth, tileHeight);
 
-				loadedSprites.emplace_back(loadedTileset.get(), x, y, tileWidth, tileHeight);
+			auto &sprite = loadedSprites.back();
+			sprite.setHash(tileGID);
 
-				auto &sprite = loadedSprites.back();
-				sprite.setHash(tileGID);
+			sprites.insert(std::pair<uint64_t, SpriteBase *>(sprite.getHash(), &sprite));
 
-				sprites.insert(std::pair<uint64_t, SpriteBase *>(sprite.getHash(), &sprite));
+			x += tileWidth + spacing;
+			++tileID;
+			if(x >= loadedTileset->getWidth()) {
+				x = 0;
+				y += tileHeight + spacing;
+
+				if(y >= loadedTileset->getHeight()) {
+					break;
+				}
 			}
 		}
 
@@ -124,7 +133,8 @@ void APG::TmxRenderer::loadTilesets() {
 
 #ifndef APG_IGNORE_ANIMATED_TILES
 			if (tile->IsAnimated()) {
-				logger->verbose(1, "Animated tile has %v tiles, with total duration %vms.", tile->GetFrameCount(), tile->GetTotalDuration());
+				logger->verbose(1, "Animated tile has %v tiles, with total duration %vms.", tile->GetFrameCount(),
+				        tile->GetTotalDuration());
 
 				const auto &frames = tile->GetFrames();
 				std::vector<SpriteBase *> framePointers;
@@ -137,7 +147,8 @@ void APG::TmxRenderer::loadTilesets() {
 
 				for (const auto &frame : frames) {
 					const auto gid = calculateTileGID(tileset, frame.GetTileID());
-					logger->verbose(2, "Frame #%v: ID %v, GID %v, duration = %vms.", framesLoaded, frame.GetTileID(), gid, frame.GetDuration());
+					logger->verbose(2, "Frame #%v: ID %v, GID %v, duration = %vms.", framesLoaded, frame.GetTileID(),
+					        gid, frame.GetDuration());
 
 					REQUIRE(sprites.find(gid) != sprites.end(), "Animation frame not loaded into sprites array.");
 

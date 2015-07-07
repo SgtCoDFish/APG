@@ -59,7 +59,7 @@ protected:
 	static const uint64_t MAX_SPRITES_PER_UNIT = 1000000;
 
 	Tmx::Map *map = nullptr;
-	std::vector<tileset_ptr> tilesets;
+	std::vector<std::unique_ptr<Tileset>> tilesets;
 	std::unordered_map<uint64_t, SpriteBase *> sprites;
 
 	std::vector<Sprite> loadedSprites;

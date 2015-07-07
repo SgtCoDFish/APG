@@ -59,7 +59,7 @@ bool APG::APGGLRenderTest::init() {
 	const auto logger = el::Loggers::getLogger("default");
 
 	map = std::make_unique<Tmx::Map>();
-	map->ParseFile("assets/world1.tmx");
+	map->ParseFile("assets/sample_indoor.tmx");
 
 	if (map->HasError()) {
 		logger->fatal("Error loading map: %v", map->GetErrorText());

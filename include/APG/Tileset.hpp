@@ -33,13 +33,21 @@
 #include <string>
 #include <memory>
 
+#include "easylogging++.h"
+
 #include "tmxparser/TmxMap.h"
+#include "tmxparser/TmxTileset.h"
+#include "tmxparser/TmxImage.h"
 
 #include "APG/Texture.hpp"
 
 namespace APG {
 
-class Tileset : public Texture {
+/**
+ * A tileset from which tiles can be picked. Note that if there is a non-zero spacing between tiles, this is expected to be uniformly applied; that is, it is expected that:
+ * (imageWidth) % (tileWidth + spacing) == 0.
+ */
+class Tileset: public Texture {
 private:
 	int32_t tileWidth = 0;
 	int32_t tileHeight = 0;
@@ -47,29 +55,54 @@ private:
 	int32_t widthInTiles = 0;
 	int32_t heightInTiles = 0;
 
+	int32_t spacing = 0;
+
 	void calculateWidthInTiles() {
-		widthInTiles = getWidth() / tileWidth;
+		const auto gap = tileWidth + spacing;
+
+		if (getWidth() % gap != 0) {
+			el::Loggers::getLogger("default")->warn(
+			        "Tileset %v may have an inconsistent spacing in the x direction; this could cause issues.", this->getFileName());
+		}
+
+		widthInTiles = getWidth() / gap;
 	}
 
 	void calculateHeightInTiles() {
-		heightInTiles = getHeight() / tileHeight;
+		const auto gap = tileHeight + spacing;
+
+		if(getHeight() % gap != 0) {
+			el::Loggers::getLogger("default")->warn(
+			        "Tileset %v may have an inconsistent spacing in the y direction; this could cause issues.", this->getFileName());
+		}
+
+		heightInTiles = getHeight() / gap;
 	}
 
 public:
-	explicit Tileset(const char * const fileName, Tmx::Map * const map) :
-			Tileset(fileName, map->GetTileWidth(), map->GetTileHeight()) {
-	}
-
+	/**
+	 * Create a new tileset based on a Tmx Map. Normally, you'll want to use Tileset(std::string, Tmx::Tileset *) instead.
+	 *
+	 * Assumes that tiles are tightly packed; that is, assumes there is no spacing between tiles.
+	 * @param fileName The location of the tileset to load.
+	 * @param map The map whose tile widths we'll be using for this tileset.
+	 */
 	explicit Tileset(const std::string &fileName, Tmx::Map * const map) :
 			Tileset(fileName, map->GetTileWidth(), map->GetTileHeight()) {
 	}
 
-	explicit Tileset(const char * const fileName, int32_t tileWidth, int32_t tileHeight) :
-			Tileset(std::string(fileName), tileWidth, tileHeight) {
+	/**
+	 * Creates a new tileset based on a Tmx::Tileset. Correctly handly spacing of tiles.
+	 *
+	 * @param fileName The location of the tileset to load.
+	 * @param tileset The tmx tileset describing the tileset. This information is parsed, and spacing information is used appropriately.
+	 */
+	explicit Tileset(const std::string &fileName, Tmx::Tileset * const tileset) :
+			Tileset(fileName, tileset->GetTileWidth(), tileset->GetTileHeight(), tileset->GetSpacing()) {
 	}
 
-	explicit Tileset(const std::string &fileName, int32_t tileWidth, int32_t tileHeight) :
-			Texture(fileName, true), tileWidth(tileWidth), tileHeight(tileHeight) {
+	explicit Tileset(const std::string &fileName, int32_t tileWidth, int32_t tileHeight, int32_t spacing = 0) :
+			Texture { fileName, true }, tileWidth { tileWidth }, tileHeight { tileHeight }, spacing { spacing } {
 		calculateWidthInTiles();
 		calculateHeightInTiles();
 	}
@@ -91,9 +124,11 @@ public:
 	int32_t getHeightInTiles() const {
 		return heightInTiles;
 	}
-};
 
-using tileset_ptr = std::unique_ptr<Tileset>;
+	int32_t getSpacing() const {
+		return spacing;
+	}
+};
 
 }
 
