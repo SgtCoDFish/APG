@@ -76,8 +76,10 @@ void APG::SDLTmxRenderer::renderLayer(Tmx::TileLayer *layer) {
 				const int tileset_x = tile_id % current_tileset->getWidthInTiles();
 				const int tileset_y = tile_id / current_tileset->getWidthInTiles();
 
-				src_rect.x = tileset_x * tile_width;
-				src_rect.y = tileset_y * tile_height;
+				const auto spacing = current_tileset->getSpacing();
+
+				src_rect.x = tileset_x * (tile_width + spacing);
+				src_rect.y = tileset_y * (tile_height + spacing);
 
 				dst_rect.x = (int) position.x + x * tile_width;
 				dst_rect.y = (int) position.y + y * tile_height;

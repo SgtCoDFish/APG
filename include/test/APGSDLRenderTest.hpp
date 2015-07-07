@@ -40,9 +40,13 @@ class APGSDLRenderTest final : public APG::SDLGame {
 private:
 	SXXDL::renderer_ptr renderer = SXXDL::make_renderer_ptr(nullptr);
 
-	std::unique_ptr<Tmx::Map> map;
+	std::unique_ptr<Tmx::Map> mapOne;
+	std::unique_ptr<Tmx::Map> mapTwo;
 
-	std::unique_ptr<APG::SDLTmxRenderer> sdlTmxRenderer = nullptr;
+	std::unique_ptr<APG::SDLTmxRenderer> rendererOne;
+	std::unique_ptr<APG::SDLTmxRenderer> rendererTwo;
+
+	APG::SDLTmxRenderer *currentRenderer = nullptr;
 
 public:
 	APGSDLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
@@ -53,10 +57,6 @@ public:
 
 	bool init() override;
 	void render(float deltaTime) override;
-
-	const Tmx::Map *getMap() const {
-		return map.get();
-	}
 };
 
 #endif /* APGSDLRENDERTEST_HPP_ */

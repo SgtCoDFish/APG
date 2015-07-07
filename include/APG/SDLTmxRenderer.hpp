@@ -46,7 +46,7 @@ namespace APG {
 /**
  * Contains methods for rendering a loaded TMX file using SDL2.
  *
- * Requires that SDL2/SDL2_image have already been initialised.
+ * Requires that SDL2/SDL2_image have already been initialised. Doesn't yet support animated tiles.
  */
 class SDLTmxRenderer : public APG::TmxRenderer {
 private:

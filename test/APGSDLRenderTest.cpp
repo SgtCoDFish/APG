@@ -63,15 +63,26 @@ bool APGSDLRenderTest::init() {
 
 	SDL_SetRenderDrawColor(renderer.get(), 0x50, 0xAC, 0x3D, 0xFF);
 
-	map = std::make_unique<Tmx::Map>();
-	map->ParseFile(ASSET_PREFIX + "world1.tmx");
+	mapOne = std::make_unique<Tmx::Map>();
+	mapOne->ParseFile(ASSET_PREFIX + "world1.tmx");
 
-	if (map->HasError()) {
-		logger->fatal("Error loading tmx map: %v", map->GetErrorText());
+	if (mapOne->HasError()) {
+		logger->fatal("Error loading tmx map: %v", mapOne->GetErrorText());
 		return false;
 	}
 
-	sdlTmxRenderer = std::make_unique<APG::SDLTmxRenderer>(map.get(), renderer);
+	mapTwo = std::make_unique<Tmx::Map>();
+	mapTwo->ParseFile(ASSET_PREFIX + "sample_indoor.tmx");
+
+	if (mapTwo->HasError()) {
+		logger->fatal("Error loading tmx map: %v", mapTwo->GetErrorText());
+		return false;
+	}
+
+	rendererOne = std::make_unique<APG::SDLTmxRenderer>(mapOne.get(), renderer);
+	rendererTwo = std::make_unique<APG::SDLTmxRenderer>(mapTwo.get(), renderer);
+
+	currentRenderer = rendererOne.get();
 
 	return true;
 }
@@ -79,7 +90,15 @@ bool APGSDLRenderTest::init() {
 void APGSDLRenderTest::render(float deltaTime) {
 	SDL_RenderClear(renderer.get());
 
-	sdlTmxRenderer->renderAll(deltaTime);
+	if (inputManager->isKeyJustPressed(SDL_SCANCODE_SPACE)) {
+		if (currentRenderer == rendererOne.get()) {
+			currentRenderer = rendererTwo.get();
+		} else {
+			currentRenderer = rendererOne.get();
+		}
+	}
+
+	currentRenderer->renderAll(deltaTime);
 
 	SDL_RenderPresent(renderer.get());
 }
@@ -98,11 +117,6 @@ int main(int argc, char *argv[]) {
 	if (!rpg->init()) {
 		return EXIT_FAILURE;
 	}
-
-	auto map = rpg->getMap();
-
-	logger->info("Map loaded, (w, h) = (%v, %v), with %v layers.", map->GetWidth(), map->GetHeight(),
-	        map->GetNumLayers());
 
 	bool done = false;
 
@@ -131,3 +145,4 @@ int main(int argc, char *argv[]) {
 
 	return EXIT_SUCCESS;
 }
+
