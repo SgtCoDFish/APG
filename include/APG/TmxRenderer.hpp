@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GENTMXRENDERER_HPP_
-#define GENTMXRENDERER_HPP_
+#ifndef APG_GENTMXRENDERER_HPP_
+#define APG_GENTMXRENDERER_HPP_
 
 #include <vector>
 #include <unordered_map>
