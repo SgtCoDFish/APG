@@ -172,7 +172,7 @@ int main(int argc, char *argv[]) {
 
 		done = game->update(deltaTime);
 
-		if (timesTaken.size() >= 100) {
+		if (timesTaken.size() >= 500) {
 			const float sum = std::accumulate(timesTaken.begin(), timesTaken.end(), 0.0f);
 
 			const float fps = 1 / (sum / timesTaken.size());
