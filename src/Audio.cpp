@@ -30,9 +30,6 @@
 #include <string>
 #include <deque>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
-
 #include "APG/APGCommon.hpp"
 #include "APG/Audio.hpp"
 
