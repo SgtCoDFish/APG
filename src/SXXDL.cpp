@@ -48,6 +48,10 @@ SXXDL::renderer_ptr SXXDL::make_renderer_ptr(SDL_Renderer *renderer) {
 	return renderer_ptr(renderer, SDL_DestroyRenderer);
 }
 
+SXXDL::ttf::font_ptr SXXDL::ttf::make_font_ptr(TTF_Font *font) {
+	return font_ptr(font, TTF_CloseFont);
+}
+
 SXXDL::mixer::sound_ptr SXXDL::mixer::make_sound_ptr(Mix_Chunk *chunk) {
 	return sound_ptr(chunk, Mix_FreeChunk);
 }

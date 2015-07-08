@@ -44,8 +44,14 @@ surface_ptr make_surface_ptr(SDL_Surface *surface);
 sdl_texture_ptr make_sdl_texture_ptr(SDL_Texture *texture);
 renderer_ptr make_renderer_ptr(SDL_Renderer *renderer);
 
-namespace mixer {
+namespace ttf {
 
+using font_ptr = std::unique_ptr<TTF_Font, void(*)(TTF_Font *)>;
+font_ptr make_font_ptr(TTF_Font *font);
+
+}
+
+namespace mixer {
 
 using music_ptr = std::unique_ptr<Mix_Music, void(*)(Mix_Music *)>;
 using sound_ptr = std::unique_ptr<Mix_Chunk, void (*)(Mix_Chunk *)>;

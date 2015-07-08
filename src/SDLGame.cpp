@@ -31,6 +31,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 
 #include <GL/glew.h>
@@ -54,19 +55,25 @@ APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint
 	logger->info("Initialising APG with OpenGL version %v.%v.", glContextMajor, glContextMinor);
 
 	if (SDL_Init(SDL_INIT_FLAGS) < 0) {
-		logger->fatal("Couldn't initialise SDL: %v", SDL_GetError());
+		logger->fatal("Couldn't initialise SDL2: %v", SDL_GetError());
 	} else {
 		logger->verbose(1, "Successfully initialised SDL2.");
 	}
 
 	if ((IMG_Init(SDL_IMAGE_INIT_FLAGS) & SDL_IMAGE_INIT_FLAGS) != SDL_IMAGE_INIT_FLAGS) {
-		logger->fatal("Couldn't initialise SDL_image: %v", IMG_GetError());
+		logger->fatal("Couldn't initialise SDL2_image: %v", IMG_GetError());
 	} else {
 		logger->verbose(1, "Successfully initialised SDL2_image.");
 	}
 
+	if(TTF_Init() == -1) {
+		logger->fatal("Couldn't initialise SDL2_ttf: %v", TTF_GetError());
+	} else {
+		logger->verbose(1, "Successfully initialised SDL2_ttf.");
+	}
+
 	if ((Mix_Init(SDL_MIXER_INIT_FLAGS) & SDL_MIXER_INIT_FLAGS) != SDL_MIXER_INIT_FLAGS) {
-		logger->fatal("Couldn't initialise SDL_mixer: %v", Mix_GetError());
+		logger->fatal("Couldn't initialise SDL2_mixer: %v", Mix_GetError());
 	} else {
 		logger->verbose(1, "Successfully initialised SDL2_mixer.");
 	}
@@ -104,6 +111,7 @@ APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint
 APG::SDLGame::~SDLGame() {
 	SDL_GL_DeleteContext(glContext);
 	Mix_Quit();
+	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
 }
@@ -144,15 +152,19 @@ void APG::SDLGame::logSDLVersions() const {
 	SDL_VERSION(&compiledVersion);
 	SDL_GetVersion(&sdlLinkedVersion);
 
-	debugSDLVersion(logger, "SDL", compiledVersion, sdlLinkedVersion);
+	debugSDLVersion(logger, "SDL2", compiledVersion, sdlLinkedVersion);
 
 	SDL_IMAGE_VERSION(&compiledVersion);
 	const auto imgVersion = IMG_Linked_Version();
-	debugSDLVersion(logger, "SDL_image", compiledVersion, *imgVersion);
+	debugSDLVersion(logger, "SDL2_image", compiledVersion, *imgVersion);
+
+	SDL_TTF_VERSION(&compiledVersion);
+	const auto ttfVersion = TTF_Linked_Version();
+	debugSDLVersion(logger, "SDL2_ttf", compiledVersion, *ttfVersion);
 
 	SDL_MIXER_VERSION(&compiledVersion);
 	const auto mixVersion = Mix_Linked_Version();
-	debugSDLVersion(logger, "SDL_mixer", compiledVersion, *mixVersion);
+	debugSDLVersion(logger, "SDL2_mixer", compiledVersion, *mixVersion);
 }
 
 void APG::SDLGame::debugSDLVersion(el::Logger * const logger, const char *libraryName,
