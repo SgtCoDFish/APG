@@ -114,11 +114,13 @@ APG::AudioManager *APG::SDLAudioManager::setSoundVolume(float volume) {
 
 void APG::SDLAudioManager::freeMusic(music_handle &handle) {
 	loadedMusic.erase(handle);
+	freeMusicHandle(handle);
 	handle = -1;
 }
 
 void APG::SDLAudioManager::freeSound(sound_handle &handle) {
 	loadedSounds.erase(handle);
+	freeSoundHandle(handle);
 	handle = -1;
 }
 

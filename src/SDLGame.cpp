@@ -82,6 +82,7 @@ APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint
 
 	inputManager = std::make_unique<SDLInputManager>();
 	audioManager = std::make_unique<SDLAudioManager>();
+	fontManager = std::make_unique<SDLFontManager>();
 
 	window = SXXDL::make_window_ptr(
 	        SDL_CreateWindow(windowTitle.c_str(), windowX, windowY, windowWidth, windowHeight, SDL_WINDOW_FLAGS));
@@ -109,6 +110,10 @@ APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint
 }
 
 APG::SDLGame::~SDLGame() {
+	fontManager = nullptr;
+	audioManager = nullptr;
+	inputManager = nullptr;
+
 	SDL_GL_DeleteContext(glContext);
 	Mix_Quit();
 	TTF_Quit();

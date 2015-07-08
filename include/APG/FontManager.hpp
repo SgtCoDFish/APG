@@ -34,7 +34,12 @@
 #include <deque>
 #include <type_traits>
 
+#include <glm/glm.hpp>
+
+#include "APG/APGCommon.hpp"
+
 namespace APG {
+class SpriteBase;
 
 class FontManager {
 public:
@@ -42,18 +47,22 @@ public:
 
 	static_assert(std::is_copy_constructible<font_handle>(), "Font handle type must be copy constructible");
 
-private:
+protected:
 	std::deque<font_handle> availableFontHandles;
-	void fillDefaultQueue(size_t initialFontHandleCount);
+	void fillDefaultQueue(int initialFontHandleCount);
+
+	font_handle getNextFontHandle();
+	void freeFontHandle(font_handle handle);
 
 public:
-	explicit FontManager(size_t initialFontHandleCount = internal::DEFAULT_FONT_HANDLE_COUNT);
+	explicit FontManager(int initialFontHandleCount = internal::DEFAULT_FONT_HANDLE_COUNT);
 	virtual ~FontManager() = default;
 
 	virtual font_handle loadFontFile(const std::string &filename, int pointSize) = 0;
-
-	font_handle getNextFontHandle();
 	virtual void freeFont(font_handle &handle) = 0;
+
+	virtual glm::ivec2 estimateSizeOf(const font_handle &fontHandle, const std::string &text) = 0;
+	virtual SpriteBase *renderText(const font_handle &fontHandle, const std::string &text) = 0;
 };
 
 }

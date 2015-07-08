@@ -49,12 +49,20 @@ APG::AudioManager::sound_handle APG::AudioManager::getNextSoundHandle() {
 	return retval;
 }
 
+void APG::AudioManager::freeMusicHandle(music_handle handle) {
+	availableMusicHandles.push_front(handle);
+}
+
+void APG::AudioManager::freeSoundHandle(sound_handle handle) {
+	availableSoundHandles.push_front(handle);
+}
+
 void APG::AudioManager::fillDefaultQueues(int initialMusicHandleCount, int initialSoundHandleCount) {
-	for(music_handle i = 0; i < initialMusicHandleCount; ++i) {
+	for (music_handle i = 0; i < initialMusicHandleCount; ++i) {
 		availableMusicHandles.push_back(i);
 	}
 
-	for(sound_handle i = 0; i < initialSoundHandleCount; ++i) {
+	for (sound_handle i = 0; i < initialSoundHandleCount; ++i) {
 		availableSoundHandles.push_back(i);
 	}
 }

@@ -28,16 +28,32 @@
 #ifndef INCLUDE_APG_SDLFONTMANAGER_HPP_
 #define INCLUDE_APG_SDLFONTMANAGER_HPP_
 
+#include <cstdint>
+
+#include <unordered_map>
+
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
 #include "APG/FontManager.hpp"
+#include "APG/SXXDL.hpp"
+#include "APG/SpriteBase.hpp"
 
 namespace APG {
 
-class SDLFontManager : public FontManager {
+class SDLFontManager: public FontManager {
+private:
+	std::unordered_map<font_handle, SXXDL::ttf::font_ptr> loadedFonts;
+
 public:
 	explicit SDLFontManager();
 	virtual ~SDLFontManager() = default;
+
+	virtual font_handle loadFontFile(const std::string &filename, int pointSize) override;
+	virtual void freeFont(font_handle &handle) override;
+
+	virtual glm::ivec2 estimateSizeOf(const font_handle &fontHandle, const std::string &text) override;
+	virtual SpriteBase *renderText(const font_handle &fontHandle, const std::string &text) override;
 };
 
 }

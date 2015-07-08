@@ -64,6 +64,9 @@ protected:
 	music_handle getNextMusicHandle();
 	sound_handle getNextSoundHandle();
 
+	void freeMusicHandle(music_handle handle);
+	void freeSoundHandle(sound_handle handle);
+
 public:
 	explicit AudioManager(int initialMusicHandleCount = internal::DEFAULT_MUSIC_HANDLE_COUNT,
 	        int initialSoundHandleCount = internal::DEFAULT_SOUND_HANDLE_COUNT);

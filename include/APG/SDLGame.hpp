@@ -45,6 +45,7 @@
 #include "APG/SXXDL.hpp"
 #include "APG/SDLInputManager.hpp"
 #include "APG/SDLAudioManager.hpp"
+#include "APG/SDLFontManager.hpp"
 
 namespace APG {
 
@@ -61,6 +62,7 @@ protected:
 
 	std::unique_ptr<SDLInputManager> inputManager = nullptr;
 	std::unique_ptr<SDLAudioManager> audioManager = nullptr;
+	std::unique_ptr<SDLFontManager> fontManager = nullptr;
 
 public:
 	/**
@@ -107,6 +109,10 @@ public:
 
 	virtual const AudioManager *audio() const override {
 		return audioManager.get();
+	}
+
+	virtual const FontManager *font() const override {
+		return fontManager.get();
 	}
 
 private:

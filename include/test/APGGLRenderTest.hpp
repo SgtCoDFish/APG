@@ -70,6 +70,8 @@ private:
 	std::vector<Sprite> playerFrames;
 	std::unique_ptr<AnimatedSprite> playerAnimation;
 
+	FontManager::font_handle font = -1;
+
 public:
 	explicit APGGLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
 	        uint32_t glContextMajor = 3, uint32_t glContextMinor = 2, uint32_t windowX = SDL_WINDOWPOS_CENTERED, uint32_t windowY = SDL_WINDOWPOS_CENTERED) :

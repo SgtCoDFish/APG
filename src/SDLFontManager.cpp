@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2015 Ashley Davis (SgtCoDFish)
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,55 +25,58 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef APGGAME_HPP_
-#define APGGAME_HPP_
-
 #include <cstdint>
 
-namespace APG {
-class InputManager;
-class AudioManager;
-class FontManager;
+#include <string>
 
-/**
- * Note that only one Game is expected to be made, and the public static screen size variables will be wrong if you create more than one.
- */
-class Game {
-protected:
-	void setupLoggingDefault();
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
-public:
-	static uint32_t screenWidth;
-	static uint32_t screenHeight;
+#include "APG/APGeasylogging.hpp"
 
-	explicit Game(uint32_t screenWidth, uint32_t screenHeight);
+#include "APG/SDLFontManager.hpp"
+#include "APG/SpriteBase.hpp"
+#include "APG/SXXDL.hpp"
 
-	virtual ~Game() = default;
-
-	/**
-	 * Should carry out initialisation of the game.
-	 * @return true if successful, false if an error state has been set.
-	 */
-	virtual bool init() = 0;
-
-	/**
-	 * Called every frame. Should call render.
-	 * @param deltaTime the amount of time elapsed since the last frame.
-	 * @return true if it's time to quit, false otherwise.
-	 */
-	virtual bool update(float deltaTime) = 0;
-
-	/**
-	 * Should be called in update(float) every frame and render the whole visible screen.
-	 * @param deltaTime the amount of time elapsed since the last frame.
-	 */
-	virtual void render(float deltaTime) = 0;
-
-	virtual const InputManager *input() const = 0;
-	virtual const AudioManager *audio() const = 0;
-	virtual const FontManager *font() const = 0;
-};
+APG::SDLFontManager::SDLFontManager() {
 
 }
 
-#endif /* APGGAME_HPP_ */
+APG::FontManager::font_handle APG::SDLFontManager::loadFontFile(const std::string &filename, int pointSize) {
+	auto sdlFont = SXXDL::ttf::make_font_ptr(TTF_OpenFont(filename.c_str(), pointSize));
+
+	if (!sdlFont) {
+		el::Loggers::getLogger("default")->fatal("Couldn't load %v, error: %v", filename, TTF_GetError());
+		return -1;
+	} else {
+		const auto handle = getNextFontHandle();
+
+		loadedFonts.emplace(handle, std::move(sdlFont));
+
+		return handle;
+	}
+}
+
+void APG::SDLFontManager::freeFont(font_handle &handle) {
+	loadedFonts.erase(handle);
+	freeFontHandle(handle);
+
+	handle = -1;
+}
+
+glm::ivec2 APG::SDLFontManager::estimateSizeOf(const font_handle &fontHandle, const std::string &text) {
+	const auto &font = loadedFonts.find(fontHandle);
+
+	glm::ivec2 ret;
+
+	if (TTF_SizeUTF8((*font).second.get(), text.c_str(), &ret.x, &ret.y)) {
+		el::Loggers::getLogger("default")->error("Couldn't get size of text string, error: %v", TTF_GetError());
+	}
+
+	return std::move(ret);
+}
+
+APG::SpriteBase *APG::SDLFontManager::renderText(const font_handle &fontHandle, const std::string &text) {
+
+}
+

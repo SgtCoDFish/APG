@@ -86,6 +86,11 @@ bool APG::APGGLRenderTest::init() {
 	playerFrames = AnimatedSprite::splitTexture(playerTexture.get(), 32, 32, 0, 64, 4);
 	playerAnimation = std::make_unique<AnimatedSprite>(0.3f, playerFrames, AnimationMode::LOOP);
 
+	font = fontManager->loadFontFile("assets/test_font.ttf", 12);
+	const auto renderedFontSize = fontManager->estimateSizeOf(font, "Hello, World!");
+
+	logger->info("Estimated font size: (w, h) = (%v, %v).", renderedFontSize.x, renderedFontSize.y);
+
 	auto glError = glGetError();
 	if (glError != GL_NO_ERROR) {
 		while (glError != GL_NO_ERROR) {
@@ -135,6 +140,13 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 			currentRenderer = rendererTwo.get();
 		} else {
 			currentRenderer = rendererOne.get();
+		}
+	}
+
+	if(inputManager->isKeyJustPressed(SDL_SCANCODE_T)) {
+		if(font != -1) {
+			el::Loggers::getLogger("default")->info("Freeing font");
+			fontManager->freeFont(font);
 		}
 	}
 
