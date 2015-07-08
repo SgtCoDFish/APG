@@ -43,16 +43,21 @@ private:
 	std::unordered_map<sound_handle, SXXDL::mixer::sound_ptr> loadedSounds;
 
 public:
-	explicit SDLAudioManager(int frequency = MIX_DEFAULT_FREQUENCY, uint16_t format = MIX_DEFAULT_FORMAT);
+	explicit SDLAudioManager(int frequency = MIX_DEFAULT_FREQUENCY, uint16_t format = MIX_DEFAULT_FORMAT, int channelCount = 8);
 	virtual ~SDLAudioManager();
 
 	virtual music_handle loadMusicFile(const std::string &filename) override;
 	virtual sound_handle loadSoundFile(const std::string &filename) override;
 
+	virtual APG::AudioManager * setGlobalVolume(float volume) override;
+	virtual APG::AudioManager * setMusicVolume(float volume) override;
+	virtual APG::AudioManager * setSoundVolume(float volume) override;
+
 	virtual void freeMusic(music_handle &handle) override;
 	virtual void freeSound(sound_handle &handle) override;
 
 	virtual void playMusic(const music_handle &handle) override;
+	virtual void playSound(const sound_handle &handle) override;
 };
 
 }

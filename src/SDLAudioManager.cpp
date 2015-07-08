@@ -28,18 +28,25 @@
 #include "APG/APGeasylogging.hpp"
 
 #include "APG/SDLAudioManager.hpp"
+#include "APG/internal/Assert.hpp"
 
-APG::SDLAudioManager::SDLAudioManager(int frequency, uint16_t format) {
+APG::SDLAudioManager::SDLAudioManager(int frequency, uint16_t format, int channelCount) :
+		APG::AudioManager() {
 	const auto logger = el::Loggers::getLogger("default");
+
 	if (Mix_OpenAudio(frequency, format, 2, 1024) == -1) {
 		logger->fatal("Couldn't open audio for SDL_mixer: %v", Mix_GetError());
 		return;
 	}
 
-	logger->info("Successfully started SDL_mixer.");
+	Mix_AllocateChannels(channelCount);
+
+	logger->info("Successfully started SDL_mixer with %v channels.", channelCount);
 }
 
 APG::SDLAudioManager::~SDLAudioManager() {
+	// Deallocates all channels.
+	Mix_AllocateChannels(0);
 	Mix_CloseAudio();
 }
 
@@ -68,11 +75,41 @@ APG::AudioManager::sound_handle APG::SDLAudioManager::loadSoundFile(const std::s
 	const auto logger = el::Loggers::getLogger("default");
 	logger->info("Loading sound file \"%v\".", filename);
 
-	const auto handle = getNextSoundHandle();
+	auto sdlSound = SXXDL::mixer::make_sound_ptr(Mix_LoadWAV(filename.c_str()));
 
-	// LOAD
+	if (sdlSound == nullptr) {
+		logger->fatal("Couldn't load \"%v\", error: %v.", filename, Mix_GetError());
+		return -1;
+	} else {
+		const auto handle = getNextSoundHandle();
+		logger->info("Loaded \"%v\" at handle %v.", filename, handle);
 
-	return handle;
+		loadedSounds.emplace(handle, std::move(sdlSound));
+
+		logger->verbose(9, "Total loaded sound files: %v.", loadedSounds.size());
+
+		return handle;
+	}
+}
+
+APG::AudioManager *APG::SDLAudioManager::setGlobalVolume(float volume) {
+	REQUIRE(volume >= 0.0f && volume <= 1.0f, "Volume must be in the range 0.0f <= volume <= 1.0f.");
+	return setMusicVolume(volume)->setSoundVolume(volume);
+}
+
+APG::AudioManager *APG::SDLAudioManager::setMusicVolume(float volume) {
+	REQUIRE(volume >= 0.0f && volume <= 1.0f, "Volume must be in the range 0.0f <= volume <= 1.0f.");
+
+	Mix_VolumeMusic((int) MIX_MAX_VOLUME * volume);
+
+	return this;
+}
+APG::AudioManager *APG::SDLAudioManager::setSoundVolume(float volume) {
+	REQUIRE(volume >= 0.0f && volume <= 1.0f, "Volume must be in the range 0.0f <= volume <= 1.0f.");
+
+	Mix_Volume(-1, (int) MIX_MAX_VOLUME * volume);
+
+	return this;
 }
 
 void APG::SDLAudioManager::freeMusic(music_handle &handle) {
@@ -81,10 +118,20 @@ void APG::SDLAudioManager::freeMusic(music_handle &handle) {
 }
 
 void APG::SDLAudioManager::freeSound(sound_handle &handle) {
+	loadedSounds.erase(handle);
 	handle = -1;
 }
 
 void APG::SDLAudioManager::playMusic(const music_handle &handle) {
 	const auto &song = loadedMusic.find(handle);
 	Mix_PlayMusic((*song).second.get(), 0);
+}
+
+void APG::SDLAudioManager::playSound(const sound_handle &handle) {
+	const auto &song = loadedSounds.find(handle);
+
+	if (Mix_PlayChannel(-1, (*song).second.get(), 0) == -1) {
+		el::Loggers::getLogger("default")->warn("Couldn't play sound at handle %v because: %v", handle,
+		Mix_GetError());
+	}
 }

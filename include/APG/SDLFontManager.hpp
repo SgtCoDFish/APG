@@ -25,37 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_APG_FONTMANAGER_HPP_
-#define INCLUDE_APG_FONTMANAGER_HPP_
+#ifndef INCLUDE_APG_SDLFONTMANAGER_HPP_
+#define INCLUDE_APG_SDLFONTMANAGER_HPP_
 
-#include <cstdint>
+#include <SDL2/SDL_ttf.h>
 
-#include <string>
-#include <deque>
-#include <type_traits>
+#include "APG/FontManager.hpp"
 
 namespace APG {
 
-class FontManager {
+class SDLFontManager : public FontManager {
 public:
-	using font_handle = int32_t;
-
-	static_assert(std::is_copy_constructible<font_handle>(), "Font handle type must be copy constructible");
-
-private:
-	std::deque<font_handle> availableFontHandles;
-	void fillDefaultQueue(size_t initialFontHandleCount);
-
-public:
-	explicit FontManager(size_t initialFontHandleCount = internal::DEFAULT_FONT_HANDLE_COUNT);
-	virtual ~FontManager() = default;
-
-	virtual font_handle loadFontFile(const std::string &filename, int pointSize) = 0;
-
-	font_handle getNextFontHandle();
-	virtual void freeFont(font_handle &handle) = 0;
+	explicit SDLFontManager();
+	virtual ~SDLFontManager() = default;
 };
 
 }
 
-#endif /* INCLUDE_APG_FONTMANAGER_HPP_ */
+#endif /* INCLUDE_APG_SDLFONTMANAGER_HPP_ */

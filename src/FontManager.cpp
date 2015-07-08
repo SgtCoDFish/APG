@@ -28,8 +28,8 @@
 #include "APG/APGCommon.hpp"
 #include "APG/FontManager.hpp"
 
-APG::FontManager::FontManager() {
-	fillDefaultQueue();
+APG::FontManager::FontManager(size_t initialFontHandleCount) {
+	fillDefaultQueue(initialFontHandleCount);
 }
 
 APG::FontManager::font_handle APG::FontManager::getNextFontHandle() {
@@ -38,8 +38,8 @@ APG::FontManager::font_handle APG::FontManager::getNextFontHandle() {
 	return retval;
 }
 
-void APG::FontManager::fillDefaultQueue() {
-	for(font_handle i = 0; i < internal::DEFAULT_HANDLE_COUNT; ++i) {
+void APG::FontManager::fillDefaultQueue(size_t initialFontHandleCount) {
+	for(font_handle i = 0; i < initialFontHandleCount; ++i) {
 		availableFontHandles.push_back(i);
 	}
 }

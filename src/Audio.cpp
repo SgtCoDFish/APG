@@ -33,8 +33,8 @@
 #include "APG/APGCommon.hpp"
 #include "APG/Audio.hpp"
 
-APG::AudioManager::AudioManager() {
-	fillDefaultQueues();
+APG::AudioManager::AudioManager(int initialMusicHandleCount, int initialSoundHandleCount) {
+	fillDefaultQueues(initialMusicHandleCount, initialSoundHandleCount);
 }
 
 APG::AudioManager::music_handle APG::AudioManager::getNextMusicHandle() {
@@ -49,12 +49,12 @@ APG::AudioManager::sound_handle APG::AudioManager::getNextSoundHandle() {
 	return retval;
 }
 
-void APG::AudioManager::fillDefaultQueues() {
-	for(music_handle i = 0; i < internal::DEFAULT_HANDLE_COUNT; ++i) {
+void APG::AudioManager::fillDefaultQueues(int initialMusicHandleCount, int initialSoundHandleCount) {
+	for(music_handle i = 0; i < initialMusicHandleCount; ++i) {
 		availableMusicHandles.push_back(i);
 	}
 
-	for(sound_handle i = 0; i < internal::DEFAULT_HANDLE_COUNT; ++i) {
+	for(sound_handle i = 0; i < initialSoundHandleCount; ++i) {
 		availableSoundHandles.push_back(i);
 	}
 }

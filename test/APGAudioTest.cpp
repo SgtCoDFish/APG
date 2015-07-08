@@ -35,12 +35,32 @@ INITIALIZE_EASYLOGGINGPP
 #include "test/APGAudioTest.hpp"
 
 bool APG::APGAudioTest::init() {
+	soundHandle = audioManager->loadSoundFile("assets/test_sound.wav");
+
 	return true;
 }
 
 void APG::APGAudioTest::render(float deltaTime) {
 	(testHandle == -1 ? clearToRed() : clearToGreen());
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Don't do this in production, but it's usefully hacky for testing.
+	for (int i = SDL_SCANCODE_1; i < SDL_SCANCODE_0; ++i) {
+		if (inputManager->isKeyJustPressed((SDL_Scancode) i)) {
+			const float volume = ((float) ((i - SDL_SCANCODE_1) + 1)) / 10.0f;
+			el::Loggers::getLogger("default")->info("Setting volume to %v", volume);
+
+			audioManager->setGlobalVolume(volume);
+
+			break;
+		}
+	}
+
+	if (inputManager->isKeyJustPressed(SDL_SCANCODE_0)) {
+		el::Loggers::getLogger("default")->info("Setting volume to max");
+
+		audioManager->setGlobalVolume(1.0f);
+	}
 
 	if (inputManager->isKeyJustPressed(SDL_SCANCODE_P)) {
 		if (testHandle == -1) {
@@ -52,6 +72,10 @@ void APG::APGAudioTest::render(float deltaTime) {
 
 	if (inputManager->isKeyJustPressed(SDL_SCANCODE_SPACE) && testHandle != -1) {
 		audioManager->playMusic(testHandle);
+	}
+
+	if (inputManager->isKeyJustPressed(SDL_SCANCODE_RETURN)) {
+		audioManager->playSound(soundHandle);
 	}
 
 	SDL_GL_SwapWindow(window.get());

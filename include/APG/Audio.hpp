@@ -34,6 +34,8 @@
 #include <deque>
 #include <type_traits>
 
+#include "APG/APGCommon.hpp"
+
 namespace APG {
 
 /**
@@ -42,7 +44,7 @@ namespace APG {
  *
  * Note that loading music and sounds depends on the implementation of AudioManager used and the file types supported may differ between implementation.
  *
- * The default handle returning implementation supports up to 256 music handles and sound handles.
+ * The default handle returning implementation supports up to 256 sound handles and 128 music handles but you can change this if you want.
  * This isn't a hard limit, but there may be some slowdown after this point.
  */
 class AudioManager {
@@ -56,23 +58,29 @@ public:
 private:
 	std::deque<music_handle> availableMusicHandles;
 	std::deque<sound_handle> availableSoundHandles;
-	void fillDefaultQueues();
+	void fillDefaultQueues(int initialMusicHandleCount, int initalSoundHandleCount);
 
 protected:
 	music_handle getNextMusicHandle();
 	sound_handle getNextSoundHandle();
 
 public:
-	explicit AudioManager();
+	explicit AudioManager(int initialMusicHandleCount = internal::DEFAULT_MUSIC_HANDLE_COUNT,
+	        int initialSoundHandleCount = internal::DEFAULT_SOUND_HANDLE_COUNT);
 	virtual ~AudioManager() = default;
 
 	virtual music_handle loadMusicFile(const std::string &filename) = 0;
 	virtual sound_handle loadSoundFile(const std::string &filename) = 0;
 
+	virtual APG::AudioManager * setGlobalVolume(float volume) = 0;
+	virtual APG::AudioManager * setMusicVolume(float volume) = 0;
+	virtual APG::AudioManager * setSoundVolume(float volume) = 0;
+
 	virtual void freeMusic(music_handle &handle) = 0;
 	virtual void freeSound(sound_handle &handle) = 0;
 
 	virtual void playMusic(const music_handle &handle) = 0;
+	virtual void playSound(const sound_handle &handle) = 0;
 };
 
 }
