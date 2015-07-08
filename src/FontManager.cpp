@@ -25,39 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <cstdint>
-
-#include <string>
-#include <deque>
-
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
-
 #include "APG/APGCommon.hpp"
-#include "APG/Audio.hpp"
+#include "APG/FontManager.hpp"
 
-APG::AudioManager::AudioManager() {
-	fillDefaultQueues();
+APG::FontManager::FontManager() {
+	fillDefaultQueue();
 }
 
-APG::AudioManager::music_handle APG::AudioManager::getNextMusicHandle() {
-	const auto retval = availableMusicHandles.front();
-	availableMusicHandles.pop_front();
+APG::FontManager::font_handle APG::FontManager::getNextFontHandle() {
+	const auto retval = availableFontHandles.front();
+	availableFontHandles.pop_front();
 	return retval;
 }
 
-APG::AudioManager::sound_handle APG::AudioManager::getNextSoundHandle() {
-	const auto retval = availableSoundHandles.front();
-	availableSoundHandles.pop_front();
-	return retval;
-}
-
-void APG::AudioManager::fillDefaultQueues() {
-	for(music_handle i = 0; i < internal::DEFAULT_HANDLE_COUNT; ++i) {
-		availableMusicHandles.push_back(i);
-	}
-
-	for(sound_handle i = 0; i < internal::DEFAULT_HANDLE_COUNT; ++i) {
-		availableSoundHandles.push_back(i);
+void APG::FontManager::fillDefaultQueue() {
+	for(font_handle i = 0; i < internal::DEFAULT_HANDLE_COUNT; ++i) {
+		availableFontHandles.push_back(i);
 	}
 }

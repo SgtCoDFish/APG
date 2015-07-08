@@ -25,39 +25,37 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef INCLUDE_APG_FONTMANAGER_HPP_
+#define INCLUDE_APG_FONTMANAGER_HPP_
+
 #include <cstdint>
 
 #include <string>
 #include <deque>
+#include <type_traits>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
+namespace APG {
 
-#include "APG/APGCommon.hpp"
-#include "APG/Audio.hpp"
+class FontManager {
+public:
+	using font_handle = int32_t;
 
-APG::AudioManager::AudioManager() {
-	fillDefaultQueues();
+	static_assert(std::is_copy_constructible<font_handle>(), "Font handle type must be copy constructible");
+
+private:
+	std::deque<font_handle> availableFontHandles;
+	void fillDefaultQueue();
+
+public:
+	explicit FontManager();
+	virtual ~FontManager() = default;
+
+	virtual font_handle loadFontFile(const std::string &filename, int pointSize) = 0;
+
+	font_handle getNextFontHandle();
+	virtual void freeFont(font_handle &handle) = 0;
+};
+
 }
 
-APG::AudioManager::music_handle APG::AudioManager::getNextMusicHandle() {
-	const auto retval = availableMusicHandles.front();
-	availableMusicHandles.pop_front();
-	return retval;
-}
-
-APG::AudioManager::sound_handle APG::AudioManager::getNextSoundHandle() {
-	const auto retval = availableSoundHandles.front();
-	availableSoundHandles.pop_front();
-	return retval;
-}
-
-void APG::AudioManager::fillDefaultQueues() {
-	for(music_handle i = 0; i < internal::DEFAULT_HANDLE_COUNT; ++i) {
-		availableMusicHandles.push_back(i);
-	}
-
-	for(sound_handle i = 0; i < internal::DEFAULT_HANDLE_COUNT; ++i) {
-		availableSoundHandles.push_back(i);
-	}
-}
+#endif /* INCLUDE_APG_FONTMANAGER_HPP_ */

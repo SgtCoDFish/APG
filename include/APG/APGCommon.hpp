@@ -47,6 +47,10 @@ struct Vertex {
 
 static const int VERTEX_SIZE = 5;
 
+namespace internal {
+static const int DEFAULT_HANDLE_COUNT = 256;
+}
+
 }
 
 #endif /* RPGCOMMON_HPP_ */
