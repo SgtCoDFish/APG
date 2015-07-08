@@ -79,8 +79,16 @@ public:
 	virtual void freeMusic(music_handle &handle) = 0;
 	virtual void freeSound(sound_handle &handle) = 0;
 
+	/**
+	 * Play the given music file from the start.
+	 * @param handle a valid handle returned from loadMusicFile.
+	 */
 	virtual void playMusic(const music_handle &handle) = 0;
 	virtual void playSound(const sound_handle &handle) = 0;
+
+	virtual void pauseMusic() = 0;
+	virtual void resumeMusic() = 0;
+	virtual void stopMusic() = 0;
 };
 
 }

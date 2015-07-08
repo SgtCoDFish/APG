@@ -70,12 +70,22 @@ void APG::APGAudioTest::render(float deltaTime) {
 		}
 	}
 
+	if (inputManager->isKeyJustPressed(SDL_SCANCODE_A)) {
+		audioManager->pauseMusic();
+	} else if (inputManager->isKeyJustPressed(SDL_SCANCODE_D)) {
+		audioManager->resumeMusic();
+	}
+
 	if (inputManager->isKeyJustPressed(SDL_SCANCODE_SPACE) && testHandle != -1) {
 		audioManager->playMusic(testHandle);
 	}
 
 	if (inputManager->isKeyJustPressed(SDL_SCANCODE_RETURN)) {
 		audioManager->playSound(soundHandle);
+	}
+
+	if (inputManager->isKeyJustPressed(SDL_SCANCODE_ESCAPE)) {
+		quit();
 	}
 
 	SDL_GL_SwapWindow(window.get());
@@ -102,7 +112,8 @@ int main(int argc, char **argv) {
 
 		auto startTime = std::chrono::high_resolution_clock::now();
 
-		logger->info("To test: press P to load/unload music, space to play/pause/resume.");
+		logger->info(
+		        "To test:\n\t> P to load/unload music\n\t> Space to play from beginning if loaded\n\t> A to pause if playing\n\t> D to resume if paused\n\t> Enter to play test sound.\n\t> Number keys to change volume");
 
 		while (true) {
 			const auto timeNow = std::chrono::high_resolution_clock::now();

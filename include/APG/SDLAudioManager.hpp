@@ -43,7 +43,8 @@ private:
 	std::unordered_map<sound_handle, SXXDL::mixer::sound_ptr> loadedSounds;
 
 public:
-	explicit SDLAudioManager(int frequency = MIX_DEFAULT_FREQUENCY, uint16_t format = MIX_DEFAULT_FORMAT, int channelCount = 8);
+	explicit SDLAudioManager(int frequency = MIX_DEFAULT_FREQUENCY, uint16_t format = MIX_DEFAULT_FORMAT,
+	        int channelCount = 8);
 	virtual ~SDLAudioManager();
 
 	virtual music_handle loadMusicFile(const std::string &filename) override;
@@ -58,6 +59,20 @@ public:
 
 	virtual void playMusic(const music_handle &handle) override;
 	virtual void playSound(const sound_handle &handle) override;
+
+	virtual void pauseMusic() override;
+	virtual void resumeMusic() override;
+	virtual void stopMusic() override;
+
+	/**
+	 * @return a raw music pointer to the underlying SDL data; use with caution as this could conflict with the audio manager's use of the object.
+	 */
+	Mix_Music * getRawMusicPointer(const music_handle &handle);
+
+	/**
+	 * @return a raw chunk pointer to the underlying SDL data; use with caution as this could conflict with the audio manager's use of the object.
+	 */
+	Mix_Chunk * getRawChunkPointer(const sound_handle &handle);
 };
 
 }

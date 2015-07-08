@@ -124,6 +124,7 @@ void APG::SDLAudioManager::freeSound(sound_handle &handle) {
 
 void APG::SDLAudioManager::playMusic(const music_handle &handle) {
 	const auto &song = loadedMusic.find(handle);
+
 	Mix_PlayMusic((*song).second.get(), 0);
 }
 
@@ -134,4 +135,24 @@ void APG::SDLAudioManager::playSound(const sound_handle &handle) {
 		el::Loggers::getLogger("default")->warn("Couldn't play sound at handle %v because: %v", handle,
 		Mix_GetError());
 	}
+}
+
+void APG::SDLAudioManager::pauseMusic() {
+	Mix_PauseMusic();
+}
+
+void APG::SDLAudioManager::resumeMusic() {
+	Mix_ResumeMusic();
+}
+
+void APG::SDLAudioManager::stopMusic() {
+	Mix_HaltMusic();
+}
+
+Mix_Music * APG::SDLAudioManager::getRawMusicPointer(const music_handle &handle) {
+	return (*loadedMusic.find(handle)).second.get();
+}
+
+Mix_Chunk * APG::SDLAudioManager::getRawChunkPointer(const sound_handle &handle) {
+	return (*loadedSounds.find(handle)).second.get();
 }
