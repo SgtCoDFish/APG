@@ -29,12 +29,13 @@
 
 #include <SDL2/SDL.h>
 
+#include "APG/APGeasylogging.hpp"
 #include "APG/SDLInputManager.hpp"
 
 APG::SDLInputManager::SDLInputManager() {
 	keyState = SDL_GetKeyboardState(nullptr);
 
-	for(auto &f : canJustPress) {
+	for (auto &f : canJustPress) {
 		f = true;
 	}
 }
@@ -43,6 +44,8 @@ void APG::SDLInputManager::update(float deltaTime) {
 	for (auto &f : justPressed) {
 		f = false;
 	}
+
+	mods = SDL_GetModState();
 }
 
 void APG::SDLInputManager::handleInputEvent(SDL_Event &event) {
@@ -50,19 +53,35 @@ void APG::SDLInputManager::handleInputEvent(SDL_Event &event) {
 	if (event.type == SDL_KEYDOWN && canJustPress[key]) {
 		justPressed[key] = true;
 		canJustPress[key] = false;
-	} else if(event.type == SDL_KEYUP) {
+	} else if (event.type == SDL_KEYUP) {
 		canJustPress[key] = true;
 	}
 }
 
-bool APG::SDLInputManager::isKeyPressed(SDL_Scancode key) const {
+bool APG::SDLInputManager::isKeyPressed(const SDL_Scancode &key) const {
 	return isSDLKeyCodePressed(key);
 }
 
-bool APG::SDLInputManager::isKeyJustPressed(SDL_Scancode key) const {
+bool APG::SDLInputManager::isKeyJustPressed(const SDL_Scancode &key) const {
 	return justPressed[key];
 }
 
-bool APG::SDLInputManager::isSDLKeyCodePressed(SDL_Scancode keysym) const {
+bool APG::SDLInputManager::isModPressed(const SDL_Keymod &mod) const {
+	return (mods & mod) == mod;
+}
+
+bool APG::SDLInputManager::isCtrlPressed() const {
+	return (mods & KMOD_CTRL) != 0;
+}
+
+bool APG::SDLInputManager::isShiftPressed() const {
+	return (mods & KMOD_SHIFT) != 0;
+}
+
+bool APG::SDLInputManager::isAltPressed() const {
+	return (mods & KMOD_ALT) != 0;
+}
+
+bool APG::SDLInputManager::isSDLKeyCodePressed(const SDL_Scancode &keysym) const {
 	return keyState[keysym];
 }

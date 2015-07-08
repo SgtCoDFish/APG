@@ -84,7 +84,7 @@ void APG::APGAudioTest::render(float deltaTime) {
 		audioManager->playSound(soundHandle);
 	}
 
-	if (inputManager->isKeyJustPressed(SDL_SCANCODE_ESCAPE)) {
+	if (inputManager->isCtrlPressed() && inputManager->isKeyJustPressed(SDL_SCANCODE_Q)) {
 		quit();
 	}
 

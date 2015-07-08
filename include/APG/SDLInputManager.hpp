@@ -42,7 +42,9 @@ class SDLInputManager: public InputManager {
 private:
 	std::array<bool, SDL_Scancode::SDL_NUM_SCANCODES> justPressed;
 	std::array<bool, SDL_Scancode::SDL_NUM_SCANCODES> canJustPress;
+
 	const uint8_t *keyState = nullptr;
+	SDL_Keymod mods  = SDL_Keymod::KMOD_NONE;
 
 public:
 	explicit SDLInputManager();
@@ -50,12 +52,18 @@ public:
 
 	virtual void update(float deltaTime) override;
 
-	virtual bool isKeyPressed(SDL_Scancode key) const;
-	virtual bool isKeyJustPressed(SDL_Scancode key) const;
+	virtual bool isKeyPressed(const SDL_Scancode &key) const override;
+	virtual bool isKeyJustPressed(const SDL_Scancode &key) const override;
+
+	virtual bool isModPressed(const SDL_Keymod &mod) const override;
+
+	virtual bool isCtrlPressed() const override;
+	virtual bool isShiftPressed() const override;
+	virtual bool isAltPressed() const override;
 
 	void handleInputEvent(SDL_Event &event);
 
-	bool isSDLKeyCodePressed(SDL_Scancode keysym) const;
+	bool isSDLKeyCodePressed(const SDL_Scancode &keysym) const;
 };
 
 }
