@@ -83,15 +83,20 @@ bool APG::APGGLRenderTest::init() {
 	currentRenderer = rendererOne.get();
 
 	playerTexture = std::make_unique<Texture>("assets/player.png");
-	playerFrames = AnimatedSprite::splitTexture(playerTexture.get(), 32, 32, 0, 64, 4);
+	playerFrames = AnimatedSprite::splitTexture(playerTexture.get(), 32, 32, 0, 32, 4);
 	playerAnimation = std::make_unique<AnimatedSprite>(0.3f, playerFrames, AnimationMode::LOOP);
+
+	miniTexture = std::make_unique<Texture>("assets/player16.png");
+	miniPlayer = std::make_unique<Sprite>(miniTexture.get());
+
+	currentPlayer = miniPlayer.get();
 
 	font = fontManager->loadFontFile("assets/test_font.ttf", 12);
 	const auto renderedFontSize = fontManager->estimateSizeOf(font, "Hello, World!");
 
 	logger->info("Estimated font size: (w, h) = (%v, %v).", renderedFontSize.x, renderedFontSize.y);
 
-	sprite = fontManager->renderText(font, "Hello, world!", FontRenderMethod::NICE);
+	fontSprite = fontManager->renderText(font, "Hello, world!", FontRenderMethod::NICE);
 
 	auto glError = glGetError();
 	if (glError != GL_NO_ERROR) {
@@ -140,14 +145,18 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	if (inputManager->isKeyJustPressed(SDL_SCANCODE_SPACE)) {
 		if (currentRenderer == rendererOne.get()) {
 			currentRenderer = rendererTwo.get();
+			currentPlayer = playerAnimation.get();
 		} else {
 			currentRenderer = rendererOne.get();
+			currentPlayer = miniPlayer.get();
+			playerX = 18 * 16;
+			playerY = 21 * -16;
 		}
 	}
 
 	spriteBatch->begin();
-	spriteBatch->draw(playerAnimation.get(), playerX, playerY);
-	spriteBatch->draw(sprite, 50, 50);
+	spriteBatch->draw(currentPlayer, playerX, playerY);
+	spriteBatch->draw(fontSprite, 50, 50);
 	spriteBatch->end();
 
 	SDL_GL_SwapWindow(window.get());

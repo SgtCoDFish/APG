@@ -70,9 +70,14 @@ private:
 	std::vector<Sprite> playerFrames;
 	std::unique_ptr<AnimatedSprite> playerAnimation;
 
+	std::unique_ptr<Texture> miniTexture;
+	std::unique_ptr<Sprite> miniPlayer;
+
+	SpriteBase * currentPlayer = nullptr;
+
 	FontManager::font_handle font = -1;
 
-	SpriteBase *sprite = nullptr;
+	SpriteBase *fontSprite = nullptr;
 
 public:
 	explicit APGGLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
