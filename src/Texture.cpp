@@ -56,16 +56,33 @@ GL_TEXTURE28, GL_TEXTURE29, GL_TEXTURE30, GL_TEXTURE31 };
 APG::Texture::Texture(const std::string &fileName, bool preserveSurface) :
 		fileName { fileName }, //
 		preserveSurface { preserveSurface }, //
-		preservedSurface { SXXDL::make_surface_ptr(nullptr) }, //
 		sWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
 		tWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
 		minFilter { APG::TextureFilterType::LINEAR }, //
 		magFilter { APG::TextureFilterType::LINEAR } {
-	textureUnitInt = availableTextureUnit++;
-	textureUnitGL = TEXTURE_TARGETS[textureUnitInt];
+	auto surface = IMG_Load(fileName.c_str());
+
+	if (surface == nullptr) {
+		el::Loggers::getLogger("default")->fatal("Couldn't load %v, SDL_image error: %v", fileName, IMG_GetError());
+		return;
+	}
 
 	generateTextureID();
-	loadTexture();
+	loadTexture(surface);
+}
+
+APG::Texture::Texture(SDL_Surface * const surface, bool preserveSurface) :
+		fileName { "from SDL_Surface" }, //
+		preserveSurface { preserveSurface }, //
+		sWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
+		tWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
+		minFilter { APG::TextureFilterType::LINEAR }, //
+		magFilter { APG::TextureFilterType::LINEAR } {
+	REQUIRE(surface != nullptr, "Can't create texture from null surface ptr.");
+
+	generateTextureID();
+
+	loadTexture(surface);
 }
 
 APG::Texture::~Texture() {
@@ -73,16 +90,17 @@ APG::Texture::~Texture() {
 }
 
 void APG::Texture::generateTextureID() {
+	textureUnitInt = availableTextureUnit++;
+	textureUnitGL = TEXTURE_TARGETS[textureUnitInt];
+
 	glGenTextures(1, &textureID);
 }
 
-void APG::Texture::loadTexture() {
+void APG::Texture::loadTexture(SDL_Surface * const surface) {
 	const auto logger = el::Loggers::getLogger("default");
-	auto surface = SXXDL::make_surface_ptr(IMG_Load(fileName.c_str()));
 
 	if (surface == nullptr) {
-		logger->fatal("Couldn't load %v, SDL_image error: %v", fileName, IMG_GetError());
-		return;
+		logger->fatal("Call to loadTexture with null surface");
 	}
 
 	const auto numberOfColors = surface->format->BytesPerPixel;
@@ -101,7 +119,8 @@ void APG::Texture::loadTexture() {
 			glFormat = GL_BGR;
 		}
 	} else {
-		logger->fatal("Invalid bytes per color value in %v (%v is invalid, only 4 or 3 supported.)", fileName, numberOfColors);
+		logger->fatal("Invalid bytes per pixel value in %v (%v is invalid, only 4 or 3 supported.)", fileName,
+		        (uint32_t)numberOfColors);
 		return;
 	}
 
@@ -109,7 +128,7 @@ void APG::Texture::loadTexture() {
 
 	tempBind();
 
-	glTexImage2D(GL_TEXTURE_2D, 0, glFormat, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, surface->w, surface->h, 0, glFormat, GL_UNSIGNED_BYTE, surface->pixels);
 
 	rebind();
 
@@ -131,11 +150,11 @@ void APG::Texture::loadTexture() {
 	invWidth = 1.0f / width;
 	invHeight = 1.0f / height;
 
-	if (preserveSurface) {
-		preservedSurface = std::move(surface);
-	}
-
 	logger->info("Loaded texture \"%v\" at unit GL_TEXTURE%v", fileName, textureUnitInt);
+
+	if (preserveSurface) {
+		preservedSurface = std::move(SXXDL::make_surface_ptr(surface));
+	}
 }
 
 void APG::Texture::tempBind() {

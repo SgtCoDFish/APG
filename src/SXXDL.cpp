@@ -49,6 +49,10 @@ SXXDL::renderer_ptr SXXDL::make_renderer_ptr(SDL_Renderer *renderer) {
 	return renderer_ptr(renderer, SDL_DestroyRenderer);
 }
 
+SXXDL::pixel_format_ptr SXXDL::make_pixel_format_ptr(SDL_PixelFormat *format) {
+	return pixel_format_ptr(format, SDL_FreeFormat);
+}
+
 SXXDL::ttf::font_ptr SXXDL::ttf::make_font_ptr(TTF_Font *font) {
 	return font_ptr(font,
 	        [](TTF_Font *font) {el::Loggers::getLogger("default")->info("Freeing font!"); TTF_CloseFont(font);});

@@ -31,19 +31,51 @@
 #include <cstdint>
 
 #include <unordered_map>
+#include <array>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
+#include "APG/Texture.hpp"
 #include "APG/FontManager.hpp"
 #include "APG/SXXDL.hpp"
 #include "APG/SpriteBase.hpp"
+#include "APG/Sprite.hpp"
 
 namespace APG {
 
 class SDLFontManager: public FontManager {
 private:
-	std::unordered_map<font_handle, SXXDL::ttf::font_ptr> loadedFonts;
+	static constexpr int MAX_OWNED_TEXTURES = 5;
+	static constexpr int MAX_OWNED_SPRITES = 3;
+
+	struct StoredFont {
+		StoredFont(const font_handle &handle, SXXDL::ttf::font_ptr &&ptr) :
+				handle { handle }, ptr { std::move(ptr) }, color { 255, 255, 255, 255 } {
+		}
+
+		font_handle handle;
+		SXXDL::ttf::font_ptr ptr;
+		SDL_Color color;
+	};
+
+	struct StoredSDLText {
+		StoredSDLText(const std::string &text, const int spriteID) :
+				text { text }, spriteID { spriteID } {
+		}
+
+		const std::string text;
+		const int spriteID;
+	};
+
+	std::unordered_map<font_handle, StoredFont> loadedFonts;
+	std::array<std::unique_ptr<Texture>, MAX_OWNED_TEXTURES> ownedTextures;
+	std::array<std::unique_ptr<Sprite>, MAX_OWNED_SPRITES> ownedSprites;
+
+	int findAvailableOwnedTexture(SDL_Surface *surface) const;
+	int findAvailableSpriteSlot() const;
+
+	SDL_Color glmToSDLColor(const glm::vec4 &glmColor);
 
 public:
 	explicit SDLFontManager();
@@ -52,8 +84,11 @@ public:
 	virtual font_handle loadFontFile(const std::string &filename, int pointSize) override;
 	virtual void freeFont(font_handle &handle) override;
 
+	virtual void setFontColor(const font_handle &handle, const glm::vec4 &color) override;
+
 	virtual glm::ivec2 estimateSizeOf(const font_handle &fontHandle, const std::string &text) override;
-	virtual SpriteBase *renderText(const font_handle &fontHandle, const std::string &text) override;
+	virtual SpriteBase *renderText(const font_handle &fontHandle, const std::string &text, FontRenderMethod method =
+	        FontRenderMethod::FAST) override;
 };
 
 }

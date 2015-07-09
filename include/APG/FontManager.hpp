@@ -41,6 +41,10 @@
 namespace APG {
 class SpriteBase;
 
+enum class FontRenderMethod {
+	FAST, NICE
+};
+
 class FontManager {
 public:
 	using font_handle = int32_t;
@@ -61,8 +65,11 @@ public:
 	virtual font_handle loadFontFile(const std::string &filename, int pointSize) = 0;
 	virtual void freeFont(font_handle &handle) = 0;
 
+	virtual void setFontColor(const font_handle &handle, const glm::vec4 &color) = 0;
+
 	virtual glm::ivec2 estimateSizeOf(const font_handle &fontHandle, const std::string &text) = 0;
-	virtual SpriteBase *renderText(const font_handle &fontHandle, const std::string &text) = 0;
+	virtual SpriteBase *renderText(const font_handle &fontHandle, const std::string &text, FontRenderMethod method =
+	        FontRenderMethod::FAST) = 0;
 };
 
 }

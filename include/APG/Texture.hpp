@@ -75,7 +75,7 @@ private:
 	uint32_t textureUnitGL = 0;
 
 	void generateTextureID();
-	void loadTexture();
+	void loadTexture(SDL_Surface * const surface);
 
 	uint32_t width = 0;
 	uint32_t height = 0;
@@ -84,7 +84,7 @@ private:
 	float invHeight = 0.0f;
 
 	bool preserveSurface = false;
-	SXXDL::surface_ptr preservedSurface;
+	SXXDL::surface_ptr preservedSurface = SXXDL::make_surface_ptr(nullptr);
 
 	int32_t tempBindID = 0;
 	int32_t tempUnit = 0;
@@ -105,6 +105,8 @@ public:
 	}
 
 	explicit Texture(const std::string &fileName, bool preserveSurface = false);
+	explicit Texture(SDL_Surface * const surface, bool preserveSurface = false);
+
 	virtual ~Texture();
 
 	void bind() const;

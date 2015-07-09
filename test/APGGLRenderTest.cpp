@@ -91,6 +91,8 @@ bool APG::APGGLRenderTest::init() {
 
 	logger->info("Estimated font size: (w, h) = (%v, %v).", renderedFontSize.x, renderedFontSize.y);
 
+	sprite = fontManager->renderText(font, "Hello, world!", FontRenderMethod::FAST);
+
 	auto glError = glGetError();
 	if (glError != GL_NO_ERROR) {
 		while (glError != GL_NO_ERROR) {
@@ -143,15 +145,9 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 		}
 	}
 
-	if(inputManager->isKeyJustPressed(SDL_SCANCODE_T)) {
-		if(font != -1) {
-			el::Loggers::getLogger("default")->info("Freeing font");
-			fontManager->freeFont(font);
-		}
-	}
-
 	spriteBatch->begin();
 	spriteBatch->draw(playerAnimation.get(), playerX, playerY);
+	spriteBatch->draw(sprite, 50, 50);
 	spriteBatch->end();
 
 	SDL_GL_SwapWindow(window.get());

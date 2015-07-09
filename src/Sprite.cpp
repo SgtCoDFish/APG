@@ -43,7 +43,6 @@ APG::Sprite::Sprite(Texture * const texture) :
 
 APG::Sprite::Sprite(Texture * const texture, uint32_t texX, uint32_t texY, uint32_t width, uint32_t height) :
 		texture(texture), texX(texX), texY(texY), width(width), height(height) {
-
 	REQUIRE(texture != nullptr, "Can't pass a null texture to Sprite::Sprite");
 
 	REQUIRE(texX + width <= texture->getWidth() && texY + height <= texture->getHeight(), "Invalid texture sizes when creating sprite.");
