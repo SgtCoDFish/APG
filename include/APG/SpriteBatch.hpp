@@ -79,8 +79,7 @@ private:
 
 public:
 	static const uint32_t DEFAULT_BUFFER_SIZE;
-	explicit SpriteBatch(uint32_t bufferSize = DEFAULT_BUFFER_SIZE, ShaderProgram * const program =
-			nullptr);
+	explicit SpriteBatch(ShaderProgram * const program = nullptr, uint32_t bufferSize = DEFAULT_BUFFER_SIZE);
 	~SpriteBatch() = default;
 
 	void begin();
@@ -88,8 +87,8 @@ public:
 
 	void flush();
 
-	void draw(Texture * const image, float x, float y, uint32_t width, uint32_t height, float srcX,
-			float srcY, uint32_t srcWidth, uint32_t srcHeight);
+	void draw(Texture * const image, float x, float y, uint32_t width, uint32_t height, float srcX, float srcY,
+	        uint32_t srcWidth, uint32_t srcHeight);
 
 	void draw(SpriteBase * const sprite, float x, float y);
 

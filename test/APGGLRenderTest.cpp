@@ -76,7 +76,7 @@ bool APG::APGGLRenderTest::init() {
 
 	shaderProgram = ShaderProgram::fromFiles(vertexShaderFilename, fragmentShaderFilename);
 
-	spriteBatch = std::make_unique<SpriteBatch>();
+	spriteBatch = std::make_unique<SpriteBatch>(shaderProgram.get());
 
 	rendererOne = std::make_unique<GLTmxRenderer>(map1.get(), *spriteBatch);
 	rendererTwo = std::make_unique<GLTmxRenderer>(map2.get(), *spriteBatch);

@@ -50,7 +50,7 @@ const char * const APG::SpriteBatch::COLOR_ATTRIBUTE = "color";
 const char * const APG::SpriteBatch::TEXCOORD_ATTRIBUTE = "texcoord";
 const uint32_t APG::SpriteBatch::DEFAULT_BUFFER_SIZE = 1000;
 
-APG::SpriteBatch::SpriteBatch(uint32_t bufferSize, ShaderProgram * const program) :
+APG::SpriteBatch::SpriteBatch(ShaderProgram * const program, uint32_t bufferSize) :
 		bufferSize(bufferSize), //
 		vao(), //
 		vertexBuffer( { //
