@@ -33,6 +33,8 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
+#include "APG/Game.hpp"
+
 namespace APG {
 
 /**
@@ -58,7 +60,7 @@ public:
 	glm::mat4 transformMatrix;
 	glm::mat4 combinedMatrix;
 
-	explicit Camera(float viewportWidth, float viewportHeight);
+	explicit Camera(float viewportWidth = Game::screenWidth, float viewportHeight = Game::screenHeight);
 
 	void update();
 

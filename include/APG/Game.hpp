@@ -30,6 +30,8 @@
 
 #include <cstdint>
 
+#include <string>
+
 namespace APG {
 class InputManager;
 class AudioManager;
