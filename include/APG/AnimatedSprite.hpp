@@ -126,27 +126,27 @@ public:
 		return texture;
 	}
 
-	virtual inline uint32_t getWidth() const override {
+	virtual uint32_t getWidth() const override {
 		return width;
 	}
 
-	virtual inline uint32_t getHeight() const override {
+	virtual uint32_t getHeight() const override {
 		return height;
 	}
 
-	virtual inline float getU() const override {
+	virtual float getU() const override {
 		return getCurrentFrame()->getU();
 	}
 
-	virtual inline float getV() const override {
+	virtual float getV() const override {
 		return getCurrentFrame()->getV();
 	}
 
-	virtual inline float getU2() const override {
+	virtual float getU2() const override {
 		return getCurrentFrame()->getU2();
 	}
 
-	virtual inline float getV2() const override {
+	virtual float getV2() const override {
 		return getCurrentFrame()->getV2();
 	}
 
