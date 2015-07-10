@@ -48,7 +48,7 @@ void APG::APGAudioTest::render(float deltaTime) {
 	for (int i = SDL_SCANCODE_1; i < SDL_SCANCODE_0; ++i) {
 		if (inputManager->isKeyJustPressed((SDL_Scancode) i)) {
 			const float volume = ((float) ((i - SDL_SCANCODE_1) + 1)) / 10.0f;
-			el::Loggers::getLogger("default")->info("Setting volume to %v", volume);
+			el::Loggers::getLogger("APG")->info("Setting volume to %v", volume);
 
 			audioManager->setGlobalVolume(volume);
 
@@ -57,7 +57,7 @@ void APG::APGAudioTest::render(float deltaTime) {
 	}
 
 	if (inputManager->isKeyJustPressed(SDL_SCANCODE_0)) {
-		el::Loggers::getLogger("default")->info("Setting volume to max");
+		el::Loggers::getLogger("APG")->info("Setting volume to max");
 
 		audioManager->setGlobalVolume(1.0f);
 	}
@@ -102,7 +102,7 @@ void APG::APGAudioTest::clearToGreen() {
 int main(int argc, char **argv) {
 	START_EASYLOGGINGPP(argc, argv);
 
-	const auto logger = el::Loggers::getLogger("default");
+	const auto logger = el::Loggers::getLogger("APG");
 
 	{
 		const auto game = std::make_unique<APG::APGAudioTest>();

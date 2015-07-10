@@ -50,7 +50,7 @@ APG::SDLFontManager::SDLFontManager() {
 }
 
 APG::FontManager::font_handle APG::SDLFontManager::loadFontFile(const std::string &filename, int pointSize) {
-	auto logger = el::Loggers::getLogger("default");
+	auto logger = el::Loggers::getLogger("APG");
 	auto sdlFont = SXXDL::ttf::make_font_ptr(TTF_OpenFont(filename.c_str(), pointSize));
 
 	if (!sdlFont) {
@@ -88,7 +88,7 @@ glm::ivec2 APG::SDLFontManager::estimateSizeOf(const font_handle &fontHandle, co
 	glm::ivec2 ret;
 
 	if (TTF_SizeUTF8((*font).second.ptr.get(), text.c_str(), &ret.x, &ret.y)) {
-		el::Loggers::getLogger("default")->error("Couldn't get size of text string, error: %v", TTF_GetError());
+		el::Loggers::getLogger("APG")->error("Couldn't get size of text string, error: %v", TTF_GetError());
 	}
 
 	return std::move(ret);
@@ -96,7 +96,7 @@ glm::ivec2 APG::SDLFontManager::estimateSizeOf(const font_handle &fontHandle, co
 
 APG::SpriteBase *APG::SDLFontManager::renderText(const font_handle &fontHandle, const std::string &text,
         FontRenderMethod method) {
-	const auto logger = el::Loggers::getLogger("default");
+	const auto logger = el::Loggers::getLogger("APG");
 
 	const auto &found = loadedFonts.find(fontHandle);
 

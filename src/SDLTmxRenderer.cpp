@@ -85,7 +85,7 @@ void APG::SDLTmxRenderer::renderLayer(Tmx::TileLayer * const layer) {
 				dst_rect.y = (int) position.y + y * tile_height;
 
 				if (SDL_RenderCopy(renderer.get(), sdl_tileset.get(), &src_rect, &dst_rect) < 0) {
-					el::Loggers::getLogger("default")->error(
+					el::Loggers::getLogger("APG")->error(
 					        "Couldn't render in tmx renderer; failed at tile %v, tileset \"%v\"", tile_id,
 					        current_tileset->getFileName());
 					return;

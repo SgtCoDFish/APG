@@ -63,7 +63,7 @@ APG::Texture::Texture(const std::string &fileName, bool preserveSurface) :
 	auto surface = IMG_Load(fileName.c_str());
 
 	if (surface == nullptr) {
-		el::Loggers::getLogger("default")->fatal("Couldn't load %v, SDL_image error: %v", fileName, IMG_GetError());
+		el::Loggers::getLogger("APG")->fatal("Couldn't load %v, SDL_image error: %v", fileName, IMG_GetError());
 		return;
 	}
 
@@ -97,7 +97,7 @@ void APG::Texture::generateTextureID() {
 }
 
 void APG::Texture::loadTexture(SDL_Surface * const surface) {
-	const auto logger = el::Loggers::getLogger("default");
+	const auto logger = el::Loggers::getLogger("APG");
 
 	if (surface == nullptr) {
 		logger->fatal("Call to loadTexture with null surface");

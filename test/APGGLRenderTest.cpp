@@ -56,7 +56,7 @@ const char * APG::APGGLRenderTest::vertexShaderFilename = "assets/pass_vertex.gl
 const char * APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag.glslf";
 
 bool APG::APGGLRenderTest::init() {
-	const auto logger = el::Loggers::getLogger("default");
+	const auto logger = el::Loggers::getLogger("APG");
 
 	map1 = std::make_unique<Tmx::Map>();
 	map1->ParseFile("assets/sample_indoor.tmx");
@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
 
 			const float fps = 1 / (sum / timesTaken.size());
 
-			el::Loggers::getLogger("default")->info("FPS: %v", fps);
+			el::Loggers::getLogger("APG")->info("FPS: %v", fps);
 
 			timesTaken.clear();
 		}

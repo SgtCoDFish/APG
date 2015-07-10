@@ -61,7 +61,7 @@ private:
 		const auto gap = tileWidth + spacing;
 
 		if (getWidth() % gap != 0) {
-			el::Loggers::getLogger("default")->warn(
+			el::Loggers::getLogger("APG")->warn(
 			        "Tileset %v may have an inconsistent spacing in the x direction; this could cause issues.", this->getFileName());
 		}
 
@@ -72,7 +72,7 @@ private:
 		const auto gap = tileHeight + spacing;
 
 		if(getHeight() % gap != 0) {
-			el::Loggers::getLogger("default")->warn(
+			el::Loggers::getLogger("APG")->warn(
 			        "Tileset %v may have an inconsistent spacing in the y direction; this could cause issues.", this->getFileName());
 		}
 

@@ -55,7 +55,7 @@ SXXDL::pixel_format_ptr SXXDL::make_pixel_format_ptr(SDL_PixelFormat *format) {
 
 SXXDL::ttf::font_ptr SXXDL::ttf::make_font_ptr(TTF_Font *font) {
 	return font_ptr(font,
-	        [](TTF_Font *font) {el::Loggers::getLogger("default")->info("Freeing font!"); TTF_CloseFont(font);});
+	        [](TTF_Font *font) {el::Loggers::getLogger("APG")->info("Freeing font!"); TTF_CloseFont(font);});
 }
 
 SXXDL::mixer::sound_ptr SXXDL::mixer::make_sound_ptr(Mix_Chunk *chunk) {
@@ -63,8 +63,8 @@ SXXDL::mixer::sound_ptr SXXDL::mixer::make_sound_ptr(Mix_Chunk *chunk) {
 }
 
 SXXDL::mixer::music_ptr SXXDL::mixer::make_music_ptr(Mix_Music *music) {
-//	el::Loggers::getLogger("default")->info("Creating music_ptr!");
+//	el::Loggers::getLogger("APG")->info("Creating music_ptr!");
 //	return music_ptr(music,
-//	        [](Mix_Music *music) {el::Loggers::getLogger("default")->info("Freeing music_ptr!"); Mix_FreeMusic(music);});
+//	        [](Mix_Music *music) {el::Loggers::getLogger("APG")->info("Freeing music_ptr!"); Mix_FreeMusic(music);});
 	return music_ptr(music, Mix_FreeMusic);
 }

@@ -51,7 +51,7 @@ uint32_t APG::SDLGame::SDL_WINDOW_FLAGS = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 APG::SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
         uint32_t glContextMajor, uint32_t glContextMinor, uint32_t windowX, uint32_t windowY) :
 		APG::Game(windowWidth, windowHeight) {
-	const auto logger = el::Loggers::getLogger("default");
+	const auto logger = el::Loggers::getLogger("APG");
 	logger->info("Initialising APG with OpenGL version %v.%v.", glContextMajor, glContextMinor);
 
 	if (SDL_Init(SDL_INIT_FLAGS) < 0) {
@@ -150,7 +150,7 @@ void APG::SDLGame::quit() {
 }
 
 void APG::SDLGame::logSDLVersions() const {
-	const auto logger = el::Loggers::getLogger("default");
+	const auto logger = el::Loggers::getLogger("APG");
 
 	SDL_version compiledVersion, sdlLinkedVersion;
 

@@ -48,7 +48,7 @@ namespace APG {
  *
  * Requires that SDL2 + SDL2_image have already been initialised. Doesn't yet support animated tiles.
  */
-class SDLTmxRenderer: public APG::TmxRenderer {
+class SDLTmxRenderer final : public APG::TmxRenderer {
 private:
 	const SXXDL::renderer_ptr &renderer;
 

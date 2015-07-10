@@ -56,7 +56,7 @@ APG::TmxRenderer::TmxRenderer(Tmx::Map *map) :
 }
 
 void APG::TmxRenderer::loadTilesets() {
-	const auto logger = el::Loggers::getLogger("default");
+	const auto logger = el::Loggers::getLogger("APG");
 
 	const auto tileWidth = map->GetTileWidth();
 	const auto tileHeight = map->GetTileHeight();

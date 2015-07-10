@@ -32,7 +32,7 @@
 
 APG::SDLAudioManager::SDLAudioManager(int frequency, uint16_t format, int channelCount) :
 		APG::AudioManager() {
-	const auto logger = el::Loggers::getLogger("default");
+	const auto logger = el::Loggers::getLogger("APG");
 
 	if (Mix_OpenAudio(frequency, format, 2, 1024) == -1) {
 		logger->fatal("Couldn't open audio for SDL_mixer: %v", Mix_GetError());
@@ -51,7 +51,7 @@ APG::SDLAudioManager::~SDLAudioManager() {
 }
 
 APG::AudioManager::music_handle APG::SDLAudioManager::loadMusicFile(const std::string &filename) {
-	const auto logger = el::Loggers::getLogger("default");
+	const auto logger = el::Loggers::getLogger("APG");
 	logger->info("Loading music file \"%v\".", filename);
 
 	auto sdlMusic = SXXDL::mixer::make_music_ptr(Mix_LoadMUS(filename.c_str()));
@@ -72,7 +72,7 @@ APG::AudioManager::music_handle APG::SDLAudioManager::loadMusicFile(const std::s
 }
 
 APG::AudioManager::sound_handle APG::SDLAudioManager::loadSoundFile(const std::string &filename) {
-	const auto logger = el::Loggers::getLogger("default");
+	const auto logger = el::Loggers::getLogger("APG");
 	logger->info("Loading sound file \"%v\".", filename);
 
 	auto sdlSound = SXXDL::mixer::make_sound_ptr(Mix_LoadWAV(filename.c_str()));
@@ -134,7 +134,7 @@ void APG::SDLAudioManager::playSound(const sound_handle &handle) {
 	const auto &song = loadedSounds.find(handle);
 
 	if (Mix_PlayChannel(-1, (*song).second.get(), 0) == -1) {
-		el::Loggers::getLogger("default")->warn("Couldn't play sound at handle %v because: %v", handle,
+		el::Loggers::getLogger("APG")->warn("Couldn't play sound at handle %v because: %v", handle,
 		Mix_GetError());
 	}
 }

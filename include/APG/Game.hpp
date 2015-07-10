@@ -46,6 +46,8 @@ public:
 	static uint32_t screenWidth;
 	static uint32_t screenHeight;
 
+	static void setLoggerToAPGStyle(const std::string &loggerName);
+
 	explicit Game(uint32_t screenWidth, uint32_t screenHeight);
 
 	virtual ~Game() = default;

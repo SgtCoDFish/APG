@@ -53,7 +53,7 @@ INITIALIZE_EASYLOGGINGPP
 const std::string ASSET_PREFIX = "assets/";
 
 bool APGSDLRenderTest::init() {
-	const auto logger = el::Loggers::getLogger("default");
+	const auto logger = el::Loggers::getLogger("APG");
 	renderer = SXXDL::make_renderer_ptr(SDL_CreateRenderer(window.get(), -1, SDL_RENDERER_ACCELERATED));
 
 	if (renderer == nullptr) {
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
 	const uint32_t windowWidth = 1280;
 	const uint32_t windowHeight = 720;
 
-	const auto logger = el::Loggers::getLogger("default");
+	const auto logger = el::Loggers::getLogger("APG");
 
 	auto rpg = std::make_unique<APGSDLRenderTest>(windowTitle, windowWidth, windowHeight);
 

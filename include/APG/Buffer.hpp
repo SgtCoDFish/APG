@@ -108,11 +108,11 @@ public:
 		GLenum glError = glGetError();
 		if (glError != GL_NO_ERROR) {
 			if (glError == GL_OUT_OF_MEMORY) {
-				el::Loggers::getLogger("default")->error(
+				el::Loggers::getLogger("APG")->error(
 				        "Ran out of memory trying to upload buffer data with buffer size = %vB", bufferSize);
 				return;
 			} else {
-				el::Loggers::getLogger("default")->error("OpenGL error occurred: %v.", gluErrorString(glError));
+				el::Loggers::getLogger("APG")->error("OpenGL error occurred: %v.", gluErrorString(glError));
 				return;
 			}
 		}

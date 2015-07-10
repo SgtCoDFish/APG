@@ -37,7 +37,7 @@ class Layer;
 
 namespace APG {
 
-class GLTmxRenderer: public TmxRenderer {
+class GLTmxRenderer final : public TmxRenderer {
 private:
 	SpriteBatch *batch;
 
