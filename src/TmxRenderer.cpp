@@ -37,6 +37,7 @@
 #include "tmxparser/TmxTileset.h"
 #include "tmxparser/TmxImage.h"
 #include "tmxparser/TmxTile.h"
+#include "tmxparser/TmxTileLayer.h"
 
 #include "APG/APGeasylogging.hpp"
 
@@ -98,7 +99,7 @@ void APG::TmxRenderer::loadTilesets() {
 		 * When the right edge of the image is reached, we go down and back to the left of the image.
 		 */
 		uint32_t tileID = 0, x = 0, y = 0;
-		while(true) {
+		while (true) {
 			const auto tileGID = calculateTileGID(tileset, tileID);
 
 			loadedSprites.emplace_back(loadedTileset.get(), x, y, tileWidth, tileHeight);
@@ -110,11 +111,11 @@ void APG::TmxRenderer::loadTilesets() {
 
 			x += tileWidth + spacing;
 			++tileID;
-			if(x >= loadedTileset->getWidth()) {
+			if (x >= loadedTileset->getWidth()) {
 				x = 0;
 				y += tileHeight + spacing;
 
-				if(y >= loadedTileset->getHeight()) {
+				if (y >= loadedTileset->getHeight()) {
 					break;
 				}
 			}
@@ -170,7 +171,9 @@ void APG::TmxRenderer::renderAll(float deltaTime) {
 	}
 
 	for (const auto &layer : map->GetTileLayers()) {
-		renderLayer(layer);
+		if (layer->IsVisible()) {
+			renderLayer(layer);
+		}
 	}
 }
 
