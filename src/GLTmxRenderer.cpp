@@ -34,16 +34,16 @@
 #include "APG/GLTmxRenderer.hpp"
 #include "APG/Sprite.hpp"
 
-APG::GLTmxRenderer::GLTmxRenderer(Tmx::Map * const map, SpriteBatch &inBatch) :
+APG::GLTmxRenderer::GLTmxRenderer(Tmx::Map * const map, SpriteBatch * const inBatch) :
 		TmxRenderer(map), batch(inBatch) {
 }
 
 void APG::GLTmxRenderer::renderAll(float deltaTime) {
-	batch.begin();
+	batch->begin();
 
 	TmxRenderer::renderAll(deltaTime);
 
-	batch.end();
+	batch->end();
 }
 
 void APG::GLTmxRenderer::renderLayer(Tmx::TileLayer * const layer) {
@@ -70,7 +70,7 @@ void APG::GLTmxRenderer::renderLayer(Tmx::TileLayer * const layer) {
 			const auto tileHash = tile.gid;
 
 			const auto ourSprite = sprites[tileHash];
-			batch.draw(ourSprite, tileX, tileY);
+			batch->draw(ourSprite, tileX, tileY);
 		}
 	}
 }

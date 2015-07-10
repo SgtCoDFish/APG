@@ -76,6 +76,10 @@ private:
 	void reserveSpriteSpace();
 
 public:
+	explicit TmxRenderer(const std::unique_ptr<Tmx::Map> &map) :
+			TmxRenderer(map.get()) {
+	}
+
 	explicit TmxRenderer(Tmx::Map *map);
 
 	virtual ~TmxRenderer() = default;

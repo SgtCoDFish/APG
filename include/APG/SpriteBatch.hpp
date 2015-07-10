@@ -79,6 +79,11 @@ private:
 
 public:
 	static const uint32_t DEFAULT_BUFFER_SIZE;
+
+	explicit SpriteBatch(const std::unique_ptr<ShaderProgram> &program, uint32_t bufferSize = DEFAULT_BUFFER_SIZE) :
+			SpriteBatch(program.get(), bufferSize) {
+	}
+
 	explicit SpriteBatch(ShaderProgram * const program = nullptr, uint32_t bufferSize = DEFAULT_BUFFER_SIZE);
 	~SpriteBatch() = default;
 

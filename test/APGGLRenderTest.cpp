@@ -78,16 +78,16 @@ bool APG::APGGLRenderTest::init() {
 
 	spriteBatch = std::make_unique<SpriteBatch>(shaderProgram.get());
 
-	rendererOne = std::make_unique<GLTmxRenderer>(map1.get(), *spriteBatch);
-	rendererTwo = std::make_unique<GLTmxRenderer>(map2.get(), *spriteBatch);
+	rendererOne = std::make_unique<GLTmxRenderer>(map1, spriteBatch);
+	rendererTwo = std::make_unique<GLTmxRenderer>(map2, spriteBatch);
 	currentRenderer = rendererOne.get();
 
 	playerTexture = std::make_unique<Texture>("assets/player.png");
-	playerFrames = AnimatedSprite::splitTexture(playerTexture.get(), 32, 32, 0, 32, 4);
+	playerFrames = AnimatedSprite::splitTexture(playerTexture, 32, 32, 0, 32, 4);
 	playerAnimation = std::make_unique<AnimatedSprite>(0.3f, playerFrames, AnimationMode::LOOP);
 
 	miniTexture = std::make_unique<Texture>("assets/player16.png");
-	miniPlayer = std::make_unique<Sprite>(miniTexture.get());
+	miniPlayer = std::make_unique<Sprite>(miniTexture);
 
 	currentPlayer = miniPlayer.get();
 
@@ -118,28 +118,28 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	currentRenderer->renderAll(deltaTime);
 	playerAnimation->update(deltaTime);
 
-	static float playerX = 128.0f, playerY = 128.0f - ((float) playerAnimation->getHeight() / 4.0f);
+	static float playerX = 128.0f, playerY = 128.0f;
 
 	// will move the player quickly
 	if (inputManager->isKeyPressed(SDL_SCANCODE_UP)) {
-		playerY -= 32.0f;
+		playerY -= currentPlayer->getHeight();
 	} else if (inputManager->isKeyPressed(SDL_SCANCODE_DOWN)) {
-		playerY += 32.0f;
+		playerY += currentPlayer->getHeight();
 	} else if (inputManager->isKeyPressed(SDL_SCANCODE_LEFT)) {
-		playerX -= 32.0f;
+		playerX -= currentPlayer->getWidth();
 	} else if (inputManager->isKeyPressed(SDL_SCANCODE_RIGHT)) {
-		playerX += 32.0f;
+		playerX += currentPlayer->getWidth();
 	}
 
 	// will move the player once per press
 	if (inputManager->isKeyJustPressed(SDL_SCANCODE_W)) {
-		playerY -= 32.0f;
+		playerY -= currentPlayer->getHeight();
 	} else if (inputManager->isKeyJustPressed(SDL_SCANCODE_S)) {
-		playerY += 32.0f;
+		playerY += currentPlayer->getHeight();
 	} else if (inputManager->isKeyJustPressed(SDL_SCANCODE_A)) {
-		playerX -= 32.0f;
+		playerX -= currentPlayer->getWidth();
 	} else if (inputManager->isKeyJustPressed(SDL_SCANCODE_D)) {
-		playerX += 32.0f;
+		playerX += currentPlayer->getWidth();
 	}
 
 	if (inputManager->isKeyJustPressed(SDL_SCANCODE_SPACE)) {
@@ -150,7 +150,7 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 			currentRenderer = rendererOne.get();
 			currentPlayer = miniPlayer.get();
 			playerX = 18 * 16;
-			playerY = 21 * -16;
+			playerY = 21 * 16;
 		}
 	}
 

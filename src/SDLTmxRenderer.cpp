@@ -39,7 +39,7 @@
 
 #include "APG/internal/Assert.hpp"
 
-APG::SDLTmxRenderer::SDLTmxRenderer(Tmx::Map * const map, SXXDL::renderer_ptr &renderer) :
+APG::SDLTmxRenderer::SDLTmxRenderer(Tmx::Map * const map, const SXXDL::renderer_ptr &renderer) :
 		TmxRenderer(map), renderer { renderer } {
 
 	REQUIRE(map->GetOrientation() == Tmx::MapOrientation::TMX_MO_ORTHOGONAL,
@@ -52,7 +52,7 @@ APG::SDLTmxRenderer::SDLTmxRenderer(Tmx::Map * const map, SXXDL::renderer_ptr &r
 	}
 }
 
-void APG::SDLTmxRenderer::renderLayer(Tmx::TileLayer *layer) {
+void APG::SDLTmxRenderer::renderLayer(Tmx::TileLayer * const layer) {
 	const auto tile_width = map->GetTileWidth();
 	const auto tile_height = map->GetTileHeight();
 
@@ -64,12 +64,12 @@ void APG::SDLTmxRenderer::renderLayer(Tmx::TileLayer *layer) {
 			for (int x = 0; x < layer->GetWidth(); x++) {
 
 				const unsigned int tile_id = layer->GetTileId(x, y);
+				const auto tileset_index = layer->GetTileTilesetIndex(x, y);
 
-				if (tile_id == 0) {
+				if (tileset_index == -1) {
 					continue;
 				}
 
-				const auto tileset_index = layer->GetTileTilesetIndex(x, y);
 				const auto &current_tileset = tilesets[tileset_index];
 				const auto &sdl_tileset = sdlTextures[tileset_index];
 

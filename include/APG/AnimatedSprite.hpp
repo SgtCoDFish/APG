@@ -101,11 +101,18 @@ public:
 	static std::vector<Sprite> splitTexture(Texture * texture, uint32_t tileWidth, uint32_t tileHeight,
 	        uint32_t xStart = 0u, uint32_t yStart = 0u, int32_t frameCount = -1, uint32_t xSeparation = 0u);
 
+	static std::vector<Sprite> splitTexture(const std::unique_ptr<Texture> &texture, uint32_t tileWidth,
+	        uint32_t tileHeight, uint32_t xStart = 0u, uint32_t yStart = 0u, int32_t frameCount = -1,
+	        uint32_t xSeparation = 0u) {
+		return std::move(splitTexture(texture.get(), tileWidth, tileHeight, xStart, yStart, frameCount, xSeparation));
+	}
+
 	explicit AnimatedSprite(float frameDuration, Sprite * firstFrame, AnimationMode animationMode =
 	        AnimationMode::NORMAL);
 	explicit AnimatedSprite(float frameDuration, std::initializer_list<SpriteBase *> &sprites,
 	        AnimationMode animationMode = AnimationMode::NORMAL);
-	explicit AnimatedSprite(float frameDuration, std::vector<Sprite> &sprites, AnimationMode animationMode = AnimationMode::NORMAL);
+	explicit AnimatedSprite(float frameDuration, std::vector<Sprite> &sprites, AnimationMode animationMode =
+	        AnimationMode::NORMAL);
 	explicit AnimatedSprite(float frameDuration, std::vector<SpriteBase *> &sprites, AnimationMode animationMode =
 	        AnimationMode::NORMAL);
 

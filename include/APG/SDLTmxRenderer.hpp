@@ -46,19 +46,23 @@ namespace APG {
 /**
  * Contains methods for rendering a loaded TMX file using SDL2.
  *
- * Requires that SDL2/SDL2_image have already been initialised. Doesn't yet support animated tiles.
+ * Requires that SDL2 + SDL2_image have already been initialised. Doesn't yet support animated tiles.
  */
-class SDLTmxRenderer : public APG::TmxRenderer {
+class SDLTmxRenderer: public APG::TmxRenderer {
 private:
-	SXXDL::renderer_ptr &renderer;
+	const SXXDL::renderer_ptr &renderer;
 
 	std::vector<SXXDL::sdl_texture_ptr> sdlTextures;
 
 public:
-	SDLTmxRenderer(Tmx::Map * const map, SXXDL::renderer_ptr &renderer);
+	explicit SDLTmxRenderer(const std::unique_ptr<Tmx::Map> &map, const SXXDL::renderer_ptr &renderer) :
+			SDLTmxRenderer(map.get(), renderer) {
+	}
+
+	explicit SDLTmxRenderer(Tmx::Map * const map, const SXXDL::renderer_ptr &renderer);
 	virtual ~SDLTmxRenderer() = default;
 
-	void renderLayer(Tmx::TileLayer *layer) override;
+	void renderLayer(Tmx::TileLayer * const layer) override;
 
 	// disallow copying because we own resources.
 	SDLTmxRenderer(SDLTmxRenderer &other) = delete;

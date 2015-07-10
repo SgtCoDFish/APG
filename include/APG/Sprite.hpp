@@ -53,6 +53,15 @@ protected:
 	void calculateUV();
 
 public:
+	explicit Sprite(const std::unique_ptr<Texture> &texture) :
+			Sprite(texture.get()) {
+	}
+
+	explicit Sprite(const std::unique_ptr<Texture> &texture, uint32_t texX, uint32_t texY, uint32_t width,
+	        uint32_t height) :
+			Sprite(texture.get(), texX, texY, width, height) {
+	}
+
 	explicit Sprite(Texture * const texture);
 	explicit Sprite(Texture * const texture, uint32_t texX, uint32_t texY, uint32_t width, uint32_t height);
 
