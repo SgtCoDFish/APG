@@ -62,7 +62,7 @@ APG::SpriteBatch::SpriteBatch(ShaderProgram * const program, uint32_t bufferSize
 		vertices(bufferSize, 0.0f), //
 		color(1.0f, 1.0f, 1.0f, 1.0f), //
 		projectionMatrix(
-		        glm::ortho(0.0f, (float) APG::Game::screenWidth, (float) APG::Game::screenHeight, 0.0f, -1.0f, 1.0f)), //
+		        glm::ortho(0.0f, (float) APG::Game::screenWidth, (float) APG::Game::screenHeight, 0.0f, 0.0f, 1.0f)), //
 		transformMatrix(1.0f), //
 		combinedMatrix(1.0f) {
 	if (program == nullptr) {
@@ -251,6 +251,18 @@ void APG::SpriteBatch::end() {
 
 	if (idx > 0) {
 		flush();
+	}
+}
+
+void APG::SpriteBatch::setProjectionMatrix(const glm::mat4 &matrix) {
+	if (drawing) {
+		flush();
+	}
+
+	this->projectionMatrix = matrix;
+
+	if (drawing) {
+		setupMatrices();
 	}
 }
 

@@ -92,7 +92,8 @@ public:
 
 	void flush();
 
-	inline void draw(const std::unique_ptr<Texture> &image, float x, float y, uint32_t width, uint32_t height, float srcX, float srcY, uint32_t srcWidth, uint32_t srcHeight) {
+	inline void draw(const std::unique_ptr<Texture> &image, float x, float y, uint32_t width, uint32_t height,
+	        float srcX, float srcY, uint32_t srcWidth, uint32_t srcHeight) {
 		draw(image.get(), x, y, width, height, srcX, srcY, srcWidth, srcHeight);
 	}
 	void draw(Texture * const image, float x, float y, uint32_t width, uint32_t height, float srcX, float srcY,
@@ -118,6 +119,8 @@ public:
 		color.b = b;
 		color.a = a;
 	}
+
+	void setProjectionMatrix(const glm::mat4 &matrix);
 
 	static std::unique_ptr<APG::ShaderProgram> createDefaultShader();
 };

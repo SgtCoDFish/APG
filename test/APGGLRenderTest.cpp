@@ -49,6 +49,7 @@ INITIALIZE_EASYLOGGINGPP
 #include "APG/SXXDL.hpp"
 #include "APG/Buffer.hpp"
 #include "APG/Texture.hpp"
+#include "APG/Camera.hpp"
 
 #include "test/APGGLRenderTest.hpp"
 
@@ -76,6 +77,8 @@ bool APG::APGGLRenderTest::init() {
 
 	shaderProgram = ShaderProgram::fromFiles(vertexShaderFilename, fragmentShaderFilename);
 
+	camera = std::make_unique<Camera>(screenWidth, screenHeight);
+	camera->setToOrtho(false, screenWidth, screenHeight);
 	spriteBatch = std::make_unique<SpriteBatch>(shaderProgram.get());
 
 	rendererOne = std::make_unique<GLTmxRenderer>(map1, spriteBatch);
@@ -115,10 +118,9 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	glClearColor(0.313725f, 0.674510f, 0.239216f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	currentRenderer->renderAll(deltaTime);
-	playerAnimation->update(deltaTime);
-
 	static float playerX = 128.0f, playerY = 128.0f;
+	const glm::vec3 textScreenPosition { 50.0f, screenHeight - 50.0f, 0.0f };
+	static glm::vec3 textPos;
 
 	// will move the player quickly
 	if (inputManager->isKeyPressed(SDL_SCANCODE_UP)) {
@@ -154,9 +156,20 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 		}
 	}
 
+	camera->position.x = playerX - screenWidth / 2.0f;
+	camera->position.y = playerY - screenHeight / 2.0f;
+
+	camera->update();
+	spriteBatch->setProjectionMatrix(camera->combinedMatrix);
+
+	currentRenderer->renderAll(deltaTime);
+	playerAnimation->update(deltaTime);
+
+	textPos = camera->unproject(textScreenPosition);
+
 	spriteBatch->begin();
 	spriteBatch->draw(currentPlayer, playerX, playerY);
-	spriteBatch->draw(fontSprite, 50, 50);
+	spriteBatch->draw(fontSprite, textPos.x, textPos.y);
 	spriteBatch->end();
 
 	SDL_GL_SwapWindow(window.get());

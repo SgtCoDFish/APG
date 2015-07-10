@@ -45,6 +45,7 @@
 #include "APG/Texture.hpp"
 #include "APG/SpriteBatch.hpp"
 #include "APG/Sprite.hpp"
+#include "APG/Camera.hpp"
 
 #include "tmxparser/TmxMap.h"
 
@@ -60,6 +61,7 @@ private:
 
 	std::unique_ptr<ShaderProgram> shaderProgram;
 
+	std::unique_ptr<Camera> camera;
 	std::unique_ptr<SpriteBatch> spriteBatch;
 
 	std::unique_ptr<GLTmxRenderer> rendererOne;
