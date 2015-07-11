@@ -57,9 +57,11 @@ namespace APG {
 class TmxRenderer {
 protected:
 	static const uint64_t MAX_SPRITES_PER_UNIT = 1000000;
+	static std::unordered_map<std::string, std::shared_ptr<Tileset>> tmxTilesets;
+	static void initialiseStaticTilesets();
 
 	Tmx::Map *map = nullptr;
-	std::vector<std::unique_ptr<Tileset>> tilesets;
+	std::vector<std::shared_ptr<Tileset>> tilesets;
 	std::unordered_map<uint64_t, SpriteBase *> sprites;
 
 	std::vector<Sprite> loadedSprites;

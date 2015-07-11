@@ -51,6 +51,8 @@ namespace internal {
 static const int DEFAULT_SOUND_HANDLE_COUNT = 256;
 static const int DEFAULT_MUSIC_HANDLE_COUNT = 128;
 static const int DEFAULT_FONT_HANDLE_COUNT = 16;
+
+static const int MAX_SUPPORTED_TEXTURES = 32;
 }
 
 }

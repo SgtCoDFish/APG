@@ -42,6 +42,7 @@
 
 #include "APG/SDLGame.hpp"
 #include "APG/SDLInputManager.hpp"
+#include "APG/TmxRenderer.hpp"
 
 uint32_t APG::SDLGame::SDL_INIT_FLAGS = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS;
 uint32_t APG::SDLGame::SDL_IMAGE_INIT_FLAGS = IMG_INIT_PNG;

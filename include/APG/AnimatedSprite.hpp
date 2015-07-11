@@ -75,8 +75,6 @@ private:
 	 */
 	void initializeFromSpriteFrame(const SpriteBase * sprite);
 
-	void initializeAnimFromOwned();
-
 	/**
 	 * Called by AnimatedSprite::fromTexture
 	 */

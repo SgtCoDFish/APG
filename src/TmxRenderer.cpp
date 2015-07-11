@@ -51,12 +51,16 @@
 
 #include <glm/vec2.hpp>
 
+std::unordered_map<std::string, std::shared_ptr<APG::Tileset>> APG::TmxRenderer::tmxTilesets;
+
 APG::TmxRenderer::TmxRenderer(Tmx::Map *map) :
 		map { map } {
 	loadTilesets();
 }
 
 void APG::TmxRenderer::loadTilesets() {
+	initialiseStaticTilesets();
+
 	const auto logger = el::Loggers::getLogger("APG");
 
 	const auto tileWidth = map->GetTileWidth();
@@ -82,11 +86,24 @@ void APG::TmxRenderer::loadTilesets() {
 
 		const auto tilesetName = map->GetFilepath() + tileset->GetImage()->GetSource();
 
-		logger->info("Loading tileset \"%v\" (first GID = %v, has %v special tiles, spacing = %vpx)", tilesetName,
-		        tileset->GetFirstGid(), tileset->GetTiles().size(), tileset->GetSpacing());
+		const auto tilesetExists = tmxTilesets.find(tilesetName);
+		Tileset * loadedTileset = nullptr;
 
-		tilesets.emplace_back(std::make_unique<Tileset>(tilesetName, tileset));
-		auto &loadedTileset = tilesets.back();
+		if (tilesetExists != tmxTilesets.end()) {
+			logger->info("Using previously loaded tileset for \"%v\"", tilesetName);
+
+			loadedTileset = tilesetExists->second.get();
+		} else {
+			logger->info("Loading tileset \"%v\" (first GID = %v, has %v special tiles, spacing = %vpx)", tilesetName,
+			        tileset->GetFirstGid(), tileset->GetTiles().size(), tileset->GetSpacing());
+
+			tmxTilesets.emplace(tilesetName, std::make_shared<Tileset>(tilesetName, tileset));
+
+			tilesets.emplace_back(std::shared_ptr<Tileset>(tmxTilesets.at(tilesetName)));
+			loadedTileset = tilesets.back().get();
+		}
+
+		REQUIRE(loadedTileset != nullptr, "Couldn't load/find tileset when loading map");
 
 		const auto spacing = loadedTileset->getSpacing();
 
@@ -102,7 +119,7 @@ void APG::TmxRenderer::loadTilesets() {
 		while (true) {
 			const auto tileGID = calculateTileGID(tileset, tileID);
 
-			loadedSprites.emplace_back(loadedTileset.get(), x, y, tileWidth, tileHeight);
+			loadedSprites.emplace_back(loadedTileset, x, y, tileWidth, tileHeight);
 
 			auto &sprite = loadedSprites.back();
 			sprite.setHash(tileGID);
@@ -207,4 +224,10 @@ void APG::TmxRenderer::reserveSpriteSpace() {
 	sprites.reserve(tileCount);
 	loadedSprites.reserve(tileCount);
 	loadedAnimatedSprites.reserve(animTileCount);
+}
+
+void APG::TmxRenderer::initialiseStaticTilesets() {
+	if (tmxTilesets.empty()) {
+		tmxTilesets.reserve(internal::MAX_SUPPORTED_TEXTURES);
+	}
 }

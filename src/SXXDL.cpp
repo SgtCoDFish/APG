@@ -54,8 +54,7 @@ SXXDL::pixel_format_ptr SXXDL::make_pixel_format_ptr(SDL_PixelFormat *format) {
 }
 
 SXXDL::ttf::font_ptr SXXDL::ttf::make_font_ptr(TTF_Font *font) {
-	return font_ptr(font,
-	        [](TTF_Font *font) {el::Loggers::getLogger("APG")->info("Freeing font!"); TTF_CloseFont(font);});
+	return font_ptr(font, TTF_CloseFont);
 }
 
 SXXDL::mixer::sound_ptr SXXDL::mixer::make_sound_ptr(Mix_Chunk *chunk) {
