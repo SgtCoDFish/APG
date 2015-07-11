@@ -48,11 +48,6 @@ void APG::GLTmxRenderer::renderAll(float deltaTime) {
 
 void APG::GLTmxRenderer::renderLayer(Tmx::TileLayer * const layer) {
 //	std::cout << "Rendering layer \"" << layer->GetName() << "\"\n";
-
-	if (!layer->IsVisible()) {
-		return;
-	}
-
 	const uint32_t tileWidth = map->GetTileWidth();
 	const uint32_t tileHeight = map->GetTileHeight();
 
@@ -72,5 +67,11 @@ void APG::GLTmxRenderer::renderLayer(Tmx::TileLayer * const layer) {
 			const auto ourSprite = sprites[tileHash];
 			batch->draw(ourSprite, tileX, tileY);
 		}
+	}
+}
+
+void APG::GLTmxRenderer::renderObjectGroup(const std::vector<TiledObject> &objects) {
+	for(const auto &obj : objects) {
+		batch->draw(obj.sprite, obj.position.x, obj.position.y);
 	}
 }

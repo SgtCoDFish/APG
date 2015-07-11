@@ -45,6 +45,19 @@ class Tile;
 
 namespace APG {
 
+class TiledObject {
+public:
+	explicit TiledObject(const glm::vec2 &pos, SpriteBase * const sprite) :
+			position { pos }, sprite { sprite } {
+	}
+	explicit TiledObject(float x, float y, SpriteBase * const sprite) :
+			position { x, y }, sprite { sprite } {
+	}
+
+	glm::vec2 position;
+	SpriteBase * sprite;
+};
+
 /**
  * Abstracts a renderer for a TMX file that can be loaded using the tmxparser library.
  *
@@ -67,9 +80,12 @@ protected:
 	std::vector<Sprite> loadedSprites;
 	std::vector<AnimatedSprite> loadedAnimatedSprites;
 
+	std::unordered_map<std::string, std::vector<TiledObject>> objectGroups;
+
 	glm::vec2 position { 0.0f, 0.0f };
 
 	void loadTilesets();
+	void loadObjects();
 
 	uint64_t calculateTileGID(Tmx::Tileset *tileset, int tileID);
 	uint64_t calculateTileGID(Tmx::Tileset *tileset, Tmx::Tile *tile);
@@ -87,6 +103,8 @@ public:
 	virtual ~TmxRenderer() = default;
 
 	virtual void renderLayer(Tmx::TileLayer * const layer) = 0;
+	virtual void renderObjectGroup(const std::vector<TiledObject> &objects) = 0;
+
 	void renderAll(float deltaTime);
 
 	const Tmx::Map *getMap() {

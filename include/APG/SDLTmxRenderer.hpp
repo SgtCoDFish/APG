@@ -63,6 +63,7 @@ public:
 	virtual ~SDLTmxRenderer() = default;
 
 	void renderLayer(Tmx::TileLayer * const layer) override;
+	void renderObjectGroup(const std::vector<TiledObject> &objects) override;
 
 	// disallow copying because we own resources.
 	SDLTmxRenderer(SDLTmxRenderer &other) = delete;

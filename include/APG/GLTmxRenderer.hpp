@@ -50,7 +50,9 @@ public:
 	virtual ~GLTmxRenderer() = default;
 
 	virtual void renderAll(float deltaTime);
+
 	virtual void renderLayer(Tmx::TileLayer * const layer) override;
+	virtual void renderObjectGroup(const std::vector<TiledObject> &objects) override;
 };
 
 }

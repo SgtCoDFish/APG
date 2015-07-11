@@ -38,6 +38,8 @@
 #include "tmxparser/TmxImage.h"
 #include "tmxparser/TmxTile.h"
 #include "tmxparser/TmxTileLayer.h"
+#include "tmxparser/TmxObjectGroup.h"
+#include "tmxparser/TmxObject.h"
 
 #include "APG/APGeasylogging.hpp"
 
@@ -56,6 +58,7 @@ std::unordered_map<std::string, std::shared_ptr<APG::Tileset>> APG::TmxRenderer:
 APG::TmxRenderer::TmxRenderer(Tmx::Map *map) :
 		map { map } {
 	loadTilesets();
+	loadObjects();
 }
 
 void APG::TmxRenderer::loadTilesets() {
@@ -182,19 +185,56 @@ void APG::TmxRenderer::loadTilesets() {
 	}
 }
 
+void APG::TmxRenderer::loadObjects() {
+	const auto logger = el::Loggers::getLogger("APG");
+
+	for (auto &group : map->GetObjectGroups()) {
+		logger->info("Loading object group \"%v\", has %v objects.", group->GetName(), group->GetNumObjects());
+		std::vector<TiledObject> objects;
+
+		for (auto &obj : group->GetObjects()) {
+			const auto gid = obj->GetGid();
+
+			if (gid == 0) {
+				logger->verbose(5, "Ignoring non-tile object \"%v\"", obj->GetName());
+				continue;
+			}
+
+			objects.emplace_back(obj->GetX(), obj->GetY() - map->GetTileHeight(), sprites[gid]);
+		}
+
+		objectGroups.emplace(group->GetName(), objects);
+	}
+}
+
 void APG::TmxRenderer::renderAll(float deltaTime) {
 	for (auto &animation : loadedAnimatedSprites) {
 		animation.update(deltaTime);
 	}
 
-	for (const auto &layer : map->GetTileLayers()) {
+	for (const auto &layer : map->GetLayers()) {
 		if (layer->IsVisible()) {
-			renderLayer(layer);
+			switch (layer->GetLayerType()) {
+			case Tmx::LayerType::TMX_LAYERTYPE_TILE: {
+				renderLayer((Tmx::TileLayer *) layer);
+				break;
+			}
+
+			case Tmx::LayerType::TMX_LAYERTYPE_OBJECTGROUP: {
+				renderObjectGroup(objectGroups[layer->GetName()]);
+				break;
+			}
+
+			default: {
+				el::Loggers::getLogger("APG")->warn("Unsupported layer type for layer \"%v\"", layer->GetName());
+				break;
+			}
+			}
 		}
 	}
 }
 
-uint64_t APG::TmxRenderer::calculateTileGID(Tmx::Tileset *tileset, Tmx::Tile *tile) {
+uint64_t APG::TmxRenderer::calculateTileGID(Tmx::Tileset * tileset, Tmx::Tile * tile) {
 	return calculateTileGID(tileset, tile->GetId());
 }
 
@@ -208,7 +248,7 @@ void APG::TmxRenderer::reserveSpriteSpace() {
 
 	const auto &tilesets = map->GetTilesets();
 
-	// Go through the tilesets counting all the static tiles and then individually counting animated tiles.
+// Go through the tilesets counting all the static tiles and then individually counting animated tiles.
 	for (const auto &tileset : tilesets) {
 		tileCount += (tileset->GetImage()->GetWidth() / tileset->GetTileWidth())
 		        * (tileset->GetImage()->GetHeight() / tileset->GetTileHeight());

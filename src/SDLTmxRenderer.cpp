@@ -94,3 +94,7 @@ void APG::SDLTmxRenderer::renderLayer(Tmx::TileLayer * const layer) {
 		}
 	}
 }
+
+void APG::SDLTmxRenderer::renderObjectGroup(const std::vector<TiledObject> &objects) {
+	el::Loggers::getLogger("APG")->fatal("SDL renderer cannot render object groups yet.");
+}
