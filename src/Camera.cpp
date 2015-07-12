@@ -40,7 +40,7 @@ APG::Camera::Camera(float viewportWidth, float viewportHeight) {
 }
 
 void APG::Camera::update() {
-	projectionMatrix = glm::ortho(0.0f, viewportWidth, viewportHeight, 0.0f, near, far);
+	projectionMatrix = glm::ortho(0.0f, viewportWidth, viewportHeight, 0.0f, nearPlane, farPlane);
 	transformMatrix = glm::lookAt(position, position + direction, up);
 	combinedMatrix = projectionMatrix * transformMatrix;
 }

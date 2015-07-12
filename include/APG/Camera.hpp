@@ -46,7 +46,12 @@ class Camera {
 private:
 	static const glm::mat4 IDENTITY;
 
-	float near = 0.0f, far = 100.0f;
+	/*
+	 * Interesting note: some header on windows defines "near" and "far"" to be something,
+	 * which makes our definitions useless in some circumstances. This caused a compile-time error
+	 * and a lot of head scratching. The end result is these variables had their names changed.
+	 */
+	float nearPlane = 0.0f, farPlane = 100.0f;
 	float viewportWidth, viewportHeight;
 
 	float zoom = 1.0f;
@@ -66,22 +71,22 @@ public:
 
 	void setToOrtho(bool yDown, float viewportWidth, float viewportHeight);
 
-	Camera &setNear(float near) {
-		this->near = near;
+	Camera &setNearPlane(float nearPlane) {
+		this->nearPlane = nearPlane;
 		return *this;
 	}
 
-	float getNear() const {
-		return near;
+	float getNearPlane() const {
+		return nearPlane;
 	}
 
-	Camera &setFar(float far) {
-		this->far = far;
+	Camera &setFarPlane(float farPlane) {
+		this->farPlane = farPlane;
 		return *this;
 	}
 
-	float getFar() const {
-		return far;
+	float getFarPlane() const {
+		return farPlane;
 	}
 
 	Camera &setZoom(float zoom) {
