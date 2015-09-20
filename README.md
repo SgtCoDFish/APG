@@ -32,7 +32,7 @@ make -jN # where N is the number of cores you have
 
 If you don't care about the render tests, you can use `cmake -DEXCLUDE_SDL_TEST=ON ..` or `cmake -DEXCLUDE_GL_TEST=ON ..` or both exclusions. By default, both tests are built as well as the libraries.
 
-The audio test is slightly different, and is off by default. You can similarly use `-DEXCLUDE_AUDIO_TEST=OFF` but the option also requires you to place a file, `test_music.ogg` in the base `assets/` directory before running cmake. This is to avoid shipping a test music file which could be several megabytes and would be a waste.
+The audio test is slightly different, and is off by default. You can similarly use `-DEXCLUDE_AUDIO_TEST=OFF` but the option also requires you to place a file, `test_music.ogg` in the base `assets/` directory before running cmake. This is to avoid shipping a test music file which would be a waste of repository space.
 
 Usage Notes - Logging
 ---------------------
