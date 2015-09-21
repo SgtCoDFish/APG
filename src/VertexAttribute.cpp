@@ -27,13 +27,15 @@
 
 #include "APG/VertexAttribute.hpp"
 
-APG::VertexAttribute::VertexAttribute(const std::string &alias, AttributeUsage usage,
-		uint8_t numComponents, bool normalized) :
-		alias { alias }, usage { usage }, normalized { normalized } {
-	if (numComponents < 1 || numComponents > 4) {
-		// TODO: set some kind of error.
-		return;
-	} else {
-		this->numComponents = numComponents;
-	}
+APG::VertexAttribute::VertexAttribute(const std::string &alias, AttributeUsage usage, uint8_t numComponents,
+        bool normalized) :
+                alias { alias },
+                usage { usage },
+                normalized { normalized } {
+    if (numComponents < 1 || numComponents > 4) {
+        // TODO: set some kind of error.
+        return;
+    } else {
+        this->numComponents = numComponents;
+    }
 }

@@ -46,7 +46,7 @@ enum class AnimationMode {
     NORMAL, REVERSED, LOOP, LOOP_PINGPONG
 };
 
-class AnimatedSprite: public SpriteBase {
+class AnimatedSprite : public SpriteBase {
 private:
     int32_t currentFrame = 0;
     int32_t frameCount = 0;

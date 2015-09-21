@@ -77,20 +77,20 @@ bool APG::APGGLRenderTest::init() {
 
     shaderProgram = ShaderProgram::fromFiles(vertexShaderFilename, fragmentShaderFilename);
 
-    camera = std::make_unique < Camera > (screenWidth, screenHeight);
+    camera = std::make_unique<Camera>(screenWidth, screenHeight);
     camera->setToOrtho(false, screenWidth, screenHeight);
-    spriteBatch = std::make_unique < SpriteBatch > (shaderProgram.get());
+    spriteBatch = std::make_unique<SpriteBatch>(shaderProgram.get());
 
-    rendererOne = std::make_unique < GLTmxRenderer > (map1, spriteBatch);
-    rendererTwo = std::make_unique < GLTmxRenderer > (map2, spriteBatch);
+    rendererOne = std::make_unique<GLTmxRenderer>(map1, spriteBatch);
+    rendererTwo = std::make_unique<GLTmxRenderer>(map2, spriteBatch);
     currentRenderer = rendererOne.get();
 
-    playerTexture = std::make_unique < Texture > ("assets/player.png");
+    playerTexture = std::make_unique<Texture>("assets/player.png");
     playerFrames = AnimatedSprite::splitTexture(playerTexture, 32, 32, 0, 32, 4);
-    playerAnimation = std::make_unique < AnimatedSprite > (0.3f, playerFrames, AnimationMode::LOOP);
+    playerAnimation = std::make_unique<AnimatedSprite>(0.3f, playerFrames, AnimationMode::LOOP);
 
-    miniTexture = std::make_unique < Texture > ("assets/player16.png");
-    miniPlayer = std::make_unique < Sprite > (miniTexture);
+    miniTexture = std::make_unique<Texture>("assets/player16.png");
+    miniPlayer = std::make_unique<Sprite>(miniTexture);
 
     currentPlayer = miniPlayer.get();
 
@@ -116,7 +116,7 @@ bool APG::APGGLRenderTest::init() {
 
 void APG::APGGLRenderTest::render(float deltaTime) {
     glClearColor(0.313725f, 0.674510f, 0.239216f, 1.0f);
-    glClear (GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     static float playerX = 128.0f, playerY = 128.0f;
     const glm::vec3 textScreenPosition { 50.0f, screenHeight - 50.0f, 0.0f };
@@ -186,7 +186,7 @@ int main(int argc, char *argv[]) {
     const uint32_t windowWidth = 1280;
     const uint32_t windowHeight = 720;
 
-    auto game = std::make_unique < APG::APGGLRenderTest > (windowTitle, windowWidth, windowHeight);
+    auto game = std::make_unique<APG::APGGLRenderTest>(windowTitle, windowWidth, windowHeight);
 
     if (!game->init()) {
         return EXIT_FAILURE;
@@ -199,8 +199,7 @@ int main(int argc, char *argv[]) {
 
     while (!done) {
         const auto timeNow = std::chrono::high_resolution_clock::now();
-        float deltaTime = std::chrono::duration_cast < std::chrono::milliseconds
-                > (timeNow - startTime).count() / 1000.0f;
+        float deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count() / 1000.0f;
 
         startTime = timeNow;
         timesTaken.push_back(deltaTime);

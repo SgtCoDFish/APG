@@ -34,22 +34,23 @@ uint32_t APG::Game::screenWidth = 1280;
 uint32_t APG::Game::screenHeight = 720;
 
 APG::Game::Game(uint32_t screenWidth, uint32_t screenHeight) {
-	Game::screenWidth = screenWidth;
-	Game::screenHeight = screenHeight;
+    Game::screenWidth = screenWidth;
+    Game::screenHeight = screenHeight;
 
-	setupLoggingDefault();
-	el::Loggers::getLogger("APG")->verbose(9, "Logging initialised.");
+    setupLoggingDefault();
+    el::Loggers::getLogger("APG")->verbose(9, "Logging initialised.");
 }
 
 void APG::Game::setupLoggingDefault() {
-	setLoggerToAPGStyle("APG");
+    setLoggerToAPGStyle("APG");
 }
 
 void APG::Game::setLoggerToAPGStyle(const std::string &loggerName) {
-	auto conf = el::Configurations();
+    auto conf = el::Configurations();
 
-	conf.setToDefault();
-	conf.setGlobally(el::ConfigurationType::Format, "%datetime{%h:%m:%s.%g} [%logger] [%levshort ] - %msg");
-	conf.set(el::Level::Verbose, el::ConfigurationType::Format, "%datetime{%h:%m:%s.%g} [%logger] [%levshort%vlevel] - %msg");
-	el::Loggers::reconfigureLogger(loggerName, conf);
+    conf.setToDefault();
+    conf.setGlobally(el::ConfigurationType::Format, "%datetime{%h:%m:%s.%g} [%logger] [%levshort ] - %msg");
+    conf.set(el::Level::Verbose, el::ConfigurationType::Format,
+            "%datetime{%h:%m:%s.%g} [%logger] [%levshort%vlevel] - %msg");
+    el::Loggers::reconfigureLogger(loggerName, conf);
 }

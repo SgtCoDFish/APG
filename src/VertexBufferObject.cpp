@@ -33,24 +33,23 @@
 #include "APG/ShaderProgram.hpp"
 
 APG::VertexBufferObject::VertexBufferObject(std::initializer_list<APG::VertexAttribute> initList) :
-		VertexBufferObject(false, initList) {
+                VertexBufferObject(false, initList) {
 }
 
-APG::VertexBufferObject::VertexBufferObject(bool isStatic,
-		std::initializer_list<APG::VertexAttribute> initList) :
-		VertexBufferObject(isStatic, initList, nullptr, 0) {
+APG::VertexBufferObject::VertexBufferObject(bool isStatic, std::initializer_list<APG::VertexAttribute> initList) :
+                VertexBufferObject(isStatic, initList, nullptr, 0) {
 }
 
-APG::VertexBufferObject::VertexBufferObject(bool isStatic,
-		std::initializer_list<VertexAttribute> initList, float vertices[], int vertexCount) :
-		APG::FloatBuffer(BufferType::ARRAY,
-				isStatic ? DrawType::STATIC_DRAW : DrawType::DYNAMIC_DRAW, vertices, vertexCount), //
-		attributeList { initList } {
+APG::VertexBufferObject::VertexBufferObject(bool isStatic, std::initializer_list<VertexAttribute> initList,
+        float vertices[], int vertexCount) :
+                APG::FloatBuffer(BufferType::ARRAY, isStatic ? DrawType::STATIC_DRAW : DrawType::DYNAMIC_DRAW, vertices,
+                        vertexCount), //
+                attributeList { initList } {
 
 }
 
 void APG::VertexBufferObject::bind(ShaderProgram * const program) {
-	Buffer::bind();
+    Buffer::bind();
 
-	program->setVertexAttributes(attributeList);
+    program->setVertexAttributes(attributeList);
 }

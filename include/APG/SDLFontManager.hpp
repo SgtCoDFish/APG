@@ -44,7 +44,7 @@
 
 namespace APG {
 
-class SDLFontManager: public FontManager {
+class SDLFontManager : public FontManager {
 private:
     static constexpr int MAX_OWNED_TEXTURES = 5;
     static constexpr int MAX_OWNED_SPRITES = 3;

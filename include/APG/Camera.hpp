@@ -44,65 +44,63 @@ namespace APG {
  */
 class Camera {
 private:
-	static const glm::mat4 IDENTITY;
+    static const glm::mat4 IDENTITY;
 
-	/*
-	 * Interesting note: some header on windows defines "near" and "far"" to be something,
-	 * which makes our definitions useless in some circumstances. This caused a compile-time error
-	 * and a lot of head scratching. The end result is these variables had their names changed.
-	 */
-	float nearPlane = 0.0f, farPlane = 100.0f;
-	float viewportWidth, viewportHeight;
+    /*
+     * Interesting note: some header on windows defines "near" and "far"" to be something,
+     * which makes our definitions useless in some circumstances. This caused a compile-time error
+     * and a lot of head scratching. The end result is these variables had their names changed.
+     */
+    float nearPlane = 0.0f, farPlane = 100.0f;
+    float viewportWidth, viewportHeight;
 
-	float zoom = 1.0f;
+    float zoom = 1.0f;
 
 public:
-	glm::vec3 position;
-	glm::vec3 direction;
-	glm::vec3 up;
+    glm::vec3 position;
+    glm::vec3 direction;
+    glm::vec3 up;
 
-	glm::mat4 projectionMatrix;
-	glm::mat4 transformMatrix;
-	glm::mat4 combinedMatrix;
+    glm::mat4 projectionMatrix;
+    glm::mat4 transformMatrix;
+    glm::mat4 combinedMatrix;
 
-	explicit Camera(float viewportWidth = Game::screenWidth, float viewportHeight = Game::screenHeight);
+    explicit Camera(float viewportWidth = Game::screenWidth, float viewportHeight = Game::screenHeight);
 
-	void update();
+    void update();
 
-	void setToOrtho(bool yDown, float viewportWidth, float viewportHeight);
+    void setToOrtho(bool yDown, float viewportWidth, float viewportHeight);
 
-	Camera &setNearPlane(float nearPlane) {
-		this->nearPlane = nearPlane;
-		return *this;
-	}
+    Camera &setNearPlane(float nearPlane) {
+        this->nearPlane = nearPlane;
+        return *this;
+    }
 
-	float getNearPlane() const {
-		return nearPlane;
-	}
+    float getNearPlane() const {
+        return nearPlane;
+    }
 
-	Camera &setFarPlane(float farPlane) {
-		this->farPlane = farPlane;
-		return *this;
-	}
+    Camera &setFarPlane(float farPlane) {
+        this->farPlane = farPlane;
+        return *this;
+    }
 
-	float getFarPlane() const {
-		return farPlane;
-	}
+    float getFarPlane() const {
+        return farPlane;
+    }
 
-	Camera &setZoom(float zoom) {
-		this->zoom = zoom;
-		return *this;
-	}
+    Camera &setZoom(float zoom) {
+        this->zoom = zoom;
+        return *this;
+    }
 
-	float getZoom() const {
-		return zoom;
-	}
+    float getZoom() const {
+        return zoom;
+    }
 
-	glm::vec3 unproject(const glm::vec3 &position) const;
+    glm::vec3 unproject(const glm::vec3 &position) const;
 };
 
 }
-
-
 
 #endif /* INCLUDE_APG_CAMERA_HPP_ */

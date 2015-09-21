@@ -36,13 +36,13 @@
 namespace APG {
 
 struct Vertex {
-	float x;
-	float y;
+    float x;
+    float y;
 
-	float c;
+    float c;
 
-	float u;
-	float v;
+    float u;
+    float v;
 };
 
 static const int VERTEX_SIZE = 5;

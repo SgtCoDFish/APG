@@ -50,24 +50,24 @@ namespace APG {
  */
 class SDLTmxRenderer final : public APG::TmxRenderer {
 private:
-	const SXXDL::renderer_ptr &renderer;
+    const SXXDL::renderer_ptr &renderer;
 
-	std::vector<SXXDL::sdl_texture_ptr> sdlTextures;
+    std::vector<SXXDL::sdl_texture_ptr> sdlTextures;
 
 public:
-	explicit SDLTmxRenderer(const std::unique_ptr<Tmx::Map> &map, const SXXDL::renderer_ptr &renderer) :
-			SDLTmxRenderer(map.get(), renderer) {
-	}
+    explicit SDLTmxRenderer(const std::unique_ptr<Tmx::Map> &map, const SXXDL::renderer_ptr &renderer) :
+                    SDLTmxRenderer(map.get(), renderer) {
+    }
 
-	explicit SDLTmxRenderer(Tmx::Map * const map, const SXXDL::renderer_ptr &renderer);
-	virtual ~SDLTmxRenderer() = default;
+    explicit SDLTmxRenderer(Tmx::Map * const map, const SXXDL::renderer_ptr &renderer);
+    virtual ~SDLTmxRenderer() = default;
 
-	void renderLayer(Tmx::TileLayer * const layer) override;
-	void renderObjectGroup(const std::vector<TiledObject> &objects) override;
+    void renderLayer(Tmx::TileLayer * const layer) override;
+    void renderObjectGroup(const std::vector<TiledObject> &objects) override;
 
-	// disallow copying because we own resources.
-	SDLTmxRenderer(SDLTmxRenderer &other) = delete;
-	SDLTmxRenderer(const SDLTmxRenderer &other) = delete;
+    // disallow copying because we own resources.
+    SDLTmxRenderer(SDLTmxRenderer &other) = delete;
+    SDLTmxRenderer(const SDLTmxRenderer &other) = delete;
 };
 
 }

@@ -128,7 +128,7 @@ void APG::AnimatedSprite::update(float deltaTime) {
 }
 
 APG::SpriteBase *APG::AnimatedSprite::getFrame(uint32_t frameNumber) const {
-    REQUIRE((int32_t) frameNumber >= 0 && (int32_t) frameNumber <= frameCount,
+    REQUIRE((int32_t ) frameNumber >= 0 && (int32_t ) frameNumber <= frameCount,
             "Invalid frame number passed to getFrame.");
     return frames[frameNumber];
 }
@@ -227,7 +227,7 @@ std::vector<APG::Sprite> APG::AnimatedSprite::splitTexture(Texture * texture, ui
 
     REQUIRE(frameCount >= 1, "Cannot have 0 frames in a split texture.");
 
-    std::vector < Sprite > loadedFrames;
+    std::vector<Sprite> loadedFrames;
     loadedFrames.reserve(frameCount);
 
     for (uint32_t i = 0u; i < (uint32_t) frameCount; ++i) {

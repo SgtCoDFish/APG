@@ -34,17 +34,17 @@ namespace APG {
 
 class VAO final {
 private:
-	uint32_t vaoID;
+    uint32_t vaoID;
 
 public:
-	VAO();
-	~VAO();
+    VAO();
+    ~VAO();
 
-	void bind() const;
+    void bind() const;
 
-	uint32_t getVAOID() const {
-		return vaoID;
-	}
+    uint32_t getVAOID() const {
+        return vaoID;
+    }
 };
 
 }

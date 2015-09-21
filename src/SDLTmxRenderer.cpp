@@ -40,61 +40,62 @@
 #include "APG/internal/Assert.hpp"
 
 APG::SDLTmxRenderer::SDLTmxRenderer(Tmx::Map * const map, const SXXDL::renderer_ptr &renderer) :
-		TmxRenderer(map), renderer { renderer } {
+                TmxRenderer(map),
+                renderer { renderer } {
 
-	REQUIRE(map->GetOrientation() == Tmx::MapOrientation::TMX_MO_ORTHOGONAL,
-	        "SDLTmxRenderer only supports orthogonal maps.");
+    REQUIRE(map->GetOrientation() == Tmx::MapOrientation::TMX_MO_ORTHOGONAL,
+            "SDLTmxRenderer only supports orthogonal maps.");
 
-	for (const auto &tileset : tilesets) {
-		sdlTextures.emplace_back(
-		        SXXDL::make_sdl_texture_ptr(
-		                SDL_CreateTextureFromSurface(renderer.get(), tileset->getPreservedSurface())));
-	}
+    for (const auto &tileset : tilesets) {
+        sdlTextures.emplace_back(
+                SXXDL::make_sdl_texture_ptr(
+                        SDL_CreateTextureFromSurface(renderer.get(), tileset->getPreservedSurface())));
+    }
 }
 
 void APG::SDLTmxRenderer::renderLayer(Tmx::TileLayer * const layer) {
-	const auto tile_width = map->GetTileWidth();
-	const auto tile_height = map->GetTileHeight();
+    const auto tile_width = map->GetTileWidth();
+    const auto tile_height = map->GetTileHeight();
 
-	auto src_rect = SDL_Rect { 0, 0, tile_width, tile_height };
-	auto dst_rect = SDL_Rect { 0, 0, tile_width, tile_height };
+    auto src_rect = SDL_Rect { 0, 0, tile_width, tile_height };
+    auto dst_rect = SDL_Rect { 0, 0, tile_width, tile_height };
 
-	if (layer->IsVisible()) {
-		for (int y = 0; y < layer->GetHeight(); y++) {
-			for (int x = 0; x < layer->GetWidth(); x++) {
+    if (layer->IsVisible()) {
+        for (int y = 0; y < layer->GetHeight(); y++) {
+            for (int x = 0; x < layer->GetWidth(); x++) {
 
-				const unsigned int tile_id = layer->GetTileId(x, y);
-				const auto tileset_index = layer->GetTileTilesetIndex(x, y);
+                const unsigned int tile_id = layer->GetTileId(x, y);
+                const auto tileset_index = layer->GetTileTilesetIndex(x, y);
 
-				if (tileset_index == -1) {
-					continue;
-				}
+                if (tileset_index == -1) {
+                    continue;
+                }
 
-				const auto &current_tileset = tilesets[tileset_index];
-				const auto &sdl_tileset = sdlTextures[tileset_index];
+                const auto &current_tileset = tilesets[tileset_index];
+                const auto &sdl_tileset = sdlTextures[tileset_index];
 
-				const int tileset_x = tile_id % current_tileset->getWidthInTiles();
-				const int tileset_y = tile_id / current_tileset->getWidthInTiles();
+                const int tileset_x = tile_id % current_tileset->getWidthInTiles();
+                const int tileset_y = tile_id / current_tileset->getWidthInTiles();
 
-				const auto spacing = current_tileset->getSpacing();
+                const auto spacing = current_tileset->getSpacing();
 
-				src_rect.x = tileset_x * (tile_width + spacing);
-				src_rect.y = tileset_y * (tile_height + spacing);
+                src_rect.x = tileset_x * (tile_width + spacing);
+                src_rect.y = tileset_y * (tile_height + spacing);
 
-				dst_rect.x = (int) position.x + x * tile_width;
-				dst_rect.y = (int) position.y + y * tile_height;
+                dst_rect.x = (int) position.x + x * tile_width;
+                dst_rect.y = (int) position.y + y * tile_height;
 
-				if (SDL_RenderCopy(renderer.get(), sdl_tileset.get(), &src_rect, &dst_rect) < 0) {
-					el::Loggers::getLogger("APG")->error(
-					        "Couldn't render in tmx renderer; failed at tile %v, tileset \"%v\"", tile_id,
-					        current_tileset->getFileName());
-					return;
-				}
-			}
-		}
-	}
+                if (SDL_RenderCopy(renderer.get(), sdl_tileset.get(), &src_rect, &dst_rect) < 0) {
+                    el::Loggers::getLogger("APG")->error(
+                            "Couldn't render in tmx renderer; failed at tile %v, tileset \"%v\"", tile_id,
+                            current_tileset->getFileName());
+                    return;
+                }
+            }
+        }
+    }
 }
 
 void APG::SDLTmxRenderer::renderObjectGroup(const std::vector<TiledObject> &objects) {
-	el::Loggers::getLogger("APG")->fatal("SDL renderer cannot render object groups yet.");
+    el::Loggers::getLogger("APG")->fatal("SDL renderer cannot render object groups yet.");
 }
