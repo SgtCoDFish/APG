@@ -73,7 +73,7 @@ APG::SpriteBatch::SpriteBatch(ShaderProgram * const program, uint32_t bufferSize
     }
 
     const unsigned int indicesLength = bufferSize * 6;
-    std::vector < uint16_t > indices(indicesLength, 0);
+    std::vector<uint16_t> indices(indicesLength, 0);
 
     uint16_t j = 0;
     for (unsigned int i = 0; i < indicesLength; i += 6, j += 4) {
@@ -242,7 +242,7 @@ void APG::SpriteBatch::begin() {
     setupMatrices();
     program->use();
 
-    glEnable (GL_BLEND);
+    glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 

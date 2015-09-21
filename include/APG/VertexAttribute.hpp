@@ -35,48 +35,47 @@
 namespace APG {
 
 enum class AttributeUsage {
-	POSITION, COLOR, TEXCOORD, NORMAL,
+    POSITION, COLOR, TEXCOORD, NORMAL,
 };
 
 class VertexAttribute final {
 private:
-	std::string alias;
-	AttributeUsage usage;
+    std::string alias;
+    AttributeUsage usage;
 
-	uint8_t numComponents = 0;
+    uint8_t numComponents = 0;
 
-	bool normalized = false;
+    bool normalized = false;
 
-	uint16_t offset = 0;
+    uint16_t offset = 0;
 
 public:
-	VertexAttribute(const std::string &alias, AttributeUsage usage, uint8_t numComponents,
-			bool normalized = false);
-	~VertexAttribute() = default;
+    VertexAttribute(const std::string &alias, AttributeUsage usage, uint8_t numComponents, bool normalized = false);
+    ~VertexAttribute() = default;
 
-	const std::string &getAlias() const {
-		return alias;
-	}
+    const std::string &getAlias() const {
+        return alias;
+    }
 
-	AttributeUsage getUsage() const {
-		return usage;
-	}
+    AttributeUsage getUsage() const {
+        return usage;
+    }
 
-	uint8_t getComponentCount() const {
-		return numComponents;
-	}
+    uint8_t getComponentCount() const {
+        return numComponents;
+    }
 
-	bool isNormalized() const {
-		return normalized;
-	}
+    bool isNormalized() const {
+        return normalized;
+    }
 
-	void setOffset(uint16_t offset) {
-		this->offset = offset;
-	}
+    void setOffset(uint16_t offset) {
+        this->offset = offset;
+    }
 
-	uint8_t getOffset() const {
-		return offset;
-	}
+    uint8_t getOffset() const {
+        return offset;
+    }
 };
 
 }

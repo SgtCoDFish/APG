@@ -53,48 +53,49 @@ namespace APG {
 
 class APGGLRenderTest final : public APG::SDLGame {
 private:
-	static const char *vertexShaderFilename;
-	static const char *fragmentShaderFilename;
+    static const char *vertexShaderFilename;
+    static const char *fragmentShaderFilename;
 
-	std::unique_ptr<Tmx::Map> map1;
-	std::unique_ptr<Tmx::Map> map2;
+    std::unique_ptr<Tmx::Map> map1;
+    std::unique_ptr<Tmx::Map> map2;
 
-	std::unique_ptr<ShaderProgram> shaderProgram;
+    std::unique_ptr<ShaderProgram> shaderProgram;
 
-	std::unique_ptr<Camera> camera;
-	std::unique_ptr<SpriteBatch> spriteBatch;
+    std::unique_ptr<Camera> camera;
+    std::unique_ptr<SpriteBatch> spriteBatch;
 
-	std::unique_ptr<GLTmxRenderer> rendererOne;
-	std::unique_ptr<GLTmxRenderer> rendererTwo;
-	GLTmxRenderer *currentRenderer = nullptr;
+    std::unique_ptr<GLTmxRenderer> rendererOne;
+    std::unique_ptr<GLTmxRenderer> rendererTwo;
+    GLTmxRenderer *currentRenderer = nullptr;
 
-	std::unique_ptr<Texture> playerTexture;
-	std::vector<Sprite> playerFrames;
-	std::unique_ptr<AnimatedSprite> playerAnimation;
+    std::unique_ptr<Texture> playerTexture;
+    std::vector<Sprite> playerFrames;
+    std::unique_ptr<AnimatedSprite> playerAnimation;
 
-	std::unique_ptr<Texture> miniTexture;
-	std::unique_ptr<Sprite> miniPlayer;
+    std::unique_ptr<Texture> miniTexture;
+    std::unique_ptr<Sprite> miniPlayer;
 
-	SpriteBase * currentPlayer = nullptr;
+    SpriteBase * currentPlayer = nullptr;
 
-	FontManager::font_handle font = -1;
+    FontManager::font_handle font = -1;
 
-	SpriteBase *fontSprite = nullptr;
+    SpriteBase *fontSprite = nullptr;
 
 public:
-	explicit APGGLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
-	        uint32_t glContextMajor = 3, uint32_t glContextMinor = 2, uint32_t windowX = SDL_WINDOWPOS_CENTERED, uint32_t windowY = SDL_WINDOWPOS_CENTERED) :
-			SDLGame(windowTitle, windowWidth, windowHeight, glContextMajor, glContextMinor, windowX, windowY) {
-	}
+    explicit APGGLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
+            uint32_t glContextMajor = 3, uint32_t glContextMinor = 2, uint32_t windowX = SDL_WINDOWPOS_CENTERED,
+            uint32_t windowY = SDL_WINDOWPOS_CENTERED) :
+                    SDLGame(windowTitle, windowWidth, windowHeight, glContextMajor, glContextMinor, windowX, windowY) {
+    }
 
-	virtual ~APGGLRenderTest() = default;
+    virtual ~APGGLRenderTest() = default;
 
-	bool init() override;
-	void render(float deltaTime) override;
+    bool init() override;
+    void render(float deltaTime) override;
 
-	const Tmx::Map *getMap() const {
-		return map1.get();
-	}
+    const Tmx::Map *getMap() const {
+        return map1.get();
+    }
 };
 
 }

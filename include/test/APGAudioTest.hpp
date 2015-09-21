@@ -36,20 +36,21 @@ namespace APG {
 
 class APGAudioTest : public SDLGame {
 private:
-	AudioManager::music_handle testHandle = -1;
-	AudioManager::sound_handle soundHandle = -1;
+    AudioManager::music_handle testHandle = -1;
+    AudioManager::sound_handle soundHandle = -1;
 
-	inline void clearToRed();
-	inline void clearToGreen();
+    inline void clearToRed();
+    inline void clearToGreen();
 
 public:
-	explicit APGAudioTest(const uint32_t windowWidth = 1280u, const uint32_t windowHeight = 720u) : SDLGame("APG Audio Test", windowWidth, windowHeight) {
-	}
+    explicit APGAudioTest(const uint32_t windowWidth = 1280u, const uint32_t windowHeight = 720u) :
+                    SDLGame("APG Audio Test", windowWidth, windowHeight) {
+    }
 
-	virtual ~APGAudioTest() = default;
+    virtual ~APGAudioTest() = default;
 
-	bool init() override;
-	void render(float deltaTime) override;
+    bool init() override;
+    void render(float deltaTime) override;
 };
 
 }
