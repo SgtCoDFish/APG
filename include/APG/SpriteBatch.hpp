@@ -49,80 +49,80 @@ class Sprite;
 
 class SpriteBatch {
 private:
-	static const char * const POSITION_ATTRIBUTE;
-	static const char * const COLOR_ATTRIBUTE;
-	static const char * const TEXCOORD_ATTRIBUTE;
+    static const char * const POSITION_ATTRIBUTE;
+    static const char * const COLOR_ATTRIBUTE;
+    static const char * const TEXCOORD_ATTRIBUTE;
 
-	const uint32_t bufferSize;
+    const uint32_t bufferSize;
 
-	bool drawing = false;
+    bool drawing = false;
 
-	VAO vao;
-	VertexBufferObject vertexBuffer;
-	IndexBufferObject indexBuffer;
+    VAO vao;
+    VertexBufferObject vertexBuffer;
+    IndexBufferObject indexBuffer;
 
-	std::vector<float> vertices;
+    std::vector<float> vertices;
 
-	std::unique_ptr<APG::ShaderProgram> ownedShaderProgram;
-	ShaderProgram *program = nullptr;
+    std::unique_ptr<APG::ShaderProgram> ownedShaderProgram;
+    ShaderProgram *program = nullptr;
 
-	uint64_t idx = 0;
+    uint64_t idx = 0;
 
-	Texture * lastTexture = nullptr;
-	void switchTexture(Texture * const newTexture);
+    Texture * lastTexture = nullptr;
+    void switchTexture(Texture * const newTexture);
 
-	glm::vec4 color;
-	glm::mat4 projectionMatrix;
-	glm::mat4 transformMatrix;
-	glm::mat4 combinedMatrix;
-	void setupMatrices();
+    glm::vec4 color;
+    glm::mat4 projectionMatrix;
+    glm::mat4 transformMatrix;
+    glm::mat4 combinedMatrix;
+    void setupMatrices();
 
 public:
-	static const uint32_t DEFAULT_BUFFER_SIZE;
+    static const uint32_t DEFAULT_BUFFER_SIZE;
 
-	explicit SpriteBatch(const std::unique_ptr<ShaderProgram> &program, uint32_t bufferSize = DEFAULT_BUFFER_SIZE) :
-			SpriteBatch(program.get(), bufferSize) {
-	}
+    explicit SpriteBatch(const std::unique_ptr<ShaderProgram> &program, uint32_t bufferSize = DEFAULT_BUFFER_SIZE) :
+            SpriteBatch(program.get(), bufferSize) {
+    }
 
-	explicit SpriteBatch(ShaderProgram * const program = nullptr, uint32_t bufferSize = DEFAULT_BUFFER_SIZE);
-	~SpriteBatch() = default;
+    explicit SpriteBatch(ShaderProgram * const program = nullptr, uint32_t bufferSize = DEFAULT_BUFFER_SIZE);
+    ~SpriteBatch() = default;
 
-	void begin();
-	void end();
+    void begin();
+    void end();
 
-	void flush();
+    void flush();
 
-	inline void draw(const std::unique_ptr<Texture> &image, float x, float y, uint32_t width, uint32_t height,
-	        float srcX, float srcY, uint32_t srcWidth, uint32_t srcHeight) {
-		draw(image.get(), x, y, width, height, srcX, srcY, srcWidth, srcHeight);
-	}
-	void draw(Texture * const image, float x, float y, uint32_t width, uint32_t height, float srcX, float srcY,
-	        uint32_t srcWidth, uint32_t srcHeight);
+    inline void draw(const std::unique_ptr<Texture> &image, float x, float y, uint32_t width, uint32_t height,
+            float srcX, float srcY, uint32_t srcWidth, uint32_t srcHeight) {
+        draw(image.get(), x, y, width, height, srcX, srcY, srcWidth, srcHeight);
+    }
+    void draw(Texture * const image, float x, float y, uint32_t width, uint32_t height, float srcX, float srcY,
+            uint32_t srcWidth, uint32_t srcHeight);
 
-	inline void draw(const std::unique_ptr<SpriteBase> &sprite, float x, float y) {
-		draw(sprite.get(), x, y);
-	}
+    inline void draw(const std::unique_ptr<SpriteBase> &sprite, float x, float y) {
+        draw(sprite.get(), x, y);
+    }
 
-	void draw(SpriteBase * const sprite, float x, float y);
+    void draw(SpriteBase * const sprite, float x, float y);
 
-	glm::vec4 getColor() const {
-		return color;
-	}
+    glm::vec4 getColor() const {
+        return color;
+    }
 
-	void setColor(const glm::vec4 &newColor) {
-		color = glm::vec4(newColor);
-	}
+    void setColor(const glm::vec4 &newColor) {
+        color = glm::vec4(newColor);
+    }
 
-	void setColor(float r, float g, float b, float a) {
-		color.r = r;
-		color.g = g;
-		color.b = b;
-		color.a = a;
-	}
+    void setColor(float r, float g, float b, float a) {
+        color.r = r;
+        color.g = g;
+        color.b = b;
+        color.a = a;
+    }
 
-	void setProjectionMatrix(const glm::mat4 &matrix);
+    void setProjectionMatrix(const glm::mat4 &matrix);
 
-	static std::unique_ptr<APG::ShaderProgram> createDefaultShader();
+    static std::unique_ptr<APG::ShaderProgram> createDefaultShader();
 };
 
 }

@@ -57,161 +57,166 @@ const char * APG::APGGLRenderTest::vertexShaderFilename = "assets/pass_vertex.gl
 const char * APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag.glslf";
 
 bool APG::APGGLRenderTest::init() {
-	const auto logger = el::Loggers::getLogger("APG");
+    const auto logger = el::Loggers::getLogger("APG");
 
-	map1 = std::make_unique<Tmx::Map>();
-	map1->ParseFile("assets/sample_indoor.tmx");
+    map1 = std::make_unique<Tmx::Map>();
+    map1->ParseFile("assets/sample_indoor.tmx");
 
-	if (map1->HasError()) {
-		logger->fatal("Error loading map1: %v", map1->GetErrorText());
-		return false;
-	}
+    if (map1->HasError()) {
+        logger->fatal("Error loading map1: %v", map1->GetErrorText());
+        return false;
+    }
 
-	map2 = std::make_unique<Tmx::Map>();
-	map2->ParseFile("assets/world1.tmx");
+    map2 = std::make_unique<Tmx::Map>();
+    map2->ParseFile("assets/world1.tmx");
 
-	if (map2->HasError()) {
-		logger->fatal("Error loading map2: %v", map2->GetErrorText());
-		return false;
-	}
+    if (map2->HasError()) {
+        logger->fatal("Error loading map2: %v", map2->GetErrorText());
+        return false;
+    }
 
-	shaderProgram = ShaderProgram::fromFiles(vertexShaderFilename, fragmentShaderFilename);
+    shaderProgram = ShaderProgram::fromFiles(vertexShaderFilename, fragmentShaderFilename);
 
-	camera = std::make_unique<Camera>(screenWidth, screenHeight);
-	camera->setToOrtho(false, screenWidth, screenHeight);
-	spriteBatch = std::make_unique<SpriteBatch>(shaderProgram.get());
+    camera = std::make_unique < Camera > (screenWidth, screenHeight);
+    camera->setToOrtho(false, screenWidth, screenHeight);
+    spriteBatch = std::make_unique < SpriteBatch > (shaderProgram.get());
 
-	rendererOne = std::make_unique<GLTmxRenderer>(map1, spriteBatch);
-	rendererTwo = std::make_unique<GLTmxRenderer>(map2, spriteBatch);
-	currentRenderer = rendererOne.get();
+    rendererOne = std::make_unique < GLTmxRenderer > (map1, spriteBatch);
+    rendererTwo = std::make_unique < GLTmxRenderer > (map2, spriteBatch);
+    currentRenderer = rendererOne.get();
 
-	playerTexture = std::make_unique<Texture>("assets/player.png");
-	playerFrames = AnimatedSprite::splitTexture(playerTexture, 32, 32, 0, 32, 4);
-	playerAnimation = std::make_unique<AnimatedSprite>(0.3f, playerFrames, AnimationMode::LOOP);
+    playerTexture = std::make_unique < Texture > ("assets/player.png");
+    playerFrames = AnimatedSprite::splitTexture(playerTexture, 32, 32, 0, 32, 4);
+    playerAnimation = std::make_unique < AnimatedSprite > (0.3f, playerFrames, AnimationMode::LOOP);
 
-	miniTexture = std::make_unique<Texture>("assets/player16.png");
-	miniPlayer = std::make_unique<Sprite>(miniTexture);
+    miniTexture = std::make_unique < Texture > ("assets/player16.png");
+    miniPlayer = std::make_unique < Sprite > (miniTexture);
 
-	currentPlayer = miniPlayer.get();
+    currentPlayer = miniPlayer.get();
 
-	font = fontManager->loadFontFile("assets/test_font.ttf", 12);
-	const auto renderedFontSize = fontManager->estimateSizeOf(font, "Hello, World!");
+    font = fontManager->loadFontFile("assets/test_font.ttf", 12);
+    const auto renderedFontSize = fontManager->estimateSizeOf(font, "Hello, World!");
 
-	logger->info("Estimated font size: (w, h) = (%v, %v).", renderedFontSize.x, renderedFontSize.y);
+    logger->info("Estimated font size: (w, h) = (%v, %v).", renderedFontSize.x, renderedFontSize.y);
 
-	fontSprite = fontManager->renderText(font, "Hello, world!", FontRenderMethod::NICE);
+    fontSprite = fontManager->renderText(font, "Hello, world!", FontRenderMethod::NICE);
 
-	auto glError = glGetError();
-	if (glError != GL_NO_ERROR) {
-		while (glError != GL_NO_ERROR) {
-			logger->fatal("Error in OpenGL while loading: ", gluErrorString(glError));
-			glError = glGetError();
-		}
+    auto glError = glGetError();
+    if (glError != GL_NO_ERROR) {
+        while (glError != GL_NO_ERROR) {
+            logger->fatal("Error in OpenGL while loading: ", gluErrorString(glError));
+            glError = glGetError();
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 void APG::APGGLRenderTest::render(float deltaTime) {
-	glClearColor(0.313725f, 0.674510f, 0.239216f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0.313725f, 0.674510f, 0.239216f, 1.0f);
+    glClear (GL_COLOR_BUFFER_BIT);
 
-	static float playerX = 128.0f, playerY = 128.0f;
-	const glm::vec3 textScreenPosition { 50.0f, screenHeight - 50.0f, 0.0f };
-	static glm::vec3 textPos;
+    static float playerX = 128.0f, playerY = 128.0f;
+    const glm::vec3 textScreenPosition { 50.0f, screenHeight - 50.0f, 0.0f };
+    static glm::vec3 textPos;
 
-	// will move the player quickly
-	if (inputManager->isKeyPressed(SDL_SCANCODE_UP)) {
-		playerY -= currentPlayer->getHeight();
-	} else if (inputManager->isKeyPressed(SDL_SCANCODE_DOWN)) {
-		playerY += currentPlayer->getHeight();
-	} else if (inputManager->isKeyPressed(SDL_SCANCODE_LEFT)) {
-		playerX -= currentPlayer->getWidth();
-	} else if (inputManager->isKeyPressed(SDL_SCANCODE_RIGHT)) {
-		playerX += currentPlayer->getWidth();
-	}
+    // will move the player quickly
+    if (inputManager->isKeyPressed(SDL_SCANCODE_UP)) {
+        playerY -= currentPlayer->getHeight();
+    } else if (inputManager->isKeyPressed(SDL_SCANCODE_DOWN)) {
+        playerY += currentPlayer->getHeight();
+    } else if (inputManager->isKeyPressed(SDL_SCANCODE_LEFT)) {
+        playerX -= currentPlayer->getWidth();
+    } else if (inputManager->isKeyPressed(SDL_SCANCODE_RIGHT)) {
+        playerX += currentPlayer->getWidth();
+    }
 
-	// will move the player once per press
-	if (inputManager->isKeyJustPressed(SDL_SCANCODE_W)) {
-		playerY -= currentPlayer->getHeight();
-	} else if (inputManager->isKeyJustPressed(SDL_SCANCODE_S)) {
-		playerY += currentPlayer->getHeight();
-	} else if (inputManager->isKeyJustPressed(SDL_SCANCODE_A)) {
-		playerX -= currentPlayer->getWidth();
-	} else if (inputManager->isKeyJustPressed(SDL_SCANCODE_D)) {
-		playerX += currentPlayer->getWidth();
-	}
+    // will move the player once per press
+    if (inputManager->isKeyJustPressed(SDL_SCANCODE_W)) {
+        playerY -= currentPlayer->getHeight();
+    } else if (inputManager->isKeyJustPressed(SDL_SCANCODE_S)) {
+        playerY += currentPlayer->getHeight();
+    } else if (inputManager->isKeyJustPressed(SDL_SCANCODE_A)) {
+        playerX -= currentPlayer->getWidth();
+    } else if (inputManager->isKeyJustPressed(SDL_SCANCODE_D)) {
+        playerX += currentPlayer->getWidth();
+    }
 
-	if (inputManager->isKeyJustPressed(SDL_SCANCODE_SPACE)) {
-		if (currentRenderer == rendererOne.get()) {
-			currentRenderer = rendererTwo.get();
-			currentPlayer = playerAnimation.get();
-		} else {
-			currentRenderer = rendererOne.get();
-			currentPlayer = miniPlayer.get();
-			playerX = 18 * 16;
-			playerY = 21 * 16;
-		}
-	}
+    if (inputManager->isKeyJustPressed(SDL_SCANCODE_SPACE)) {
+        if (currentRenderer == rendererOne.get()) {
+            currentRenderer = rendererTwo.get();
+            currentPlayer = playerAnimation.get();
+        } else {
+            currentRenderer = rendererOne.get();
+            currentPlayer = miniPlayer.get();
+            playerX = 18 * 16;
+            playerY = 21 * 16;
+        }
+    }
 
-	camera->position.x = playerX - screenWidth / 2.0f;
-	camera->position.y = playerY - screenHeight / 2.0f;
+    camera->position.x = playerX - screenWidth / 2.0f;
+    camera->position.y = playerY - screenHeight / 2.0f;
 
-	camera->update();
-	spriteBatch->setProjectionMatrix(camera->combinedMatrix);
+    camera->update();
+    spriteBatch->setProjectionMatrix(camera->combinedMatrix);
 
-	currentRenderer->renderAll(deltaTime);
-	playerAnimation->update(deltaTime);
+    currentRenderer->renderAll(deltaTime);
+    playerAnimation->update(deltaTime);
 
-	textPos = camera->unproject(textScreenPosition);
+    textPos = camera->unproject(textScreenPosition);
 
-	spriteBatch->begin();
-	spriteBatch->draw(currentPlayer, playerX, playerY);
-	spriteBatch->draw(fontSprite, textPos.x, textPos.y);
-	spriteBatch->end();
+    spriteBatch->begin();
+//	spriteBatch->draw(currentPlayer, playerX, playerY);
+    // draw a weird quarter version of the player to test out extended draw method
+    spriteBatch->draw(currentPlayer->getTexture(), playerX, playerY, currentPlayer->getWidth() * 2,
+            currentPlayer->getHeight() * 2, 0.0f, 0.0f, currentPlayer->getWidth() * 0.5f,
+            currentPlayer->getHeight() * 0.5f);
+    spriteBatch->draw(fontSprite, textPos.x, textPos.y);
+    spriteBatch->end();
 
-	SDL_GL_SwapWindow(window.get());
+    SDL_GL_SwapWindow(window.get());
 }
 
 int main(int argc, char *argv[]) {
-	START_EASYLOGGINGPP(argc, argv);
+    START_EASYLOGGINGPP(argc, argv);
 
-	const std::string windowTitle("APG GLTmxRenderer Example");
-	const uint32_t windowWidth = 1280;
-	const uint32_t windowHeight = 720;
+    const std::string windowTitle("APG GLTmxRenderer Example");
+    const uint32_t windowWidth = 1280;
+    const uint32_t windowHeight = 720;
 
-	auto game = std::make_unique<APG::APGGLRenderTest>(windowTitle, windowWidth, windowHeight);
+    auto game = std::make_unique < APG::APGGLRenderTest > (windowTitle, windowWidth, windowHeight);
 
-	if (!game->init()) {
-		return EXIT_FAILURE;
-	}
+    if (!game->init()) {
+        return EXIT_FAILURE;
+    }
 
-	bool done = false;
+    bool done = false;
 
-	auto startTime = std::chrono::high_resolution_clock::now();
-	std::vector<float> timesTaken;
+    auto startTime = std::chrono::high_resolution_clock::now();
+    std::vector<float> timesTaken;
 
-	while (!done) {
-		const auto timeNow = std::chrono::high_resolution_clock::now();
-		float deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count() / 1000.0f;
+    while (!done) {
+        const auto timeNow = std::chrono::high_resolution_clock::now();
+        float deltaTime = std::chrono::duration_cast < std::chrono::milliseconds
+                > (timeNow - startTime).count() / 1000.0f;
 
-		startTime = timeNow;
-		timesTaken.push_back(deltaTime);
+        startTime = timeNow;
+        timesTaken.push_back(deltaTime);
 
-		done = game->update(deltaTime);
+        done = game->update(deltaTime);
 
-		if (timesTaken.size() >= 500) {
-			const float sum = std::accumulate(timesTaken.begin(), timesTaken.end(), 0.0f);
+        if (timesTaken.size() >= 500) {
+            const float sum = std::accumulate(timesTaken.begin(), timesTaken.end(), 0.0f);
 
-			const float fps = 1 / (sum / timesTaken.size());
+            const float fps = 1 / (sum / timesTaken.size());
 
-			el::Loggers::getLogger("APG")->info("FPS: %v", fps);
+            el::Loggers::getLogger("APG")->info("FPS: %v", fps);
 
-			timesTaken.clear();
-		}
-	}
+            timesTaken.clear();
+        }
+    }
 
-	return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
