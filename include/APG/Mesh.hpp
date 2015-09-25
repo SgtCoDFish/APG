@@ -38,13 +38,13 @@ namespace APG {
 
 class Mesh final {
 private:
-    VertexBufferObject vertexBuffer;
-    IndexBufferObject indexBuffer;
+	VertexBufferObject vertexBuffer;
+	IndexBufferObject indexBuffer;
 
 public:
-    Mesh(std::initializer_list<VertexAttribute> attList);
-    Mesh(bool staticVertices, bool staticIndices, std::initializer_list<VertexAttribute> attList);
-    ~Mesh() = default;
+	Mesh(std::initializer_list<VertexAttribute> attList);
+	Mesh(bool staticVertices, bool staticIndices, std::initializer_list<VertexAttribute> attList);
+	~Mesh() = default;
 };
 
 }

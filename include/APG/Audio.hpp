@@ -49,49 +49,49 @@ namespace APG {
  */
 class AudioManager {
 public:
-    using music_handle = int32_t;
-    using sound_handle = int32_t;
+	using music_handle = int32_t;
+	using sound_handle = int32_t;
 
-    static_assert(std::is_copy_constructible<music_handle>(), "Music handle type must be copy constructible.");
-    static_assert(std::is_copy_constructible<sound_handle>(), "Sound handle type must be copy constructible.");
+	static_assert(std::is_copy_constructible<music_handle>(), "Music handle type must be copy constructible.");
+	static_assert(std::is_copy_constructible<sound_handle>(), "Sound handle type must be copy constructible.");
 
 private:
-    std::deque<music_handle> availableMusicHandles;
-    std::deque<sound_handle> availableSoundHandles;
-    void fillDefaultQueues(int initialMusicHandleCount, int initalSoundHandleCount);
+	std::deque<music_handle> availableMusicHandles;
+	std::deque<sound_handle> availableSoundHandles;
+	void fillDefaultQueues(int initialMusicHandleCount, int initalSoundHandleCount);
 
 protected:
-    music_handle getNextMusicHandle();
-    sound_handle getNextSoundHandle();
+	music_handle getNextMusicHandle();
+	sound_handle getNextSoundHandle();
 
-    void freeMusicHandle(music_handle handle);
-    void freeSoundHandle(sound_handle handle);
+	void freeMusicHandle(music_handle handle);
+	void freeSoundHandle(sound_handle handle);
 
 public:
-    explicit AudioManager(int initialMusicHandleCount = internal::DEFAULT_MUSIC_HANDLE_COUNT,
-            int initialSoundHandleCount = internal::DEFAULT_SOUND_HANDLE_COUNT);
-    virtual ~AudioManager() = default;
+	explicit AudioManager(int initialMusicHandleCount = internal::DEFAULT_MUSIC_HANDLE_COUNT,
+	        int initialSoundHandleCount = internal::DEFAULT_SOUND_HANDLE_COUNT);
+	virtual ~AudioManager() = default;
 
-    virtual music_handle loadMusicFile(const std::string &filename) = 0;
-    virtual sound_handle loadSoundFile(const std::string &filename) = 0;
+	virtual music_handle loadMusicFile(const std::string &filename) = 0;
+	virtual sound_handle loadSoundFile(const std::string &filename) = 0;
 
-    virtual APG::AudioManager * setGlobalVolume(float volume) = 0;
-    virtual APG::AudioManager * setMusicVolume(float volume) = 0;
-    virtual APG::AudioManager * setSoundVolume(float volume) = 0;
+	virtual APG::AudioManager * setGlobalVolume(float volume) = 0;
+	virtual APG::AudioManager * setMusicVolume(float volume) = 0;
+	virtual APG::AudioManager * setSoundVolume(float volume) = 0;
 
-    virtual void freeMusic(music_handle &handle) = 0;
-    virtual void freeSound(sound_handle &handle) = 0;
+	virtual void freeMusic(music_handle &handle) = 0;
+	virtual void freeSound(sound_handle &handle) = 0;
 
-    /**
-     * Play the given music file from the start.
-     * @param handle a valid handle returned from loadMusicFile.
-     */
-    virtual void playMusic(const music_handle &handle) = 0;
-    virtual void playSound(const sound_handle &handle) = 0;
+	/**
+	 * Play the given music file from the start.
+	 * @param handle a valid handle returned from loadMusicFile.
+	 */
+	virtual void playMusic(const music_handle &handle) = 0;
+	virtual void playSound(const sound_handle &handle) = 0;
 
-    virtual void pauseMusic() = 0;
-    virtual void resumeMusic() = 0;
-    virtual void stopMusic() = 0;
+	virtual void pauseMusic() = 0;
+	virtual void resumeMusic() = 0;
+	virtual void stopMusic() = 0;
 };
 
 }

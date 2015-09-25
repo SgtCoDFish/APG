@@ -29,21 +29,21 @@
 #include "APG/FontManager.hpp"
 
 APG::FontManager::FontManager(int initialFontHandleCount) {
-    fillDefaultQueue(initialFontHandleCount);
+	fillDefaultQueue(initialFontHandleCount);
 }
 
 APG::FontManager::font_handle APG::FontManager::getNextFontHandle() {
-    const auto retval = availableFontHandles.front();
-    availableFontHandles.pop_front();
-    return retval;
+	const auto retval = availableFontHandles.front();
+	availableFontHandles.pop_front();
+	return retval;
 }
 
 void APG::FontManager::freeFontHandle(font_handle handle) {
-    availableFontHandles.push_front(handle);
+	availableFontHandles.push_front(handle);
 }
 
 void APG::FontManager::fillDefaultQueue(int initialFontHandleCount) {
-    for (font_handle i = 0; i < initialFontHandleCount; ++i) {
-        availableFontHandles.push_back(i);
-    }
+	for (font_handle i = 0; i < initialFontHandleCount; ++i) {
+		availableFontHandles.push_back(i);
+	}
 }

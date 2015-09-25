@@ -34,21 +34,21 @@ namespace APG {
 
 class InputManager {
 protected:
-    static constexpr float JUST_PRESSED_THRESHOLD = 0.0001f;
+	static constexpr float JUST_PRESSED_THRESHOLD = 0.0001f;
 
 public:
-    virtual ~InputManager() = default;
+	virtual ~InputManager() = default;
 
-    virtual void update(float deltaTime) = 0;
+	virtual void update(float deltaTime) = 0;
 
-    virtual bool isKeyPressed(const SDL_Scancode &key) const = 0;
-    virtual bool isKeyJustPressed(const SDL_Scancode &key) const = 0;
+	virtual bool isKeyPressed(const SDL_Scancode &key) const = 0;
+	virtual bool isKeyJustPressed(const SDL_Scancode &key) const = 0;
 
-    virtual bool isModPressed(const SDL_Keymod &mod) const = 0;
+	virtual bool isModPressed(const SDL_Keymod &mod) const = 0;
 
-    virtual bool isCtrlPressed() const = 0;
-    virtual bool isShiftPressed() const = 0;
-    virtual bool isAltPressed() const = 0;
+	virtual bool isCtrlPressed() const = 0;
+	virtual bool isShiftPressed() const = 0;
+	virtual bool isAltPressed() const = 0;
 };
 
 }

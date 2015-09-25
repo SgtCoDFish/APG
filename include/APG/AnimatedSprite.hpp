@@ -43,119 +43,119 @@ class Tile;
 namespace APG {
 
 enum class AnimationMode {
-    NORMAL, REVERSED, LOOP, LOOP_PINGPONG
+	NORMAL, REVERSED, LOOP, LOOP_PINGPONG
 };
 
 class AnimatedSprite : public SpriteBase {
 private:
-    int32_t currentFrame = 0;
-    int32_t frameCount = 0;
+	int32_t currentFrame = 0;
+	int32_t frameCount = 0;
 
-    float secondsPerFrame = 0.0f;
-    float animTime = 0.0f;
-    int animDir = 1;
+	float secondsPerFrame = 0.0f;
+	float animTime = 0.0f;
+	int animDir = 1;
 
-    uint32_t width = 0, height = 0;
+	uint32_t width = 0, height = 0;
 
-    Texture * texture = nullptr;
+	Texture * texture = nullptr;
 
-    AnimationMode animationMode;
+	AnimationMode animationMode;
 
-    std::vector<SpriteBase *> frames;
+	std::vector<SpriteBase *> frames;
 
-    inline void progress_();
-    void handleNormalMode_();
-    void handleLoopMode_();
-    void handleLoopPingPongMode_();
-    void handleReversedMode_();
+	inline void progress_();
+	void handleNormalMode_();
+	void handleLoopMode_();
+	void handleLoopPingPongMode_();
+	void handleReversedMode_();
 
-    /**
-     * Sets width, height, u, v, u2, v2 and the texture pointer from the given frame.
-     * All future frames must match the width, height, and texture of this frame.
-     */
-    void initializeFromSpriteFrame(const SpriteBase * sprite);
+	/**
+	 * Sets width, height, u, v, u2, v2 and the texture pointer from the given frame.
+	 * All future frames must match the width, height, and texture of this frame.
+	 */
+	void initializeFromSpriteFrame(const SpriteBase * sprite);
 
-    /**
-     * Called by AnimatedSprite::fromTexture
-     */
-    explicit AnimatedSprite(float frameDuration, std::vector<Sprite> &&sprites, AnimationMode animationMode =
-            AnimationMode::NORMAL);
+	/**
+	 * Called by AnimatedSprite::fromTexture
+	 */
+	explicit AnimatedSprite(float frameDuration, std::vector<Sprite> &&sprites, AnimationMode animationMode =
+	        AnimationMode::NORMAL);
 
 public:
-    /**
-     * Splits a texture into sprite frames, ready to be used by an animated sprite.
-     *
-     * Frames are loaded left to right.
-     *
-     * @param texture The texture containing the frames.
-     * @param tileWidth The width, in pixels, of a frame.
-     * @param tileHeight The height, in pixels, of a frame.
-     * @param xStart The starting x position to load from, defaults to 0.
-     * @param yStart The starting y position to load from, defaults to 0.
-     * @param frameCount The number of frames to use. Defaults to -1; use -1 to use every available frame that fits.
-     * @param xSeparation The horizontal separation between two frames, in pixels, defaults to 0.
-     * @return a list of sprites that can be passed into an AnimatedSprite constructor
-     */
-    static std::vector<Sprite> splitTexture(Texture * texture, uint32_t tileWidth, uint32_t tileHeight,
-            uint32_t xStart = 0u, uint32_t yStart = 0u, int32_t frameCount = -1, uint32_t xSeparation = 0u);
+	/**
+	 * Splits a texture into sprite frames, ready to be used by an animated sprite.
+	 *
+	 * Frames are loaded left to right.
+	 *
+	 * @param texture The texture containing the frames.
+	 * @param tileWidth The width, in pixels, of a frame.
+	 * @param tileHeight The height, in pixels, of a frame.
+	 * @param xStart The starting x position to load from, defaults to 0.
+	 * @param yStart The starting y position to load from, defaults to 0.
+	 * @param frameCount The number of frames to use. Defaults to -1; use -1 to use every available frame that fits.
+	 * @param xSeparation The horizontal separation between two frames, in pixels, defaults to 0.
+	 * @return a list of sprites that can be passed into an AnimatedSprite constructor
+	 */
+	static std::vector<Sprite> splitTexture(Texture * texture, uint32_t tileWidth, uint32_t tileHeight,
+	        uint32_t xStart = 0u, uint32_t yStart = 0u, int32_t frameCount = -1, uint32_t xSeparation = 0u);
 
-    static std::vector<Sprite> splitTexture(const std::unique_ptr<Texture> &texture, uint32_t tileWidth,
-            uint32_t tileHeight, uint32_t xStart = 0u, uint32_t yStart = 0u, int32_t frameCount = -1,
-            uint32_t xSeparation = 0u) {
-        return std::move(splitTexture(texture.get(), tileWidth, tileHeight, xStart, yStart, frameCount, xSeparation));
-    }
+	static std::vector<Sprite> splitTexture(const std::unique_ptr<Texture> &texture, uint32_t tileWidth,
+	        uint32_t tileHeight, uint32_t xStart = 0u, uint32_t yStart = 0u, int32_t frameCount = -1,
+	        uint32_t xSeparation = 0u) {
+		return std::move(splitTexture(texture.get(), tileWidth, tileHeight, xStart, yStart, frameCount, xSeparation));
+	}
 
-    explicit AnimatedSprite(float frameDuration, Sprite * firstFrame, AnimationMode animationMode =
-            AnimationMode::NORMAL);
-    explicit AnimatedSprite(float frameDuration, std::initializer_list<SpriteBase *> &sprites,
-            AnimationMode animationMode = AnimationMode::NORMAL);
-    explicit AnimatedSprite(float frameDuration, std::vector<Sprite> &sprites, AnimationMode animationMode =
-            AnimationMode::NORMAL);
-    explicit AnimatedSprite(float frameDuration, std::vector<SpriteBase *> &sprites, AnimationMode animationMode =
-            AnimationMode::NORMAL);
+	explicit AnimatedSprite(float frameDuration, Sprite * firstFrame, AnimationMode animationMode =
+	        AnimationMode::NORMAL);
+	explicit AnimatedSprite(float frameDuration, std::initializer_list<SpriteBase *> &sprites,
+	        AnimationMode animationMode = AnimationMode::NORMAL);
+	explicit AnimatedSprite(float frameDuration, std::vector<Sprite> &sprites, AnimationMode animationMode =
+	        AnimationMode::NORMAL);
+	explicit AnimatedSprite(float frameDuration, std::vector<SpriteBase *> &sprites, AnimationMode animationMode =
+	        AnimationMode::NORMAL);
 
-    virtual ~AnimatedSprite() = default;
+	virtual ~AnimatedSprite() = default;
 
-    void update(float deltaTime);
+	void update(float deltaTime);
 
-    void addFrame(SpriteBase * frame);
+	void addFrame(SpriteBase * frame);
 
-    SpriteBase *getCurrentFrame() const;
-    SpriteBase *getFrame(uint32_t frameNumber) const;
+	SpriteBase *getCurrentFrame() const;
+	SpriteBase *getFrame(uint32_t frameNumber) const;
 
-    inline AnimationMode getAnimationMode() const {
-        return animationMode;
-    }
+	inline AnimationMode getAnimationMode() const {
+		return animationMode;
+	}
 
-    virtual Texture * getTexture() const override {
-        return texture;
-    }
+	virtual Texture * getTexture() const override {
+		return texture;
+	}
 
-    virtual uint32_t getWidth() const override {
-        return width;
-    }
+	virtual uint32_t getWidth() const override {
+		return width;
+	}
 
-    virtual uint32_t getHeight() const override {
-        return height;
-    }
+	virtual uint32_t getHeight() const override {
+		return height;
+	}
 
-    virtual float getU() const override {
-        return getCurrentFrame()->getU();
-    }
+	virtual float getU() const override {
+		return getCurrentFrame()->getU();
+	}
 
-    virtual float getV() const override {
-        return getCurrentFrame()->getV();
-    }
+	virtual float getV() const override {
+		return getCurrentFrame()->getV();
+	}
 
-    virtual float getU2() const override {
-        return getCurrentFrame()->getU2();
-    }
+	virtual float getU2() const override {
+		return getCurrentFrame()->getU2();
+	}
 
-    virtual float getV2() const override {
-        return getCurrentFrame()->getV2();
-    }
+	virtual float getV2() const override {
+		return getCurrentFrame()->getV2();
+	}
 
-    AnimatedSprite &setAnimationMode(AnimationMode mode);
+	AnimatedSprite &setAnimationMode(AnimationMode mode);
 };
 
 }

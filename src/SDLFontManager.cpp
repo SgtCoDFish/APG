@@ -50,136 +50,136 @@ APG::SDLFontManager::SDLFontManager() {
 }
 
 APG::FontManager::font_handle APG::SDLFontManager::loadFontFile(const std::string &filename, int pointSize) {
-    auto logger = el::Loggers::getLogger("APG");
-    auto sdlFont = SXXDL::ttf::make_font_ptr(TTF_OpenFont(filename.c_str(), pointSize));
+	auto logger = el::Loggers::getLogger("APG");
+	auto sdlFont = SXXDL::ttf::make_font_ptr(TTF_OpenFont(filename.c_str(), pointSize));
 
-    if (!sdlFont) {
-        logger->fatal("Couldn't load %v, error: %v", filename, TTF_GetError());
-        return -1;
-    } else {
-        const auto handle = getNextFontHandle();
+	if (!sdlFont) {
+		logger->fatal("Couldn't load %v, error: %v", filename, TTF_GetError());
+		return -1;
+	} else {
+		const auto handle = getNextFontHandle();
 
-        loadedFonts.emplace(handle, StoredFont(handle, std::move(sdlFont)));
+		loadedFonts.emplace(handle, StoredFont(handle, std::move(sdlFont)));
 
-        logger->info("Loaded font \"%v\" with handle %v.", filename, handle);
+		logger->info("Loaded font \"%v\" with handle %v.", filename, handle);
 
-        return handle;
-    }
+		return handle;
+	}
 }
 
 void APG::SDLFontManager::freeFont(font_handle &handle) {
-    loadedFonts.erase(handle);
-    freeFontHandle(handle);
+	loadedFonts.erase(handle);
+	freeFontHandle(handle);
 
-    handle = -1;
+	handle = -1;
 }
 
 void APG::SDLFontManager::setFontColor(const font_handle &handle, const glm::vec4 &color) {
-    const auto &font = loadedFonts.find(handle);
+	const auto &font = loadedFonts.find(handle);
 
-    REQUIRE(font != loadedFonts.end(), "Can't change color of a font that doesn't exist!");
+	REQUIRE(font != loadedFonts.end(), "Can't change color of a font that doesn't exist!");
 
-    font->second.color = glmToSDLColor(color);
+	font->second.color = glmToSDLColor(color);
 }
 
 glm::ivec2 APG::SDLFontManager::estimateSizeOf(const font_handle &fontHandle, const std::string &text) {
-    const auto &font = loadedFonts.find(fontHandle);
+	const auto &font = loadedFonts.find(fontHandle);
 
-    glm::ivec2 ret;
+	glm::ivec2 ret;
 
-    if (TTF_SizeUTF8((*font).second.ptr.get(), text.c_str(), &ret.x, &ret.y)) {
-        el::Loggers::getLogger("APG")->error("Couldn't get size of text string, error: %v", TTF_GetError());
-    }
+	if (TTF_SizeUTF8((*font).second.ptr.get(), text.c_str(), &ret.x, &ret.y)) {
+		el::Loggers::getLogger("APG")->error("Couldn't get size of text string, error: %v", TTF_GetError());
+	}
 
-    return ret;
+	return ret;
 }
 
 APG::SpriteBase *APG::SDLFontManager::renderText(const font_handle &fontHandle, const std::string &text,
         FontRenderMethod method) {
-    const auto logger = el::Loggers::getLogger("APG");
+	const auto logger = el::Loggers::getLogger("APG");
 
-    const auto &found = loadedFonts.find(fontHandle);
+	const auto &found = loadedFonts.find(fontHandle);
 
-    REQUIRE(found != loadedFonts.end(), "Can't render text with a font that doesn't exist.");
+	REQUIRE(found != loadedFonts.end(), "Can't render text with a font that doesn't exist.");
 
-    auto &font = (*found).second;
+	auto &font = (*found).second;
 
-    SDL_Surface *tempSurface = nullptr;
+	SDL_Surface *tempSurface = nullptr;
 
-    switch (method) {
-    case FontRenderMethod::NICE: {
-        // renders to a nice RGBA surface so we don't have to mess with it
-        tempSurface = TTF_RenderUTF8_Blended(font.ptr.get(), text.c_str(), font.color);
-        break;
-    }
+	switch (method) {
+	case FontRenderMethod::NICE: {
+		// renders to a nice RGBA surface so we don't have to mess with it
+		tempSurface = TTF_RenderUTF8_Blended(font.ptr.get(), text.c_str(), font.color);
+		break;
+	}
 
-    case FontRenderMethod::FAST: {
-        // renders to a palette so needs to be converted
-        tempSurface = TTF_RenderUTF8_Solid(font.ptr.get(), text.c_str(), font.color);
+	case FontRenderMethod::FAST: {
+		// renders to a palette so needs to be converted
+		tempSurface = TTF_RenderUTF8_Solid(font.ptr.get(), text.c_str(), font.color);
 
-        tempSurface = SDL_ConvertSurfaceFormat(tempSurface, SDL_PIXELFORMAT_RGBA8888, 0);
-        break;
-    }
-    }
+		tempSurface = SDL_ConvertSurfaceFormat(tempSurface, SDL_PIXELFORMAT_RGBA8888, 0);
+		break;
+	}
+	}
 
-    if (tempSurface == nullptr) {
-        logger->fatal("Couldn't render text string \"%v\" using font handle %v, error: %v", text, fontHandle,
-        TTF_GetError());
-        return nullptr;
-    }
+	if (tempSurface == nullptr) {
+		logger->fatal("Couldn't render text string \"%v\" using font handle %v, error: %v", text, fontHandle,
+		TTF_GetError());
+		return nullptr;
+	}
 
-    const auto ownedTextureID = findAvailableOwnedTexture(tempSurface);
+	const auto ownedTextureID = findAvailableOwnedTexture(tempSurface);
 
-    if (ownedTextureID == -1) {
-        logger->fatal("Ran out of space for textures for rendered text (max is %v textures). Time to refactor!",
-                APG::SDLFontManager::MAX_OWNED_TEXTURES);
-        return nullptr;
-    }
+	if (ownedTextureID == -1) {
+		logger->fatal("Ran out of space for textures for rendered text (max is %v textures). Time to refactor!",
+		        APG::SDLFontManager::MAX_OWNED_TEXTURES);
+		return nullptr;
+	}
 
-    const auto ownedSpriteID = findAvailableSpriteSlot();
+	const auto ownedSpriteID = findAvailableSpriteSlot();
 
-    if (ownedSpriteID == -1) {
-        logger->fatal("Ran out of space for sprites for rendered text (max is %v sprites). Time to refactor!",
-                APG::SDLFontManager::MAX_OWNED_SPRITES);
-        return nullptr;
-    }
+	if (ownedSpriteID == -1) {
+		logger->fatal("Ran out of space for sprites for rendered text (max is %v sprites). Time to refactor!",
+		        APG::SDLFontManager::MAX_OWNED_SPRITES);
+		return nullptr;
+	}
 
-    auto texture = std::make_unique<Texture>(tempSurface);
-    ownedTextures[ownedTextureID] = std::move(texture);
+	auto texture = std::make_unique<Texture>(tempSurface);
+	ownedTextures[ownedTextureID] = std::move(texture);
 
-    auto sprite = std::make_unique<Sprite>(ownedTextures[ownedTextureID].get());
-    ownedSprites[ownedSpriteID] = std::move(sprite);
+	auto sprite = std::make_unique<Sprite>(ownedTextures[ownedTextureID].get());
+	ownedSprites[ownedSpriteID] = std::move(sprite);
 
-    return ownedSprites[ownedSpriteID].get();
+	return ownedSprites[ownedSpriteID].get();
 }
 
 SDL_Color APG::SDLFontManager::glmToSDLColor(const glm::vec4 &glmColor) {
-    SDL_Color ret;
+	SDL_Color ret;
 
-    ret.r = (uint8_t) (glmColor.r * 255.0f);
-    ret.g = (uint8_t) (glmColor.g * 255.0f);
-    ret.b = (uint8_t) (glmColor.b * 255.0f);
-    ret.a = (uint8_t) (glmColor.a * 255.0f);
+	ret.r = (uint8_t) (glmColor.r * 255.0f);
+	ret.g = (uint8_t) (glmColor.g * 255.0f);
+	ret.b = (uint8_t) (glmColor.b * 255.0f);
+	ret.a = (uint8_t) (glmColor.a * 255.0f);
 
-    return ret;
+	return ret;
 }
 
 int APG::SDLFontManager::findAvailableOwnedTexture(SDL_Surface * const surface) const {
-    for (int i = 0; i < MAX_OWNED_TEXTURES; ++i) {
-        if (ownedTextures[i] == nullptr) {
-            return i;
-        }
-    }
+	for (int i = 0; i < MAX_OWNED_TEXTURES; ++i) {
+		if (ownedTextures[i] == nullptr) {
+			return i;
+		}
+	}
 
-    return -1;
+	return -1;
 }
 
 int APG::SDLFontManager::findAvailableSpriteSlot() const {
-    for (int i = 0; i < MAX_OWNED_SPRITES; ++i) {
-        if (ownedSprites[i] == nullptr) {
-            return i;
-        }
-    }
+	for (int i = 0; i < MAX_OWNED_SPRITES; ++i) {
+		if (ownedSprites[i] == nullptr) {
+			return i;
+		}
+	}
 
-    return -1;
+	return -1;
 }

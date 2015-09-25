@@ -53,96 +53,96 @@ INITIALIZE_EASYLOGGINGPP
 const std::string ASSET_PREFIX = "assets/";
 
 bool APGSDLRenderTest::init() {
-    const auto logger = el::Loggers::getLogger("APG");
-    renderer = SXXDL::make_renderer_ptr(SDL_CreateRenderer(window.get(), -1, SDL_RENDERER_ACCELERATED));
+	const auto logger = el::Loggers::getLogger("APG");
+	renderer = SXXDL::make_renderer_ptr(SDL_CreateRenderer(window.get(), -1, SDL_RENDERER_ACCELERATED));
 
-    if (renderer == nullptr) {
-        logger->fatal("Couldn't create SDL_Renderer: %v", SDL_GetError());
-        return false;
-    }
+	if (renderer == nullptr) {
+		logger->fatal("Couldn't create SDL_Renderer: %v", SDL_GetError());
+		return false;
+	}
 
-    SDL_SetRenderDrawColor(renderer.get(), 0x50, 0xAC, 0x3D, 0xFF);
+	SDL_SetRenderDrawColor(renderer.get(), 0x50, 0xAC, 0x3D, 0xFF);
 
-    mapOne = std::make_unique<Tmx::Map>();
-    mapOne->ParseFile(ASSET_PREFIX + "world1.tmx");
+	mapOne = std::make_unique<Tmx::Map>();
+	mapOne->ParseFile(ASSET_PREFIX + "world1.tmx");
 
-    if (mapOne->HasError()) {
-        logger->fatal("Error loading tmx map: %v", mapOne->GetErrorText());
-        return false;
-    }
+	if (mapOne->HasError()) {
+		logger->fatal("Error loading tmx map: %v", mapOne->GetErrorText());
+		return false;
+	}
 
-    mapTwo = std::make_unique<Tmx::Map>();
-    mapTwo->ParseFile(ASSET_PREFIX + "sample_indoor.tmx");
+	mapTwo = std::make_unique<Tmx::Map>();
+	mapTwo->ParseFile(ASSET_PREFIX + "sample_indoor.tmx");
 
-    if (mapTwo->HasError()) {
-        logger->fatal("Error loading tmx map: %v", mapTwo->GetErrorText());
-        return false;
-    }
+	if (mapTwo->HasError()) {
+		logger->fatal("Error loading tmx map: %v", mapTwo->GetErrorText());
+		return false;
+	}
 
-    rendererOne = std::make_unique<APG::SDLTmxRenderer>(mapOne.get(), renderer);
-    rendererTwo = std::make_unique<APG::SDLTmxRenderer>(mapTwo.get(), renderer);
+	rendererOne = std::make_unique<APG::SDLTmxRenderer>(mapOne.get(), renderer);
+	rendererTwo = std::make_unique<APG::SDLTmxRenderer>(mapTwo.get(), renderer);
 
-    currentRenderer = rendererOne.get();
+	currentRenderer = rendererOne.get();
 
-    return true;
+	return true;
 }
 
 void APGSDLRenderTest::render(float deltaTime) {
-    SDL_RenderClear(renderer.get());
+	SDL_RenderClear(renderer.get());
 
-    if (inputManager->isKeyJustPressed(SDL_SCANCODE_SPACE)) {
-        if (currentRenderer == rendererOne.get()) {
-            currentRenderer = rendererTwo.get();
-        } else {
-            currentRenderer = rendererOne.get();
-        }
-    }
+	if (inputManager->isKeyJustPressed(SDL_SCANCODE_SPACE)) {
+		if (currentRenderer == rendererOne.get()) {
+			currentRenderer = rendererTwo.get();
+		} else {
+			currentRenderer = rendererOne.get();
+		}
+	}
 
-    currentRenderer->renderAll(deltaTime);
+	currentRenderer->renderAll(deltaTime);
 
-    SDL_RenderPresent(renderer.get());
+	SDL_RenderPresent(renderer.get());
 }
 
 int main(int argc, char *argv[]) {
-    START_EASYLOGGINGPP(argc, argv);
+	START_EASYLOGGINGPP(argc, argv);
 
-    const std::string windowTitle("APG GLTmxRenderer Example");
-    const uint32_t windowWidth = 1280;
-    const uint32_t windowHeight = 720;
+	const std::string windowTitle("APG GLTmxRenderer Example");
+	const uint32_t windowWidth = 1280;
+	const uint32_t windowHeight = 720;
 
-    const auto logger = el::Loggers::getLogger("APG");
+	const auto logger = el::Loggers::getLogger("APG");
 
-    auto rpg = std::make_unique<APGSDLRenderTest>(windowTitle, windowWidth, windowHeight);
+	auto rpg = std::make_unique<APGSDLRenderTest>(windowTitle, windowWidth, windowHeight);
 
-    if (!rpg->init()) {
-        return EXIT_FAILURE;
-    }
+	if (!rpg->init()) {
+		return EXIT_FAILURE;
+	}
 
-    bool done = false;
+	bool done = false;
 
-    auto startTime = std::chrono::high_resolution_clock::now();
-    std::vector<float> timesTaken;
+	auto startTime = std::chrono::high_resolution_clock::now();
+	std::vector<float> timesTaken;
 
-    while (!done) {
-        auto timeNow = std::chrono::high_resolution_clock::now();
-        float deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count() / 1000.0f;
+	while (!done) {
+		auto timeNow = std::chrono::high_resolution_clock::now();
+		float deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count() / 1000.0f;
 
-        startTime = timeNow;
-        timesTaken.push_back(deltaTime);
+		startTime = timeNow;
+		timesTaken.push_back(deltaTime);
 
-        done = rpg->update(deltaTime);
+		done = rpg->update(deltaTime);
 
-        if (timesTaken.size() >= 1000) {
-            const float sum = std::accumulate(timesTaken.begin(), timesTaken.end(), 0.0f);
+		if (timesTaken.size() >= 1000) {
+			const float sum = std::accumulate(timesTaken.begin(), timesTaken.end(), 0.0f);
 
-            const float fps = 1 / (sum / timesTaken.size());
+			const float fps = 1 / (sum / timesTaken.size());
 
-            logger->info("FPS: ", fps);
+			logger->info("FPS: ", fps);
 
-            timesTaken.clear();
-        }
-    }
+			timesTaken.clear();
+		}
+	}
 
-    return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
 

@@ -37,28 +37,28 @@
 #include "APG/internal/Assert.hpp"
 
 APG::Sprite::Sprite(Texture * const texture) :
-                Sprite(texture, 0, 0, texture->getWidth(), texture->getHeight()) {
+		        Sprite(texture, 0, 0, texture->getWidth(), texture->getHeight()) {
 
 }
 
 APG::Sprite::Sprite(Texture * const texture, uint32_t texX, uint32_t texY, uint32_t width, uint32_t height) :
-                texture(texture),
-                texX(texX),
-                texY(texY),
-                width(width),
-                height(height) {
-    REQUIRE(texture != nullptr, "Can't pass a null texture to Sprite::Sprite");
+		        texture(texture),
+		        texX(texX),
+		        texY(texY),
+		        width(width),
+		        height(height) {
+	REQUIRE(texture != nullptr, "Can't pass a null texture to Sprite::Sprite");
 
-    REQUIRE(texX + width <= texture->getWidth() && texY + height <= texture->getHeight(),
-            "Invalid texture sizes when creating sprite.");
+	REQUIRE(texX + width <= texture->getWidth() && texY + height <= texture->getHeight(),
+	        "Invalid texture sizes when creating sprite.");
 
-    calculateUV();
+	calculateUV();
 }
 
 void APG::Sprite::calculateUV() {
-    u1 = texture->getInvWidth() * texX;
-    v1 = texture->getInvHeight() * texY;
+	u1 = texture->getInvWidth() * texX;
+	v1 = texture->getInvHeight() * texY;
 
-    u2 = texture->getInvWidth() * (texX + width);
-    v2 = texture->getInvHeight() * (texY + height);
+	u2 = texture->getInvWidth() * (texX + width);
+	v2 = texture->getInvHeight() * (texY + height);
 }

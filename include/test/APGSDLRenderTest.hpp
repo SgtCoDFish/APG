@@ -38,25 +38,25 @@
 
 class APGSDLRenderTest final : public APG::SDLGame {
 private:
-    SXXDL::renderer_ptr renderer = SXXDL::make_renderer_ptr(nullptr);
+	SXXDL::renderer_ptr renderer = SXXDL::make_renderer_ptr(nullptr);
 
-    std::unique_ptr<Tmx::Map> mapOne;
-    std::unique_ptr<Tmx::Map> mapTwo;
+	std::unique_ptr<Tmx::Map> mapOne;
+	std::unique_ptr<Tmx::Map> mapTwo;
 
-    std::unique_ptr<APG::SDLTmxRenderer> rendererOne;
-    std::unique_ptr<APG::SDLTmxRenderer> rendererTwo;
+	std::unique_ptr<APG::SDLTmxRenderer> rendererOne;
+	std::unique_ptr<APG::SDLTmxRenderer> rendererTwo;
 
-    APG::SDLTmxRenderer *currentRenderer = nullptr;
+	APG::SDLTmxRenderer *currentRenderer = nullptr;
 
 public:
-    APGSDLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
-            uint32_t glContextMajor = 3, uint32_t glContextMinor = 2) :
-                    SDLGame(windowTitle, windowWidth, windowHeight, glContextMajor, glContextMinor) {
-    }
-    virtual ~APGSDLRenderTest() = default;
+	APGSDLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
+	        uint32_t glContextMajor = 3, uint32_t glContextMinor = 2) :
+			        SDLGame(windowTitle, windowWidth, windowHeight, glContextMajor, glContextMinor) {
+	}
+	virtual ~APGSDLRenderTest() = default;
 
-    bool init() override;
-    void render(float deltaTime) override;
+	bool init() override;
+	void render(float deltaTime) override;
 };
 
 #endif /* APGSDLRENDERTEST_HPP_ */

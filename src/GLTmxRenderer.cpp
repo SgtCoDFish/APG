@@ -35,44 +35,44 @@
 #include "APG/Sprite.hpp"
 
 APG::GLTmxRenderer::GLTmxRenderer(Tmx::Map * const map, SpriteBatch * const inBatch) :
-                TmxRenderer(map),
-                batch(inBatch) {
+		        TmxRenderer(map),
+		        batch(inBatch) {
 }
 
 void APG::GLTmxRenderer::renderAll(float deltaTime) {
-    batch->begin();
+	batch->begin();
 
-    TmxRenderer::renderAll(deltaTime);
+	TmxRenderer::renderAll(deltaTime);
 
-    batch->end();
+	batch->end();
 }
 
 void APG::GLTmxRenderer::renderLayer(Tmx::TileLayer * const layer) {
 //	std::cout << "Rendering layer \"" << layer->GetName() << "\"\n";
-    const uint32_t tileWidth = map->GetTileWidth();
-    const uint32_t tileHeight = map->GetTileHeight();
+	const uint32_t tileWidth = map->GetTileWidth();
+	const uint32_t tileHeight = map->GetTileHeight();
 
-    for (int y = 0; y < layer->GetHeight(); y++) {
-        for (int x = 0; x < layer->GetWidth(); x++) {
-            const uint32_t tileX = position.x + x * tileWidth;
-            const uint32_t tileY = position.y + y * tileHeight;
+	for (int y = 0; y < layer->GetHeight(); y++) {
+		for (int x = 0; x < layer->GetWidth(); x++) {
+			const uint32_t tileX = position.x + x * tileWidth;
+			const uint32_t tileY = position.y + y * tileHeight;
 
-            const auto &tile = layer->GetTile(x, y);
+			const auto &tile = layer->GetTile(x, y);
 
-            if (tile.tilesetId == -1) {
-                continue;
-            }
+			if (tile.tilesetId == -1) {
+				continue;
+			}
 
-            const auto tileHash = tile.gid;
+			const auto tileHash = tile.gid;
 
-            const auto ourSprite = sprites[tileHash];
-            batch->draw(ourSprite, tileX, tileY);
-        }
-    }
+			const auto ourSprite = sprites[tileHash];
+			batch->draw(ourSprite, tileX, tileY);
+		}
+	}
 }
 
 void APG::GLTmxRenderer::renderObjectGroup(const std::vector<TiledObject> &objects) {
-    for (const auto &obj : objects) {
-        batch->draw(obj.sprite, obj.position.x, obj.position.y);
-    }
+	for (const auto &obj : objects) {
+		batch->draw(obj.sprite, obj.position.x, obj.position.y);
+	}
 }

@@ -41,20 +41,20 @@ namespace APG {
  */
 class VertexBufferObject : public FloatBuffer {
 private:
-    VertexAttributeList attributeList;
+	VertexAttributeList attributeList;
 
 public:
-    explicit VertexBufferObject(std::initializer_list<VertexAttribute> initList);
-    VertexBufferObject(bool isStatic, std::initializer_list<VertexAttribute> initList);
-    VertexBufferObject(bool isStatic, std::initializer_list<VertexAttribute> initList, float vertices[],
-            int vertexCount);
-    virtual ~VertexBufferObject() = default;
+	explicit VertexBufferObject(std::initializer_list<VertexAttribute> initList);
+	VertexBufferObject(bool isStatic, std::initializer_list<VertexAttribute> initList);
+	VertexBufferObject(bool isStatic, std::initializer_list<VertexAttribute> initList, float vertices[],
+	        int vertexCount);
+	virtual ~VertexBufferObject() = default;
 
-    inline const VertexAttributeList &getAttributes() const {
-        return attributeList;
-    }
+	inline const VertexAttributeList &getAttributes() const {
+		return attributeList;
+	}
 
-    void bind(ShaderProgram * const program);
+	void bind(ShaderProgram * const program);
 };
 
 }

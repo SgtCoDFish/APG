@@ -38,42 +38,42 @@ namespace APG {
 
 class VertexAttributeList final {
 private:
-    std::vector<VertexAttribute> attributes;
+	std::vector<VertexAttribute> attributes;
 
-    uint16_t stride = 0;
-    void calculateOffsets();
+	uint16_t stride = 0;
+	void calculateOffsets();
 
 public:
-    explicit VertexAttributeList(std::initializer_list<VertexAttribute> initList);
-    explicit VertexAttributeList(std::vector<VertexAttribute> &attVec);
+	explicit VertexAttributeList(std::initializer_list<VertexAttribute> initList);
+	explicit VertexAttributeList(std::vector<VertexAttribute> &attVec);
 
-    ~VertexAttributeList() = default;
+	~VertexAttributeList() = default;
 
-    /**
-     * @param attribute the attribute to be copied into this list.
-     */
-    void addAttribute(const VertexAttribute &attribute);
+	/**
+	 * @param attribute the attribute to be copied into this list.
+	 */
+	void addAttribute(const VertexAttribute &attribute);
 
-    /**
-     * @param attribute the attribute to be moved into this list.
-     */
-    void addAttribute(VertexAttribute &&attribute);
+	/**
+	 * @param attribute the attribute to be moved into this list.
+	 */
+	void addAttribute(VertexAttribute &&attribute);
 
-    inline uint16_t getStride() const {
-        return stride;
-    }
+	inline uint16_t getStride() const {
+		return stride;
+	}
 
-    inline int getAttributeCount() const {
-        return attributes.size();
-    }
+	inline int getAttributeCount() const {
+		return attributes.size();
+	}
 
-    inline const std::vector<VertexAttribute> &getAttributes() const {
-        return attributes;
-    }
+	inline const std::vector<VertexAttribute> &getAttributes() const {
+		return attributes;
+	}
 
-    const VertexAttribute &operator[](unsigned int index) const {
-        return attributes[index];
-    }
+	const VertexAttribute &operator[](unsigned int index) const {
+		return attributes[index];
+	}
 };
 
 }

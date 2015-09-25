@@ -48,306 +48,306 @@
 #include "APG/internal/Assert.hpp"
 
 APG::ShaderProgram::ShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource) {
-    loadShader(vertexShaderSource, GL_VERTEX_SHADER);
-    loadShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
+	loadShader(vertexShaderSource, GL_VERTEX_SHADER);
+	loadShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
 
-    combineProgram();
+	combineProgram();
 }
 
 std::unique_ptr<APG::ShaderProgram> APG::ShaderProgram::fromSource(const std::string &vertexShaderSource,
         const std::string &fragmentShaderSource) {
-    return std::make_unique<APG::ShaderProgram>(vertexShaderSource, fragmentShaderSource);
+	return std::make_unique<APG::ShaderProgram>(vertexShaderSource, fragmentShaderSource);
 }
 
 std::unique_ptr<APG::ShaderProgram> APG::ShaderProgram::fromFiles(const std::string &vertexShaderFilename,
         const std::string &fragmentShaderFilename) {
-    const auto vertexSource = ShaderProgram::loadSourceFromFile(vertexShaderFilename);
-    const auto fragmentSource = ShaderProgram::loadSourceFromFile(fragmentShaderFilename);
+	const auto vertexSource = ShaderProgram::loadSourceFromFile(vertexShaderFilename);
+	const auto fragmentSource = ShaderProgram::loadSourceFromFile(fragmentShaderFilename);
 
-    return std::make_unique<APG::ShaderProgram>(vertexSource, fragmentSource);
+	return std::make_unique<APG::ShaderProgram>(vertexSource, fragmentSource);
 }
 
 APG::ShaderProgram::~ShaderProgram() {
-    glDeleteProgram(shaderProgram);
-    glDeleteShader(fragmentShader);
-    glDeleteShader(vertexShader);
+	glDeleteProgram(shaderProgram);
+	glDeleteShader(fragmentShader);
+	glDeleteShader(vertexShader);
 }
 
 void APG::ShaderProgram::use() {
-    glUseProgram(shaderProgram);
+	glUseProgram(shaderProgram);
 }
 
 void APG::ShaderProgram::setVertexAttribute(const APG::VertexAttribute &vertexAttribute, uint16_t stride) {
-    setFloatAttribute(vertexAttribute.getAlias().c_str(), vertexAttribute.getComponentCount(), stride,
-            vertexAttribute.getOffset(), false);
+	setFloatAttribute(vertexAttribute.getAlias().c_str(), vertexAttribute.getComponentCount(), stride,
+	        vertexAttribute.getOffset(), false);
 }
 
 void APG::ShaderProgram::setVertexAttributes(const VertexAttributeList &attributeList) {
-    for (const auto &attribute : attributeList.getAttributes()) {
-        setVertexAttribute(attribute, attributeList.getStride());
-    }
+	for (const auto &attribute : attributeList.getAttributes()) {
+		setVertexAttribute(attribute, attributeList.getStride());
+	}
 }
 
 void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, uint8_t valueCount,
         uint32_t strideInElements, uint32_t offsetInElements, bool normalize) {
-    const auto attributeLocation = glGetAttribLocation(shaderProgram, attributeName);
+	const auto attributeLocation = glGetAttribLocation(shaderProgram, attributeName);
 
-    if (attributeLocation == -1) {
-        el::Loggers::getLogger("APG")->error("Couldn't get attribute location \"%v\"", attributeName);
-        return;
-    }
+	if (attributeLocation == -1) {
+		el::Loggers::getLogger("APG")->error("Couldn't get attribute location \"%v\"", attributeName);
+		return;
+	}
 
-    glEnableVertexAttribArray(attributeLocation);
-    glVertexAttribPointer(attributeLocation, valueCount, GL_FLOAT, (normalize ? GL_TRUE : GL_FALSE),
-            strideInElements * sizeof(float), (void *) (sizeof(float) * offsetInElements));
+	glEnableVertexAttribArray(attributeLocation);
+	glVertexAttribPointer(attributeLocation, valueCount, GL_FLOAT, (normalize ? GL_TRUE : GL_FALSE),
+	        strideInElements * sizeof(float), (void *) (sizeof(float) * offsetInElements));
 
-    const auto error = glGetError();
+	const auto error = glGetError();
 
-    if (error != GL_NO_ERROR) {
-        el::Loggers::getLogger("APG")->error("Error while setting float attribute: %v.", gluErrorString(error));
-        return;
-    }
+	if (error != GL_NO_ERROR) {
+		el::Loggers::getLogger("APG")->error("Error while setting float attribute: %v.", gluErrorString(error));
+		return;
+	}
 }
 
 void APG::ShaderProgram::setUniformf(const char * const uniformName, std::initializer_list<float> vals) {
-    const auto paramCount = vals.size();
+	const auto paramCount = vals.size();
 
-    REQUIRE(paramCount >= 1 && paramCount <= 4, "Invalid parameter count in setUniformf");
+	REQUIRE(paramCount >= 1 && paramCount <= 4, "Invalid parameter count in setUniformf");
 
-    std::vector<float> vec;
+	std::vector<float> vec;
 
-    for (const auto &f : vals) {
-        vec.emplace_back(f);
-    }
+	for (const auto &f : vals) {
+		vec.emplace_back(f);
+	}
 
-    const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
 
-    switch (paramCount) {
-    case 1:
-        glUniform1f(uniLoc, vec[0]);
-        break;
+	switch (paramCount) {
+	case 1:
+		glUniform1f(uniLoc, vec[0]);
+		break;
 
-    case 2:
-        glUniform2f(uniLoc, vec[0], vec[1]);
-        break;
+	case 2:
+		glUniform2f(uniLoc, vec[0], vec[1]);
+		break;
 
-    case 3:
-        glUniform3f(uniLoc, vec[0], vec[1], vec[2]);
-        break;
+	case 3:
+		glUniform3f(uniLoc, vec[0], vec[1], vec[2]);
+		break;
 
-    case 4:
-        glUniform4f(uniLoc, vec[0], vec[1], vec[2], vec[3]);
-        break;
-    }
+	case 4:
+		glUniform4f(uniLoc, vec[0], vec[1], vec[2], vec[3]);
+		break;
+	}
 }
 
 void APG::ShaderProgram::setUniformf(const char * const uniformName, float val) {
-    const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
-    glUniform1f(uniLoc, val);
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniform1f(uniLoc, val);
 }
 
 void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::vec2 vals) {
-    const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
-    glUniform2f(uniLoc, vals.x, vals.y);
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniform2f(uniLoc, vals.x, vals.y);
 }
 
 void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::vec3 vals) {
-    const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
-    glUniform3f(uniLoc, vals.x, vals.y, vals.z);
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniform3f(uniLoc, vals.x, vals.y, vals.z);
 }
 
 void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::vec4 vals) {
-    const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
-    glUniform4f(uniLoc, vals.x, vals.y, vals.z, vals.w);
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniform4f(uniLoc, vals.x, vals.y, vals.z, vals.w);
 }
 
 void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::mat4 mat) {
-    const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
-    glUniformMatrix4fv(uniLoc, 1, GL_FALSE, glm::value_ptr(mat));
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniformMatrix4fv(uniLoc, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 void APG::ShaderProgram::setUniformi(const char * const uniformName, std::initializer_list<int32_t> vals) {
-    const auto paramCount = vals.size();
+	const auto paramCount = vals.size();
 
-    REQUIRE(paramCount >= 1 && paramCount <= 4, "Invalid parameter count in setUniformf");
+	REQUIRE(paramCount >= 1 && paramCount <= 4, "Invalid parameter count in setUniformf");
 
-    std::vector<int32_t> vec;
+	std::vector<int32_t> vec;
 
-    for (const auto &f : vals) {
-        vec.emplace_back(f);
-    }
+	for (const auto &f : vals) {
+		vec.emplace_back(f);
+	}
 
-    const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
 
-    switch (paramCount) {
-    case 1:
-        glUniform1i(uniLoc, vec[0]);
-        break;
+	switch (paramCount) {
+	case 1:
+		glUniform1i(uniLoc, vec[0]);
+		break;
 
-    case 2:
-        glUniform2i(uniLoc, vec[0], vec[1]);
-        break;
+	case 2:
+		glUniform2i(uniLoc, vec[0], vec[1]);
+		break;
 
-    case 3:
-        glUniform3i(uniLoc, vec[0], vec[1], vec[2]);
-        break;
+	case 3:
+		glUniform3i(uniLoc, vec[0], vec[1], vec[2]);
+		break;
 
-    case 4:
-        glUniform4i(uniLoc, vec[0], vec[1], vec[2], vec[3]);
-        break;
-    }
+	case 4:
+		glUniform4i(uniLoc, vec[0], vec[1], vec[2], vec[3]);
+		break;
+	}
 }
 
 void APG::ShaderProgram::setUniformi(const char * const uniformName, int32_t val) {
-    const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
-    glUniform1i(uniLoc, val);
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniform1i(uniLoc, val);
 }
 
 void APG::ShaderProgram::setUniformi(const char * const uniformName, glm::ivec2 vals) {
-    const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
-    glUniform2i(uniLoc, vals.x, vals.y);
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniform2i(uniLoc, vals.x, vals.y);
 }
 
 void APG::ShaderProgram::setUniformi(const char * const uniformName, glm::ivec3 vals) {
-    const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
-    glUniform3i(uniLoc, vals.x, vals.y, vals.z);
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniform3i(uniLoc, vals.x, vals.y, vals.z);
 }
 
 void APG::ShaderProgram::setUniformi(const char * const uniformName, glm::ivec4 vals) {
-    const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
-    glUniform4i(uniLoc, vals.x, vals.y, vals.z, vals.w);
+	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
+	glUniform4i(uniLoc, vals.x, vals.y, vals.z, vals.w);
 }
 
 std::string APG::ShaderProgram::loadSourceFromFile(const std::string &filename) {
-    std::ifstream inStream(filename, std::ios::in);
+	std::ifstream inStream(filename, std::ios::in);
 
-    if (!inStream.is_open()) {
-        el::Loggers::getLogger("APG")->fatal("Couldn't find shader file: %v", filename);
-        return "";
-    }
+	if (!inStream.is_open()) {
+		el::Loggers::getLogger("APG")->fatal("Couldn't find shader file: %v", filename);
+		return "";
+	}
 
-    std::stringstream ss;
-    std::string tempString;
-    while (std::getline(inStream, tempString)) {
-        ss << tempString << "\n";
-    }
+	std::stringstream ss;
+	std::string tempString;
+	while (std::getline(inStream, tempString)) {
+		ss << tempString << "\n";
+	}
 
-    inStream.close();
+	inStream.close();
 
-    return ss.str();
+	return ss.str();
 }
 
 void APG::ShaderProgram::loadShader(const std::string &shaderSource, uint32_t type) {
-    uint32_t *source = validateTypeAndGet(type);
+	uint32_t *source = validateTypeAndGet(type);
 
-    if (source == nullptr) {
-        return;
-    }
+	if (source == nullptr) {
+		return;
+	}
 
-    *source = glCreateShader(type);
+	*source = glCreateShader(type);
 
-    auto csource = shaderSource.c_str();
-    glShaderSource(*source, 1, &csource, nullptr);
-    glCompileShader(*source);
+	auto csource = shaderSource.c_str();
+	glShaderSource(*source, 1, &csource, nullptr);
+	glCompileShader(*source);
 
-    std::stringstream statusStream;
-    GLint status;
-    glGetShaderiv(*source, GL_COMPILE_STATUS, &status);
+	std::stringstream statusStream;
+	GLint status;
+	glGetShaderiv(*source, GL_COMPILE_STATUS, &status);
 
-    if (status != GL_TRUE) {
-        statusStream << "Compilation error in shader.\n";
-    }
+	if (status != GL_TRUE) {
+		statusStream << "Compilation error in shader.\n";
+	}
 
-    GLint logLength;
-    glGetShaderiv(*source, GL_INFO_LOG_LENGTH, &logLength);
-    if (logLength > 1) {
-        char buffer[logLength];
+	GLint logLength;
+	glGetShaderiv(*source, GL_INFO_LOG_LENGTH, &logLength);
+	if (logLength > 1) {
+		char buffer[logLength];
 
-        glGetShaderInfoLog(*source, logLength, NULL, buffer);
+		glGetShaderInfoLog(*source, logLength, NULL, buffer);
 
-        statusStream << "Info log:\n" << buffer;
-        statusStream << "Source:\n" << shaderSource << "\n\n";
-    }
+		statusStream << "Info log:\n" << buffer;
+		statusStream << "Source:\n" << shaderSource << "\n\n";
+	}
 
-    shaderInfoLog = shaderInfoLog + statusStream.str();
+	shaderInfoLog = shaderInfoLog + statusStream.str();
 
-    if (status != GL_TRUE) {
-        el::Loggers::getLogger("APG")->error("Shader error log: %v", shaderInfoLog);
-        glDeleteShader(*source);
-        return;
-    }
+	if (status != GL_TRUE) {
+		el::Loggers::getLogger("APG")->error("Shader error log: %v", shaderInfoLog);
+		glDeleteShader(*source);
+		return;
+	}
 }
 
 void APG::ShaderProgram::combineProgram() {
 
-    shaderProgram = glCreateProgram();
+	shaderProgram = glCreateProgram();
 
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
 
-    glBindFragDataLocation(shaderProgram, 0, "outColor");
-    glLinkProgram(shaderProgram);
+	glBindFragDataLocation(shaderProgram, 0, "outColor");
+	glLinkProgram(shaderProgram);
 
-    GLint status;
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &status);
+	GLint status;
+	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &status);
 
-    std::stringstream linkStatusStream;
+	std::stringstream linkStatusStream;
 
-    if (status != GL_TRUE) {
-        linkStatusStream << "Error while linking shader program.\n";
-    }
+	if (status != GL_TRUE) {
+		linkStatusStream << "Error while linking shader program.\n";
+	}
 
-    GLint infoLogLength;
-    glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &infoLogLength);
+	GLint infoLogLength;
+	glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &infoLogLength);
 
-    if (infoLogLength > 1) {
-        char buffer[infoLogLength];
+	if (infoLogLength > 1) {
+		char buffer[infoLogLength];
 
-        glGetProgramInfoLog(shaderProgram, infoLogLength, nullptr, buffer);
+		glGetProgramInfoLog(shaderProgram, infoLogLength, nullptr, buffer);
 
-        linkStatusStream << buffer;
-    }
+		linkStatusStream << buffer;
+	}
 
-    GLenum glerror;
-    while ((glerror = glGetError()) != GL_NO_ERROR) {
-        status = GL_FALSE;
+	GLenum glerror;
+	while ((glerror = glGetError()) != GL_NO_ERROR) {
+		status = GL_FALSE;
 
-        linkStatusStream << "glGetError(): " << gluErrorString(glerror) << "\n";
-    }
+		linkStatusStream << "glGetError(): " << gluErrorString(glerror) << "\n";
+	}
 
-    linkInfoLog = linkInfoLog + linkStatusStream.str();
+	linkInfoLog = linkInfoLog + linkStatusStream.str();
 
-    if (status != GL_TRUE) {
-        el::Loggers::getLogger("APG")->error("Link error log: %v", linkInfoLog);
-        glDeleteProgram(shaderProgram);
-        return;
-    }
+	if (status != GL_TRUE) {
+		el::Loggers::getLogger("APG")->error("Link error log: %v", linkInfoLog);
+		glDeleteProgram(shaderProgram);
+		return;
+	}
 
-    glUseProgram(shaderProgram);
+	glUseProgram(shaderProgram);
 }
 
 uint32_t *APG::ShaderProgram::validateTypeAndGet(uint32_t type) {
-    switch (type) {
-    case GL_VERTEX_SHADER: {
-        return &vertexShader;
-        break;
-    }
+	switch (type) {
+	case GL_VERTEX_SHADER: {
+		return &vertexShader;
+		break;
+	}
 
-    case GL_FRAGMENT_SHADER: {
-        return &fragmentShader;
-        break;
-    }
+	case GL_FRAGMENT_SHADER: {
+		return &fragmentShader;
+		break;
+	}
 
-    case GL_GEOMETRY_SHADER:
-    case GL_TESS_CONTROL_SHADER:
-    case GL_TESS_EVALUATION_SHADER:
-        el::Loggers::getLogger("APG")->fatal(
-                "Geometry/Tesselation Evaluation/Tesselation Control shaders not supported by APG.");
-        return nullptr;
+	case GL_GEOMETRY_SHADER:
+	case GL_TESS_CONTROL_SHADER:
+	case GL_TESS_EVALUATION_SHADER:
+		el::Loggers::getLogger("APG")->fatal(
+		        "Geometry/Tesselation Evaluation/Tesselation Control shaders not supported by APG.");
+		return nullptr;
 
-    default: {
-        el::Loggers::getLogger("APG")->fatal("Invalid type passed to validateType for shader program.");
-        return nullptr;
-    }
-    }
+	default: {
+		el::Loggers::getLogger("APG")->fatal("Invalid type passed to validateType for shader program.");
+		return nullptr;
+	}
+	}
 }

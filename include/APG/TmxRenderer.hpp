@@ -47,17 +47,17 @@ namespace APG {
 
 class TiledObject {
 public:
-    explicit TiledObject(const glm::vec2 &pos, SpriteBase * const sprite) :
-                    position { pos },
-                    sprite { sprite } {
-    }
-    explicit TiledObject(float x, float y, SpriteBase * const sprite) :
-                    position { x, y },
-                    sprite { sprite } {
-    }
+	explicit TiledObject(const glm::vec2 &pos, SpriteBase * const sprite) :
+			        position { pos },
+			        sprite { sprite } {
+	}
+	explicit TiledObject(float x, float y, SpriteBase * const sprite) :
+			        position { x, y },
+			        sprite { sprite } {
+	}
 
-    glm::vec2 position;
-    SpriteBase * sprite;
+	glm::vec2 position;
+	SpriteBase * sprite;
 };
 
 /**
@@ -71,68 +71,68 @@ public:
  */
 class TmxRenderer {
 protected:
-    static const uint64_t MAX_SPRITES_PER_UNIT = 1000000;
-    static std::unordered_map<std::string, std::shared_ptr<Tileset>> tmxTilesets;
-    static void initialiseStaticTilesets();
+	static const uint64_t MAX_SPRITES_PER_UNIT = 1000000;
+	static std::unordered_map<std::string, std::shared_ptr<Tileset>> tmxTilesets;
+	static void initialiseStaticTilesets();
 
-    Tmx::Map *map = nullptr;
-    std::vector<std::shared_ptr<Tileset>> tilesets;
-    std::unordered_map<uint64_t, SpriteBase *> sprites;
+	Tmx::Map *map = nullptr;
+	std::vector<std::shared_ptr<Tileset>> tilesets;
+	std::unordered_map<uint64_t, SpriteBase *> sprites;
 
-    std::vector<Sprite> loadedSprites;
-    std::vector<AnimatedSprite> loadedAnimatedSprites;
+	std::vector<Sprite> loadedSprites;
+	std::vector<AnimatedSprite> loadedAnimatedSprites;
 
-    std::unordered_map<std::string, std::vector<TiledObject>> objectGroups;
+	std::unordered_map<std::string, std::vector<TiledObject>> objectGroups;
 
-    glm::vec2 position { 0.0f, 0.0f };
+	glm::vec2 position { 0.0f, 0.0f };
 
-    void loadTilesets();
-    void loadObjects();
+	void loadTilesets();
+	void loadObjects();
 
-    uint64_t calculateTileGID(Tmx::Tileset *tileset, int tileID);
-    uint64_t calculateTileGID(Tmx::Tileset *tileset, Tmx::Tile *tile);
+	uint64_t calculateTileGID(Tmx::Tileset *tileset, int tileID);
+	uint64_t calculateTileGID(Tmx::Tileset *tileset, Tmx::Tile *tile);
 
 private:
-    void reserveSpriteSpace();
+	void reserveSpriteSpace();
 
 public:
-    explicit TmxRenderer(const std::unique_ptr<Tmx::Map> &map) :
-                    TmxRenderer(map.get()) {
-    }
+	explicit TmxRenderer(const std::unique_ptr<Tmx::Map> &map) :
+			        TmxRenderer(map.get()) {
+	}
 
-    explicit TmxRenderer(Tmx::Map *map);
+	explicit TmxRenderer(Tmx::Map *map);
 
-    virtual ~TmxRenderer() = default;
+	virtual ~TmxRenderer() = default;
 
-    virtual void renderLayer(Tmx::TileLayer * const layer) = 0;
-    virtual void renderObjectGroup(const std::vector<TiledObject> &objects) = 0;
+	virtual void renderLayer(Tmx::TileLayer * const layer) = 0;
+	virtual void renderObjectGroup(const std::vector<TiledObject> &objects) = 0;
 
-    void renderAll(float deltaTime);
+	void renderAll(float deltaTime);
 
-    const Tmx::Map *getMap() {
-        return map;
-    }
+	const Tmx::Map *getMap() {
+		return map;
+	}
 
-    const glm::vec2 &getPosition() const {
-        return position;
-    }
+	const glm::vec2 &getPosition() const {
+		return position;
+	}
 
-    void setPosition(glm::vec2 &position) {
-        this->position = position;
-    }
+	void setPosition(glm::vec2 &position) {
+		this->position = position;
+	}
 
-    Tileset * getTilesetByID(int32_t id) const {
-        if (tilesets[id] == nullptr) {
-            return nullptr;
-        }
+	Tileset * getTilesetByID(int32_t id) const {
+		if (tilesets[id] == nullptr) {
+			return nullptr;
+		}
 
-        return tilesets[id].get();
-    }
+		return tilesets[id].get();
+	}
 
-    TmxRenderer(TmxRenderer &other) = delete;
-    TmxRenderer(const TmxRenderer &other) = delete;
-    TmxRenderer &operator=(TmxRenderer &other) = delete;
-    TmxRenderer &operator=(const TmxRenderer &other) = delete;
+	TmxRenderer(TmxRenderer &other) = delete;
+	TmxRenderer(const TmxRenderer &other) = delete;
+	TmxRenderer &operator=(TmxRenderer &other) = delete;
+	TmxRenderer &operator=(const TmxRenderer &other) = delete;
 };
 
 }

@@ -33,55 +33,55 @@
 #include "APG/SDLInputManager.hpp"
 
 APG::SDLInputManager::SDLInputManager() {
-    keyState = SDL_GetKeyboardState(nullptr);
+	keyState = SDL_GetKeyboardState(nullptr);
 
-    for (auto &f : canJustPress) {
-        f = true;
-    }
+	for (auto &f : canJustPress) {
+		f = true;
+	}
 }
 
 void APG::SDLInputManager::update(float deltaTime) {
-    for (auto &f : justPressed) {
-        f = false;
-    }
+	for (auto &f : justPressed) {
+		f = false;
+	}
 
-    mods = SDL_GetModState();
+	mods = SDL_GetModState();
 }
 
 void APG::SDLInputManager::handleInputEvent(SDL_Event &event) {
-    const auto key = event.key.keysym.scancode;
-    if (event.type == SDL_KEYDOWN && canJustPress[key]) {
-        justPressed[key] = true;
-        canJustPress[key] = false;
-    } else if (event.type == SDL_KEYUP) {
-        canJustPress[key] = true;
-    }
+	const auto key = event.key.keysym.scancode;
+	if (event.type == SDL_KEYDOWN && canJustPress[key]) {
+		justPressed[key] = true;
+		canJustPress[key] = false;
+	} else if (event.type == SDL_KEYUP) {
+		canJustPress[key] = true;
+	}
 }
 
 bool APG::SDLInputManager::isKeyPressed(const SDL_Scancode &key) const {
-    return isSDLKeyCodePressed(key);
+	return isSDLKeyCodePressed(key);
 }
 
 bool APG::SDLInputManager::isKeyJustPressed(const SDL_Scancode &key) const {
-    return justPressed[key];
+	return justPressed[key];
 }
 
 bool APG::SDLInputManager::isModPressed(const SDL_Keymod &mod) const {
-    return (mods & mod) == mod;
+	return (mods & mod) == mod;
 }
 
 bool APG::SDLInputManager::isCtrlPressed() const {
-    return (mods & KMOD_CTRL) != 0;
+	return (mods & KMOD_CTRL) != 0;
 }
 
 bool APG::SDLInputManager::isShiftPressed() const {
-    return (mods & KMOD_SHIFT) != 0;
+	return (mods & KMOD_SHIFT) != 0;
 }
 
 bool APG::SDLInputManager::isAltPressed() const {
-    return (mods & KMOD_ALT) != 0;
+	return (mods & KMOD_ALT) != 0;
 }
 
 bool APG::SDLInputManager::isSDLKeyCodePressed(const SDL_Scancode &keysym) const {
-    return keyState[keysym];
+	return keyState[keysym];
 }

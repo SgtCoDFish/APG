@@ -31,10 +31,10 @@
 #include "APG/VertexAttributeList.hpp"
 
 APG::Mesh::Mesh(std::initializer_list<VertexAttribute> attList) :
-                Mesh(false, false, attList) {
+		        Mesh(false, false, attList) {
 }
 
 APG::Mesh::Mesh(bool staticVertices, bool staticIndices, std::initializer_list<APG::VertexAttribute> attList) :
-                vertexBuffer(staticVertices, attList),
-                indexBuffer(staticIndices) {
+		        vertexBuffer(staticVertices, attList),
+		        indexBuffer(staticIndices) {
 }

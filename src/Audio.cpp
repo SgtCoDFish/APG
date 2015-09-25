@@ -34,35 +34,35 @@
 #include "APG/Audio.hpp"
 
 APG::AudioManager::AudioManager(int initialMusicHandleCount, int initialSoundHandleCount) {
-    fillDefaultQueues(initialMusicHandleCount, initialSoundHandleCount);
+	fillDefaultQueues(initialMusicHandleCount, initialSoundHandleCount);
 }
 
 APG::AudioManager::music_handle APG::AudioManager::getNextMusicHandle() {
-    const auto retval = availableMusicHandles.front();
-    availableMusicHandles.pop_front();
-    return retval;
+	const auto retval = availableMusicHandles.front();
+	availableMusicHandles.pop_front();
+	return retval;
 }
 
 APG::AudioManager::sound_handle APG::AudioManager::getNextSoundHandle() {
-    const auto retval = availableSoundHandles.front();
-    availableSoundHandles.pop_front();
-    return retval;
+	const auto retval = availableSoundHandles.front();
+	availableSoundHandles.pop_front();
+	return retval;
 }
 
 void APG::AudioManager::freeMusicHandle(music_handle handle) {
-    availableMusicHandles.push_front(handle);
+	availableMusicHandles.push_front(handle);
 }
 
 void APG::AudioManager::freeSoundHandle(sound_handle handle) {
-    availableSoundHandles.push_front(handle);
+	availableSoundHandles.push_front(handle);
 }
 
 void APG::AudioManager::fillDefaultQueues(int initialMusicHandleCount, int initialSoundHandleCount) {
-    for (music_handle i = 0; i < initialMusicHandleCount; ++i) {
-        availableMusicHandles.push_back(i);
-    }
+	for (music_handle i = 0; i < initialMusicHandleCount; ++i) {
+		availableMusicHandles.push_back(i);
+	}
 
-    for (sound_handle i = 0; i < initialSoundHandleCount; ++i) {
-        availableSoundHandles.push_back(i);
-    }
+	for (sound_handle i = 0; i < initialSoundHandleCount; ++i) {
+		availableSoundHandles.push_back(i);
+	}
 }

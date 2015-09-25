@@ -32,14 +32,14 @@
 #include "APG/VAO.hpp"
 
 APG::VAO::VAO() {
-    glGenVertexArrays(1, &vaoID);
+	glGenVertexArrays(1, &vaoID);
 }
 
 APG::VAO::~VAO() {
-    glDeleteVertexArrays(1, &vaoID);
+	glDeleteVertexArrays(1, &vaoID);
 }
 
 void APG::VAO::bind() const {
-    glBindVertexArray(vaoID);
+	glBindVertexArray(vaoID);
 }
 
