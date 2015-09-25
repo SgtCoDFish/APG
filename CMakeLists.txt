@@ -39,6 +39,8 @@ option(EXCLUDE_GL_TEST "Should we exclude compiling the OpenGL TMX rendering tes
 option(EXCLUDE_SDL_TEST "Should we exclude compiling the SDL TMX rendering test?" OFF)
 option(EXCLUDE_AUDIO_TEST "Should we exclude compiling the audio test? Required an additional file, test_music.ogg, to be added to the assets folder (and then re-running cmake)!" ON)
 
+add_definitions(-DGLM_FORCE_RADIANS)
+
 set(CMAKE_CXX_COMPILER_ARG1 "-std=c++1y")
 set(CMAKE_CXX_FLAGS_BASE "-Wall -Wextra -Wno-unused-parameter ${OS_FLAGS}")
 
