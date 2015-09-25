@@ -43,7 +43,7 @@ bool APG::APGAudioTest::init() {
 	fontSprite =
 	        fontManager->renderText(font,
 	                "To test:\n\t> P to load/unload music\n\t> Space to play from beginning if loaded\n\t> A to pause if playing\n\t> D to resume if paused\n\t> Enter to play test sound.\n\t> Number keys to change volume",
-	                FontRenderMethod::NICE);
+	                true, FontRenderMethod::NICE);
 
 	return true;
 }

@@ -99,7 +99,7 @@ bool APG::APGGLRenderTest::init() {
 
 	logger->info("Estimated font size: (w, h) = (%v, %v).", renderedFontSize.x, renderedFontSize.y);
 
-	fontSprite = fontManager->renderText(font, "Hello, world!", FontRenderMethod::NICE);
+	fontSprite = fontManager->renderText(font, "Hello, world!", true, FontRenderMethod::NICE);
 
 	auto glError = glGetError();
 	if (glError != GL_NO_ERROR) {

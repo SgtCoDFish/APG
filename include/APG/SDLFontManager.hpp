@@ -56,7 +56,7 @@ public:
 
 	virtual glm::ivec2 estimateSizeOf(const font_handle &fontHandle, const std::string &text) override;
 	virtual SpriteBase *renderText(const font_handle &fontHandle, const std::string &text, bool ignoreWhitespace = true,
-	        FontRenderMethod method = FontRenderMethod::FAST) override;
+	        const FontRenderMethod method = FontRenderMethod::FAST) override;
 
 private:
 	static constexpr int MAX_OWNED_TEXTURES = 5;
@@ -92,6 +92,9 @@ private:
 	int findAvailableSpriteSlot() const;
 
 	SDL_Color glmToSDLColor(const glm::vec4 &glmColor);
+
+	SpriteBase * renderTextIgnoreWhitespace(const StoredFont &font, const std::string &text, const FontRenderMethod method, el::Logger * const logger);
+	SpriteBase * renderTextWithWhitespace(const StoredFont &font, const std::string &text, const FontRenderMethod method, el::Logger * const logger);
 };
 
 }

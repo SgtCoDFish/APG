@@ -68,7 +68,7 @@ public:
 	virtual void setFontColor(const font_handle &handle, const glm::vec4 &color) = 0;
 
 	virtual glm::ivec2 estimateSizeOf(const font_handle &fontHandle, const std::string &text) = 0;
-	virtual SpriteBase *renderText(const font_handle &fontHandle, const std::string &text, FontRenderMethod method =
+	virtual SpriteBase *renderText(const font_handle &fontHandle, const std::string &text, bool ignoreWhitespace = true, const FontRenderMethod method =
 	        FontRenderMethod::FAST) = 0;
 };
 

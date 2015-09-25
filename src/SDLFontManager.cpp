@@ -95,7 +95,7 @@ glm::ivec2 APG::SDLFontManager::estimateSizeOf(const font_handle &fontHandle, co
 }
 
 APG::SpriteBase *APG::SDLFontManager::renderText(const font_handle &fontHandle, const std::string &text,
-        FontRenderMethod method) {
+bool ignoreWhitespace, const FontRenderMethod method) {
 	const auto logger = el::Loggers::getLogger("APG");
 
 	const auto &found = loadedFonts.find(fontHandle);
@@ -104,53 +104,11 @@ APG::SpriteBase *APG::SDLFontManager::renderText(const font_handle &fontHandle, 
 
 	auto &font = (*found).second;
 
-	SDL_Surface *tempSurface = nullptr;
-
-	switch (method) {
-	case FontRenderMethod::NICE: {
-		// renders to a nice RGBA surface so we don't have to mess with it
-		tempSurface = TTF_RenderUTF8_Blended(font.ptr.get(), text.c_str(), font.color);
-		break;
+	if (ignoreWhitespace) {
+		return renderTextIgnoreWhitespace(font, text, method, logger);
+	} else {
+		return renderTextWithWhitespace(font, text, method, logger);
 	}
-
-	case FontRenderMethod::FAST: {
-		// renders to a palette so needs to be converted
-		tempSurface = TTF_RenderUTF8_Solid(font.ptr.get(), text.c_str(), font.color);
-
-		tempSurface = SDL_ConvertSurfaceFormat(tempSurface, SDL_PIXELFORMAT_RGBA8888, 0);
-		break;
-	}
-	}
-
-	if (tempSurface == nullptr) {
-		logger->fatal("Couldn't render text string \"%v\" using font handle %v, error: %v", text, fontHandle,
-		TTF_GetError());
-		return nullptr;
-	}
-
-	const auto ownedTextureID = findAvailableOwnedTexture(tempSurface);
-
-	if (ownedTextureID == -1) {
-		logger->fatal("Ran out of space for textures for rendered text (max is %v textures). Time to refactor!",
-		        APG::SDLFontManager::MAX_OWNED_TEXTURES);
-		return nullptr;
-	}
-
-	const auto ownedSpriteID = findAvailableSpriteSlot();
-
-	if (ownedSpriteID == -1) {
-		logger->fatal("Ran out of space for sprites for rendered text (max is %v sprites). Time to refactor!",
-		        APG::SDLFontManager::MAX_OWNED_SPRITES);
-		return nullptr;
-	}
-
-	auto texture = std::make_unique<Texture>(tempSurface);
-	ownedTextures[ownedTextureID] = std::move(texture);
-
-	auto sprite = std::make_unique<Sprite>(ownedTextures[ownedTextureID].get());
-	ownedSprites[ownedSpriteID] = std::move(sprite);
-
-	return ownedSprites[ownedSpriteID].get();
 }
 
 SDL_Color APG::SDLFontManager::glmToSDLColor(const glm::vec4 &glmColor) {
@@ -182,4 +140,164 @@ int APG::SDLFontManager::findAvailableSpriteSlot() const {
 	}
 
 	return -1;
+}
+
+APG::SpriteBase * APG::SDLFontManager::renderTextIgnoreWhitespace(const APG::SDLFontManager::StoredFont &font,
+        const std::string &text, const APG::FontRenderMethod method, el::Logger * const logger) {
+	SDL_Surface *tempSurface = nullptr;
+
+	switch (method) {
+	case FontRenderMethod::NICE: {
+		// renders to a nice RGBA surface so we don't have to mess with it
+		tempSurface = TTF_RenderUTF8_Blended(font.ptr.get(), text.c_str(), font.color);
+		break;
+	}
+
+	case FontRenderMethod::FAST: {
+		// renders to a palette so needs to be converted
+		tempSurface = TTF_RenderUTF8_Solid(font.ptr.get(), text.c_str(), font.color);
+
+		tempSurface = SDL_ConvertSurfaceFormat(tempSurface, SDL_PIXELFORMAT_RGBA8888, 0);
+		break;
+	}
+	}
+
+	if (tempSurface == nullptr) {
+		logger->fatal("Couldn't render text string \"%v\" using font handle %v, error: %v", text, font.handle,
+		TTF_GetError());
+		return nullptr;
+	}
+
+	const auto ownedTextureID = findAvailableOwnedTexture(tempSurface);
+
+	if (ownedTextureID == -1) {
+		logger->fatal("Ran out of space for textures for rendered text (max is %v textures). Time to refactor!",
+		        APG::SDLFontManager::MAX_OWNED_TEXTURES);
+		return nullptr;
+	}
+
+	const auto ownedSpriteID = findAvailableSpriteSlot();
+
+	if (ownedSpriteID == -1) {
+		logger->fatal("Ran out of space for sprites for rendered text (max is %v sprites). Time to refactor!",
+		        APG::SDLFontManager::MAX_OWNED_SPRITES);
+		return nullptr;
+	}
+
+	auto texture = std::make_unique<Texture>(tempSurface);
+	ownedTextures[ownedTextureID] = std::move(texture);
+
+	auto sprite = std::make_unique<Sprite>(ownedTextures[ownedTextureID].get());
+	ownedSprites[ownedSpriteID] = std::move(sprite);
+
+	return ownedSprites[ownedSpriteID].get();
+}
+
+APG::SpriteBase * APG::SDLFontManager::renderTextWithWhitespace(const StoredFont &font, const std::string &text,
+        const FontRenderMethod method, el::Logger * const logger) {
+	const std::string wsDelim = "\n";
+
+	std::vector<std::string> stringVector;
+	std::vector<SXXDL::surface_ptr> surfaces;
+
+	std::string::size_type begin = 0U;
+	auto end = text.find(wsDelim);
+
+	while (end != std::string::npos) {
+		stringVector.emplace_back(text.substr(begin, end));
+		begin = end + wsDelim.length();
+		end = text.find(wsDelim);
+	}
+
+	switch (method) {
+	case FontRenderMethod::NICE: {
+		for (const auto &s : stringVector) {
+			// renders to a nice RGBA surface so we don't have to mess with it
+			auto surface = TTF_RenderUTF8_Blended(font.ptr.get(), s.c_str(), font.color);
+
+			if (surface == nullptr) {
+				logger->fatal("Couldn't render text string \"%v\" (%v of %v) using font handle %v. Error: %v", s,
+				        surfaces.size() + 1, stringVector.size(), font.handle, TTF_GetError());
+				return nullptr;
+			}
+
+			surfaces.emplace_back(SXXDL::make_surface_ptr(surface));
+		}
+		break;
+	}
+
+	case FontRenderMethod::FAST: {
+		for (const auto &s : stringVector) {
+			// renders to a palette so needs to be converted
+			auto surface = TTF_RenderUTF8_Solid(font.ptr.get(), s.c_str(), font.color);
+
+			if (surface == nullptr) {
+				logger->fatal("Couldn't render text string \"%v\" (%v of %v) using font handle %v. Error: %v", s,
+				        surfaces.size() + 1, stringVector.size(), font.handle, TTF_GetError());
+				return nullptr;
+			}
+
+			surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGBA8888, 0);
+
+			surfaces.emplace_back(SXXDL::make_surface_ptr(surface));
+		}
+
+		break;
+	}
+	}
+
+	auto maxWidth = 0, totalHeight = 0;
+
+	for (const auto &surf : surfaces) {
+		if (surf->w > maxWidth) {
+			maxWidth = surf->w;
+		}
+
+		totalHeight += surf->h;
+	}
+
+	SDL_Surface *tempSurface = SDL_CreateRGBSurface(0, maxWidth, totalHeight, surfaces.front()->format->BitsPerPixel,
+	        surfaces.front()->format->Rmask, surfaces.front()->format->Gmask, surfaces.front()->format->Bmask,
+	        surfaces.front()->format->Amask);
+
+	if (tempSurface == nullptr) {
+		logger->fatal("Couldn't create master surface for multiline rendering with handle %v. Error: %v", font.handle,
+		        SDL_GetError());
+		return nullptr;
+	}
+
+	auto hCounter = 0;
+	for (const auto &surf : surfaces) {
+		auto rect = SDL_Rect { 0u, hCounter, 0u, 0u };
+		if(SDL_BlitSurface(surf.get(), nullptr, tempSurface, &rect) != 0) {
+			logger->fatal("Couldn't blit micro surface to multiline master surface, error: %v", SDL_GetError());
+			return nullptr;
+		}
+
+		hCounter += surf->h;
+	}
+
+	const auto ownedTextureID = findAvailableOwnedTexture(tempSurface);
+
+	if (ownedTextureID == -1) {
+		logger->fatal("Ran out of space for textures for rendered text (max is %v textures). Time to refactor!",
+		        APG::SDLFontManager::MAX_OWNED_TEXTURES);
+		return nullptr;
+	}
+
+	const auto ownedSpriteID = findAvailableSpriteSlot();
+
+	if (ownedSpriteID == -1) {
+		logger->fatal("Ran out of space for sprites for rendered text (max is %v sprites). Time to refactor!",
+		        APG::SDLFontManager::MAX_OWNED_SPRITES);
+		return nullptr;
+	}
+
+	auto texture = std::make_unique<Texture>(tempSurface);
+	ownedTextures[ownedTextureID] = std::move(texture);
+
+	auto sprite = std::make_unique<Sprite>(ownedTextures[ownedTextureID]);
+	ownedSprites[ownedSpriteID] = std::move(sprite);
+
+	return ownedSprites[ownedSpriteID].get();
 }
