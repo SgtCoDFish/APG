@@ -195,7 +195,7 @@ APG::SpriteBase * APG::SDLFontManager::renderTextIgnoreWhitespace(const APG::SDL
 
 APG::SpriteBase * APG::SDLFontManager::renderTextWithWhitespace(const StoredFont &font, const std::string &text,
         const FontRenderMethod method, el::Logger * const logger) {
-	const std::string wsDelim = "\n";
+	static const std::string wsDelim = "\n";
 
 	std::vector<std::string> stringVector;
 	std::vector<SXXDL::surface_ptr> surfaces;
@@ -204,9 +204,13 @@ APG::SpriteBase * APG::SDLFontManager::renderTextWithWhitespace(const StoredFont
 	auto end = text.find(wsDelim);
 
 	while (end != std::string::npos) {
-		stringVector.emplace_back(text.substr(begin, end));
+		stringVector.emplace_back(text.substr(begin, end-begin));
 		begin = end + wsDelim.length();
-		end = text.find(wsDelim);
+		end = text.find(wsDelim, begin);
+	}
+
+	if(stringVector.empty()) {
+		return renderTextIgnoreWhitespace(font, text, method, logger);
 	}
 
 	switch (method) {

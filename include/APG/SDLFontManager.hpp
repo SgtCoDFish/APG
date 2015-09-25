@@ -66,7 +66,7 @@ private:
 		StoredFont(const font_handle &handle, SXXDL::ttf::font_ptr &&ptr) :
 				        handle { handle },
 				        ptr { std::move(ptr) },
-				        color { 255, 255, 255, 255 } {
+				        color { 0, 0, 0, 255 } {
 		}
 
 		font_handle handle;
