@@ -70,31 +70,6 @@ public:
  * this happens so you should be aware.
  */
 class TmxRenderer {
-protected:
-	static const uint64_t MAX_SPRITES_PER_UNIT = 1000000;
-	static std::unordered_map<std::string, std::shared_ptr<Tileset>> tmxTilesets;
-	static void initialiseStaticTilesets();
-
-	Tmx::Map *map = nullptr;
-	std::vector<std::shared_ptr<Tileset>> tilesets;
-	std::unordered_map<uint64_t, SpriteBase *> sprites;
-
-	std::vector<Sprite> loadedSprites;
-	std::vector<AnimatedSprite> loadedAnimatedSprites;
-
-	std::unordered_map<std::string, std::vector<TiledObject>> objectGroups;
-
-	glm::vec2 position { 0.0f, 0.0f };
-
-	void loadTilesets();
-	void loadObjects();
-
-	uint64_t calculateTileGID(Tmx::Tileset *tileset, int tileID);
-	uint64_t calculateTileGID(Tmx::Tileset *tileset, Tmx::Tile *tile);
-
-private:
-	void reserveSpriteSpace();
-
 public:
 	explicit TmxRenderer(const std::unique_ptr<Tmx::Map> &map) :
 			        TmxRenderer(map.get()) {
@@ -133,6 +108,31 @@ public:
 	TmxRenderer(const TmxRenderer &other) = delete;
 	TmxRenderer &operator=(TmxRenderer &other) = delete;
 	TmxRenderer &operator=(const TmxRenderer &other) = delete;
+
+protected:
+	static const uint64_t MAX_SPRITES_PER_UNIT = 1000000;
+	static std::unordered_map<std::string, std::shared_ptr<Tileset>> tmxTilesets;
+	static void initialiseStaticTilesets();
+
+	Tmx::Map *map = nullptr;
+	std::vector<std::shared_ptr<Tileset>> tilesets;
+	std::unordered_map<uint64_t, SpriteBase *> sprites;
+
+	std::vector<Sprite> loadedSprites;
+	std::vector<AnimatedSprite> loadedAnimatedSprites;
+
+	std::unordered_map<std::string, std::vector<TiledObject>> objectGroups;
+
+	glm::vec2 position { 0.0f, 0.0f };
+
+	void loadTilesets();
+	void loadObjects();
+
+	uint64_t calculateTileGID(Tmx::Tileset *tileset, int tileID);
+	uint64_t calculateTileGID(Tmx::Tileset *tileset, Tmx::Tile *tile);
+
+private:
+	void reserveSpriteSpace();
 };
 
 }
