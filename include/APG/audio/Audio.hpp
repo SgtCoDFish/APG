@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_APG_AUDIO_HPP_
-#define INCLUDE_APG_AUDIO_HPP_
+#ifndef INCLUDE_APG_AUDIO_AUDIO_HPP_
+#define INCLUDE_APG_AUDIO_AUDIO_HPP_
 
 #include <cstdint>
 
@@ -34,7 +34,7 @@
 #include <deque>
 #include <type_traits>
 
-#include "APG/APGCommon.hpp"
+#include "APG/core/APGCommon.hpp"
 
 namespace APG {
 

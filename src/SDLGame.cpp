@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -38,11 +38,10 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-#include "APG/APGeasylogging.hpp"
-
-#include "APG/SDLGame.hpp"
-#include "APG/SDLInputManager.hpp"
-#include "APG/TmxRenderer.hpp"
+#include "APG/core/APGeasylogging.hpp"
+#include "APG/core/SDLGame.hpp"
+#include "APG/input/SDLInputManager.hpp"
+#include "APG/tiled/TmxRenderer.hpp"
 
 uint32_t APG::SDLGame::SDL_INIT_FLAGS = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS;
 uint32_t APG::SDLGame::SDL_IMAGE_INIT_FLAGS = IMG_INIT_PNG;

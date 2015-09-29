@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -34,9 +34,8 @@
 
 #include "tmxparser/TmxTile.h"
 
-#include "APG/AnimatedSprite.hpp"
-#include "APG/Texture.hpp"
-
+#include "APG/graphics/AnimatedSprite.hpp"
+#include "APG/graphics/Texture.hpp"
 #include "APG/internal/Assert.hpp"
 
 APG::AnimatedSprite::AnimatedSprite(float frameDuration, Sprite * firstFrame, AnimationMode animationMode) :

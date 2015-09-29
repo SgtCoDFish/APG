@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,53 +25,40 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_APG_FONTMANAGER_HPP_
-#define INCLUDE_APG_FONTMANAGER_HPP_
+#ifndef INCLUDE_APG_GRAPHICS_SPRITEBASE_HPP_
+#define INCLUDE_APG_GRAPHICS_SPRITEBASE_HPP_
 
 #include <cstdint>
 
-#include <string>
-#include <deque>
-#include <type_traits>
-
-#include <glm/glm.hpp>
-
-#include "APG/APGCommon.hpp"
-
 namespace APG {
-class SpriteBase;
+class Texture;
 
-enum class FontRenderMethod {
-	FAST, NICE
-};
-
-class FontManager {
+class SpriteBase {
 public:
-	using font_handle = int32_t;
+	virtual ~SpriteBase() = default;
+	virtual Texture * getTexture() const = 0;
 
-	static_assert(std::is_copy_constructible<font_handle>(), "Font handle type must be copy constructible");
+	virtual uint32_t getWidth() const = 0;
 
-protected:
-	std::deque<font_handle> availableFontHandles;
-	void fillDefaultQueue(int initialFontHandleCount);
+	virtual uint32_t getHeight() const = 0;
 
-	font_handle getNextFontHandle();
-	void freeFontHandle(font_handle handle);
+	virtual float getU() const = 0;
+	virtual float getV() const = 0;
+	virtual float getU2() const = 0;
+	virtual float getV2() const = 0;
 
-public:
-	explicit FontManager(int initialFontHandleCount = internal::DEFAULT_FONT_HANDLE_COUNT);
-	virtual ~FontManager() = default;
+	inline void setHash(uint64_t hash) {
+		this->hash = hash;
+	}
 
-	virtual font_handle loadFontFile(const std::string &filename, int pointSize) = 0;
-	virtual void freeFont(font_handle &handle) = 0;
+	inline uint64_t getHash() const {
+		return hash;
+	}
 
-	virtual void setFontColor(const font_handle &handle, const glm::vec4 &color) = 0;
-
-	virtual glm::ivec2 estimateSizeOf(const font_handle &fontHandle, const std::string &text) = 0;
-	virtual SpriteBase *renderText(const font_handle &fontHandle, const std::string &text, bool ignoreWhitespace = true, const FontRenderMethod method =
-	        FontRenderMethod::FAST) = 0;
+private:
+	uint64_t hash = 0;
 };
 
 }
 
-#endif /* INCLUDE_APG_FONTMANAGER_HPP_ */
+#endif /* INCLUDE_APG_SPRITEBASE_HPP_ */

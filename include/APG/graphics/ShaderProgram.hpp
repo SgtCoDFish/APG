@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SHADERPROGRAM_HPP_
-#define SHADERPROGRAM_HPP_
+#ifndef INCLUDE_APG_GRAPHICS_SHADERPROGRAM_HPP_
+#define INCLUDE_APG_GRAPHICS_SHADERPROGRAM_HPP_
 
 #include <cstdint>
 
@@ -42,26 +42,13 @@ class VertexAttribute;
 class VertexAttributeList;
 
 class ShaderProgram final {
-private:
-	static std::string loadSourceFromFile(const std::string &filename);
-
-	uint32_t vertexShader, fragmentShader;
-	uint32_t shaderProgram;
-
-	uint32_t *validateTypeAndGet(uint32_t shaderType);
-
-	std::string shaderInfoLog, linkInfoLog;
-
-	void loadShader(const std::string &vertexShaderFilename, uint32_t shaderType);
-	void combineProgram();
-
 public:
-	ShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource);
 	static std::unique_ptr<APG::ShaderProgram> fromSource(const std::string &vertexShaderSource,
 	        const std::string &fragmentShaderSource);
 	static std::unique_ptr<APG::ShaderProgram> fromFiles(const std::string &vertexShaderFilename,
 	        const std::string &fragmentShaderFilename);
 
+	explicit ShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource);
 	virtual ~ShaderProgram();
 
 	void use();
@@ -111,6 +98,19 @@ public:
 	ShaderProgram(const ShaderProgram &other) = delete;
 	ShaderProgram &operator=(ShaderProgram &other) = delete;
 	ShaderProgram &operator=(const ShaderProgram &other) = delete;
+
+private:
+	static std::string loadSourceFromFile(const std::string &filename);
+
+	uint32_t vertexShader, fragmentShader;
+	uint32_t shaderProgram;
+
+	uint32_t *validateTypeAndGet(uint32_t shaderType);
+
+	std::string shaderInfoLog, linkInfoLog;
+
+	void loadShader(const std::string &vertexShaderFilename, uint32_t shaderType);
+	void combineProgram();
 };
 
 }

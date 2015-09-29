@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,28 +25,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef VAOINCLUDE_HPP_
-#define VAOINCLUDE_HPP_
+#ifndef INCLUDE_APG_GRAPHICS_VERTEXBUFFEROBJECT_HPP_
+#define INCLUDE_APG_GRAPHICS_VERTEXBUFFEROBJECT_HPP_
 
 #include <cstdint>
 
+#include "APG/graphics/Buffer.hpp"
+#include "APG/graphics/VertexAttributeList.hpp"
+#include "APG/graphics/ShaderProgram.hpp"
+
 namespace APG {
 
-class VAO final {
-private:
-	uint32_t vaoID;
-
+/**
+ * A float buffer for vertices with vertex attributes added in for good measure.
+ */
+class VertexBufferObject : public FloatBuffer {
 public:
-	VAO();
-	~VAO();
+	explicit VertexBufferObject(std::initializer_list<VertexAttribute> initList);
+	explicit VertexBufferObject(bool isStatic, std::initializer_list<VertexAttribute> initList);
+	explicit VertexBufferObject(bool isStatic, std::initializer_list<VertexAttribute> initList, float vertices[],
+	        int vertexCount);
+	virtual ~VertexBufferObject() = default;
 
-	void bind() const;
-
-	uint32_t getVAOID() const {
-		return vaoID;
+	inline const VertexAttributeList &getAttributes() const {
+		return attributeList;
 	}
+
+	void bind(ShaderProgram * const program);
+
+private:
+	VertexAttributeList attributeList;
 };
 
 }
 
-#endif /* VAOINCLUDE_HPP_ */
+#endif /* VERTEXBUFFEROBJECT_HPP_ */

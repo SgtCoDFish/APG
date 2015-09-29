@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,8 @@
 #include <string>
 #include <deque>
 
-#include "APG/APGCommon.hpp"
-#include "APG/Audio.hpp"
+#include "APG/core/APGCommon.hpp"
+#include "APG/audio/Audio.hpp"
 
 APG::AudioManager::AudioManager(int initialMusicHandleCount, int initialSoundHandleCount) {
 	fillDefaultQueues(initialMusicHandleCount, initialSoundHandleCount);

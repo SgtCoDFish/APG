@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,18 +25,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef APGSDLRENDERTEST_HPP_
-#define APGSDLRENDERTEST_HPP_
+#ifndef INCLUDE_TEST_APGSDLRENDERTEST_HPP_
+#define INCLUDE_TEST_APGSDLRENDERTEST_HPP_
 
 #include <memory>
 
-#include "APG/Game.hpp"
-#include "APG/SDLGame.hpp"
-#include "APG/APGCommon.hpp"
 #include "APG/SXXDL.hpp"
-#include "APG/SDLTmxRenderer.hpp"
+#include "APG/core/Game.hpp"
+#include "APG/core/SDLGame.hpp"
+#include "APG/core/APGCommon.hpp"
+#include "APG/tiled/SDLTmxRenderer.hpp"
 
 class APGSDLRenderTest final : public APG::SDLGame {
+public:
+	APGSDLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
+	        uint32_t glContextMajor = 3, uint32_t glContextMinor = 2) :
+			        SDLGame(windowTitle, windowWidth, windowHeight, glContextMajor, glContextMinor) {
+	}
+	virtual ~APGSDLRenderTest() = default;
+
+	bool init() override;
+	void render(float deltaTime) override;
+
 private:
 	SXXDL::renderer_ptr renderer = SXXDL::make_renderer_ptr(nullptr);
 
@@ -47,16 +57,6 @@ private:
 	std::unique_ptr<APG::SDLTmxRenderer> rendererTwo;
 
 	APG::SDLTmxRenderer *currentRenderer = nullptr;
-
-public:
-	APGSDLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
-	        uint32_t glContextMajor = 3, uint32_t glContextMinor = 2) :
-			        SDLGame(windowTitle, windowWidth, windowHeight, glContextMajor, glContextMinor) {
-	}
-	virtual ~APGSDLRenderTest() = default;
-
-	bool init() override;
-	void render(float deltaTime) override;
 };
 
 #endif /* APGSDLRENDERTEST_HPP_ */

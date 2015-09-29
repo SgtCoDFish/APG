@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_APG_SDLFONTMANAGER_HPP_
-#define INCLUDE_APG_SDLFONTMANAGER_HPP_
+#ifndef INCLUDE_APG_FONT_SDLFONTMANAGER_HPP_
+#define INCLUDE_APG_FONT_SDLFONTMANAGER_HPP_
 
 #include <cstdint>
 
@@ -36,13 +36,13 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-#include "APG/Texture.hpp"
-#include "APG/FontManager.hpp"
 #include "APG/SXXDL.hpp"
-#include "APG/SpriteBase.hpp"
-#include "APG/Sprite.hpp"
+#include "APG/graphics/Texture.hpp"
+#include "APG/graphics/Sprite.hpp"
+#include "APG/font/FontManager.hpp"
 
 namespace APG {
+class SpriteBase;
 
 class SDLFontManager : public FontManager {
 public:

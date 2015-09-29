@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -40,16 +40,15 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 
-#include "APG/APGeasylogging.hpp"
-INITIALIZE_EASYLOGGINGPP
-
-#include "APG/Game.hpp"
-#include "APG/SDLGame.hpp"
-#include "APG/APGCommon.hpp"
 #include "APG/SXXDL.hpp"
-#include "APG/Buffer.hpp"
-#include "APG/Texture.hpp"
-#include "APG/Camera.hpp"
+#include "APG/core/APGeasylogging.hpp"
+INITIALIZE_EASYLOGGINGPP
+#include "APG/core/Game.hpp"
+#include "APG/core/SDLGame.hpp"
+#include "APG/core/APGCommon.hpp"
+#include "APG/graphics/Buffer.hpp"
+#include "APG/graphics/Texture.hpp"
+#include "APG/graphics/Camera.hpp"
 
 #include "test/APGGLRenderTest.hpp"
 

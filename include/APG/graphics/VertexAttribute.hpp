@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,47 +25,59 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_APG_SDLINPUTMANAGER_HPP_
-#define INCLUDE_APG_SDLINPUTMANAGER_HPP_
+#ifndef INCLUDE_APG_GRAPHICS_VERTEXATTRIBUTE_HPP_
+#define INCLUDE_APG_GRAPHICS_VERTEXATTRIBUTE_HPP_
 
 #include <cstdint>
 
-#include <array>
-
-#include <SDL2/SDL.h>
-
-#include "APG/InputManager.hpp"
+#include <string>
 
 namespace APG {
 
-class SDLInputManager : public InputManager {
-private:
-	std::array<bool, SDL_Scancode::SDL_NUM_SCANCODES> justPressed;
-	std::array<bool, SDL_Scancode::SDL_NUM_SCANCODES> canJustPress;
+enum class AttributeUsage {
+	POSITION, COLOR, TEXCOORD, NORMAL,
+};
 
-	const uint8_t *keyState = nullptr;
-	SDL_Keymod mods = SDL_Keymod::KMOD_NONE;
-
+class VertexAttribute final {
 public:
-	explicit SDLInputManager();
-	virtual ~SDLInputManager() = default;
+	explicit VertexAttribute(const std::string &alias, AttributeUsage usage, uint8_t numComponents, bool normalized = false);
+	~VertexAttribute() = default;
 
-	virtual void update(float deltaTime) override;
+	const std::string &getAlias() const {
+		return alias;
+	}
 
-	virtual bool isKeyPressed(const SDL_Scancode &key) const override;
-	virtual bool isKeyJustPressed(const SDL_Scancode &key) const override;
+	AttributeUsage getUsage() const {
+		return usage;
+	}
 
-	virtual bool isModPressed(const SDL_Keymod &mod) const override;
+	uint8_t getComponentCount() const {
+		return numComponents;
+	}
 
-	virtual bool isCtrlPressed() const override;
-	virtual bool isShiftPressed() const override;
-	virtual bool isAltPressed() const override;
+	bool isNormalized() const {
+		return normalized;
+	}
 
-	void handleInputEvent(SDL_Event &event);
+	void setOffset(uint16_t offset) {
+		this->offset = offset;
+	}
 
-	bool isSDLKeyCodePressed(const SDL_Scancode &keysym) const;
+	uint8_t getOffset() const {
+		return offset;
+	}
+
+private:
+	std::string alias;
+	AttributeUsage usage;
+
+	uint8_t numComponents = 0;
+
+	bool normalized = false;
+
+	uint16_t offset = 0;
 };
 
 }
 
-#endif /* INCLUDE_APG_SDLINPUTMANAGER_HPP_ */
+#endif /* VERTEXATTRIBUTE_HPP_ */

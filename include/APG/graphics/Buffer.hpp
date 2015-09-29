@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,10 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef APG__BUFFER_HPP_
-#define APG__BUFFER_HPP_
+#ifndef INCLUDE_APG_GRAPHICS_BUFFER_HPP_
+#define INCLUDE_APG_GRAPHICS_BUFFER_HPP_
 
-#include "APG/APGeasylogging.hpp"
 #include <cstdint>
 
 #include <string>
@@ -37,6 +36,8 @@
 
 #include <GL/glew.h>
 #include <GL/glu.h>
+
+#include "APG/core/APGeasylogging.hpp"
 
 namespace APG {
 

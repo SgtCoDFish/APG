@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,7 @@
 
 #include <cstdio>
 
-#include "APG/APGeasylogging.hpp"
+#include "APG/core/APGeasylogging.hpp"
 
 #define REQUIRE(expr, orElse) \
 	do { \

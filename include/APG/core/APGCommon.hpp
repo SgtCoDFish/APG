@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,59 +25,36 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef VERTEXATTRIBUTE_HPP_
-#define VERTEXATTRIBUTE_HPP_
+#ifndef INCLUDE_APG_CORE_APGCOMMON_HPP_
+#define INCLUDE_APG_CORE_APGCOMMON_HPP_
 
-#include <cstdint>
+#include <memory>
 
-#include <string>
+#include <glm/vec2.hpp>
+#include <glm/vec4.hpp>
 
 namespace APG {
 
-enum class AttributeUsage {
-	POSITION, COLOR, TEXCOORD, NORMAL,
+struct Vertex {
+	float x;
+	float y;
+
+	float c;
+
+	float u;
+	float v;
 };
 
-class VertexAttribute final {
-private:
-	std::string alias;
-	AttributeUsage usage;
+static const int VERTEX_SIZE = 5;
 
-	uint8_t numComponents = 0;
+namespace internal {
+static const int DEFAULT_SOUND_HANDLE_COUNT = 256;
+static const int DEFAULT_MUSIC_HANDLE_COUNT = 128;
+static const int DEFAULT_FONT_HANDLE_COUNT = 16;
 
-	bool normalized = false;
-
-	uint16_t offset = 0;
-
-public:
-	VertexAttribute(const std::string &alias, AttributeUsage usage, uint8_t numComponents, bool normalized = false);
-	~VertexAttribute() = default;
-
-	const std::string &getAlias() const {
-		return alias;
-	}
-
-	AttributeUsage getUsage() const {
-		return usage;
-	}
-
-	uint8_t getComponentCount() const {
-		return numComponents;
-	}
-
-	bool isNormalized() const {
-		return normalized;
-	}
-
-	void setOffset(uint16_t offset) {
-		this->offset = offset;
-	}
-
-	uint8_t getOffset() const {
-		return offset;
-	}
-};
+static const int MAX_SUPPORTED_TEXTURES = 32;
+}
 
 }
 
-#endif /* VERTEXATTRIBUTE_HPP_ */
+#endif /* RPGCOMMON_HPP_ */

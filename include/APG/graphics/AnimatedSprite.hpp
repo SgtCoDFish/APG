@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,16 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ANIMATED_SPRITE__INCLUDE
-#define ANIMATED_SPRITE__INCLUDE
+#ifndef INCLUDE_GRAPHICS_ANIMATED_SPRITE
+#define INCLUDE_GRAPHICS_ANIMATED_SPRITE
 
 #include <cstdint>
 
 #include <initializer_list>
 #include <vector>
 
-#include "APG/SpriteBase.hpp"
-#include "APG/Sprite.hpp"
+#include "APG/graphics/SpriteBase.hpp"
+#include "APG/graphics/Sprite.hpp"
 
 namespace Tmx {
 class Tile;
@@ -47,40 +47,6 @@ enum class AnimationMode {
 };
 
 class AnimatedSprite : public SpriteBase {
-private:
-	int32_t currentFrame = 0;
-	int32_t frameCount = 0;
-
-	float secondsPerFrame = 0.0f;
-	float animTime = 0.0f;
-	int animDir = 1;
-
-	uint32_t width = 0, height = 0;
-
-	Texture * texture = nullptr;
-
-	AnimationMode animationMode;
-
-	std::vector<SpriteBase *> frames;
-
-	inline void progress_();
-	void handleNormalMode_();
-	void handleLoopMode_();
-	void handleLoopPingPongMode_();
-	void handleReversedMode_();
-
-	/**
-	 * Sets width, height, u, v, u2, v2 and the texture pointer from the given frame.
-	 * All future frames must match the width, height, and texture of this frame.
-	 */
-	void initializeFromSpriteFrame(const SpriteBase * sprite);
-
-	/**
-	 * Called by AnimatedSprite::fromTexture
-	 */
-	explicit AnimatedSprite(float frameDuration, std::vector<Sprite> &&sprites, AnimationMode animationMode =
-	        AnimationMode::NORMAL);
-
 public:
 	/**
 	 * Splits a texture into sprite frames, ready to be used by an animated sprite.
@@ -156,6 +122,40 @@ public:
 	}
 
 	AnimatedSprite &setAnimationMode(AnimationMode mode);
+
+private:
+	int32_t currentFrame = 0;
+	int32_t frameCount = 0;
+
+	float secondsPerFrame = 0.0f;
+	float animTime = 0.0f;
+	int animDir = 1;
+
+	uint32_t width = 0, height = 0;
+
+	Texture * texture = nullptr;
+
+	AnimationMode animationMode;
+
+	std::vector<SpriteBase *> frames;
+
+	inline void progress_();
+	void handleNormalMode_();
+	void handleLoopMode_();
+	void handleLoopPingPongMode_();
+	void handleReversedMode_();
+
+	/**
+	 * Sets width, height, u, v, u2, v2 and the texture pointer from the given frame.
+	 * All future frames must match the width, height, and texture of this frame.
+	 */
+	void initializeFromSpriteFrame(const SpriteBase * sprite);
+
+	/**
+	 * Called by AnimatedSprite::fromTexture
+	 */
+	explicit AnimatedSprite(float frameDuration, std::vector<Sprite> &&sprites, AnimationMode animationMode =
+	        AnimationMode::NORMAL);
 };
 
 }

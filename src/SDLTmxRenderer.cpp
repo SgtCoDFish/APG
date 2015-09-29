@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -34,15 +34,13 @@
 #include <SDL2/SDL_image.h>
 
 #include "APG/SXXDL.hpp"
-#include "APG/TmxRenderer.hpp"
-#include "APG/SDLTmxRenderer.hpp"
-
+#include "APG/tiled/TmxRenderer.hpp"
+#include "APG/tiled/SDLTmxRenderer.hpp"
 #include "APG/internal/Assert.hpp"
 
 APG::SDLTmxRenderer::SDLTmxRenderer(Tmx::Map * const map, const SXXDL::renderer_ptr &renderer) :
 		        TmxRenderer(map),
 		        renderer { renderer } {
-
 	REQUIRE(map->GetOrientation() == Tmx::MapOrientation::TMX_MO_ORTHOGONAL,
 	        "SDLTmxRenderer only supports orthogonal maps.");
 

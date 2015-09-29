@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,26 +25,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MESH_HPP_
-#define MESH_HPP_
+#ifndef INCLUDE_APG_GRAPHICS_MESH_HPP_
+#define INCLUDE_APG_GRAPHICS_MESH_HPP_
 
 #include <cstdint>
 
-#include "APG/VertexAttribute.hpp"
-#include "APG/VertexBufferObject.hpp"
-#include "APG/IndexBufferObject.hpp"
+#include "APG/graphics/VertexAttribute.hpp"
+#include "APG/graphics/VertexBufferObject.hpp"
+#include "APG/graphics/IndexBufferObject.hpp"
 
 namespace APG {
 
 class Mesh final {
-private:
-	VertexBufferObject vertexBuffer;
-	IndexBufferObject indexBuffer;
-
 public:
 	Mesh(std::initializer_list<VertexAttribute> attList);
 	Mesh(bool staticVertices, bool staticIndices, std::initializer_list<VertexAttribute> attList);
 	~Mesh() = default;
+
+private:
+	VertexBufferObject vertexBuffer;
+	IndexBufferObject indexBuffer;
 };
 
 }

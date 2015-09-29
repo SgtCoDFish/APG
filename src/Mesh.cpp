@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,8 @@
 
 #include <cstdint>
 
-#include "APG/Mesh.hpp"
-#include "APG/VertexAttributeList.hpp"
+#include "APG/graphics/Mesh.hpp"
+#include "APG/graphics/VertexAttributeList.hpp"
 
 APG::Mesh::Mesh(std::initializer_list<VertexAttribute> attList) :
 		        Mesh(false, false, attList) {

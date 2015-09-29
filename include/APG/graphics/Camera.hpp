@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,82 +25,81 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SPRITE_HPP_
-#define SPRITE_HPP_
+#ifndef INCLUDE_APG_GRAPHICS_CAMERA_HPP_
+#define INCLUDE_APG_GRAPHICS_CAMERA_HPP_
 
 #include <cstdint>
 
-#include <memory>
-
-#include "APG/Buffer.hpp"
-#include "APG/SpriteBase.hpp"
+#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
 
 namespace APG {
 
-class Texture;
-
-class Sprite : public SpriteBase {
-protected:
-	Texture * texture = nullptr;
-
-	uint32_t texX = 0, texY = 0;
-
-	uint32_t width = 0, height = 0;
-
-	float u1 = 0.0f, v1 = 0.0f;
-	float u2 = 0.0f, v2 = 0.0f;
-
-	void calculateUV();
-
+/**
+ * An orthographic camera, heavily inspired by LibGDX
+ *
+ * https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/graphics/OrthographicCamera.java
+ */
+class Camera {
 public:
-	explicit Sprite(const std::unique_ptr<Texture> &texture) :
-			        Sprite(texture.get()) {
+	explicit Camera(float viewportWidth, float viewportHeight);
+	~Camera() = default;
+
+	glm::vec3 position;
+	glm::vec3 direction;
+	glm::vec3 up;
+
+	glm::mat4 projectionMatrix;
+	glm::mat4 transformMatrix;
+	glm::mat4 combinedMatrix;
+
+	void update();
+
+	void setToOrtho(bool yDown, float viewportWidth, float viewportHeight);
+
+	Camera &setNearPlane(float nearPlane) {
+		this->nearPlane = nearPlane;
+		return *this;
 	}
 
-	explicit Sprite(const std::unique_ptr<Texture> &texture, uint32_t texX, uint32_t texY, uint32_t width,
-	        uint32_t height) :
-			        Sprite(texture.get(), texX, texY, width, height) {
+	float getNearPlane() const {
+		return nearPlane;
 	}
 
-	explicit Sprite(Texture * const texture);
-	explicit Sprite(Texture * const texture, uint32_t texX, uint32_t texY, uint32_t width, uint32_t height);
-
-	virtual ~Sprite() = default;
-
-	Sprite(Sprite &sprite) = default;
-	Sprite(Sprite &&sprite) = default;
-	Sprite &operator =(Sprite &sprite) = default;
-	Sprite &operator =(Sprite &&sprite) = default;
-
-	virtual Texture * getTexture() const override {
-		return texture;
+	Camera &setFarPlane(float farPlane) {
+		this->farPlane = farPlane;
+		return *this;
 	}
 
-	virtual uint32_t getWidth() const override {
-		return width;
+	float getFarPlane() const {
+		return farPlane;
 	}
 
-	virtual uint32_t getHeight() const override {
-		return height;
+	Camera &setZoom(float zoom) {
+		this->zoom = zoom;
+		return *this;
 	}
 
-	virtual float getU() const override {
-		return u1;
+	float getZoom() const {
+		return zoom;
 	}
 
-	virtual float getV() const override {
-		return v1;
-	}
+	glm::vec3 unproject(const glm::vec3 &position) const;
 
-	virtual float getU2() const override {
-		return u2;
-	}
+private:
+	static const glm::mat4 IDENTITY;
 
-	virtual float getV2() const override {
-		return v2;
-	}
+	/*
+	 * Interesting note: some header on windows defines "near" and "far"" to be something,
+	 * which makes our definitions useless in some circumstances. This caused a compile-time error
+	 * and a lot of head scratching. The end result is these variables had their names changed.
+	 */
+	float nearPlane = 0.0f, farPlane = 100.0f;
+	float viewportWidth, viewportHeight;
+
+	float zoom = 1.0f;
 };
 
 }
 
-#endif /* SPRITE_HPP_ */
+#endif /* INCLUDE_APG_CAMERA_HPP_ */

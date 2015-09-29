@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -29,9 +29,8 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 
-#include "APG/APGeasylogging.hpp"
-
 #include "APG/SXXDL.hpp"
+#include "APG/core/APGeasylogging.hpp"
 
 SXXDL::window_ptr SXXDL::make_window_ptr(SDL_Window *window) {
 	return window_ptr(window, SDL_DestroyWindow);

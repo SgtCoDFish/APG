@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -24,8 +24,9 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SXXDL_INCLUDE_HPP_
-#define SXXDL_INCLUDE_HPP_
+
+#ifndef INCLUDE_APG_SXXDL_INCLUDE_HPP_
+#define INCLUDE_APG_SXXDL_INCLUDE_HPP_
 
 #include <memory>
 

@@ -25,82 +25,32 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_APG_CAMERA_HPP_
-#define INCLUDE_APG_CAMERA_HPP_
+#ifndef INCLUDE_APG_INPUT_INPUTMANAGER_HPP_
+#define INCLUDE_APG_INPUT_INPUTMANAGER_HPP_
 
-#include <cstdint>
-
-#include <glm/vec3.hpp>
-#include <glm/mat4x4.hpp>
-
-#include "APG/Game.hpp"
+#include <SDL2/SDL.h>
 
 namespace APG {
 
-/**
- * An orthographic camera, heavily inspired by LibGDX
- *
- * https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/graphics/OrthographicCamera.java
- */
-class Camera {
-private:
-	static const glm::mat4 IDENTITY;
-
-	/*
-	 * Interesting note: some header on windows defines "near" and "far"" to be something,
-	 * which makes our definitions useless in some circumstances. This caused a compile-time error
-	 * and a lot of head scratching. The end result is these variables had their names changed.
-	 */
-	float nearPlane = 0.0f, farPlane = 100.0f;
-	float viewportWidth, viewportHeight;
-
-	float zoom = 1.0f;
-
+class InputManager {
 public:
-	glm::vec3 position;
-	glm::vec3 direction;
-	glm::vec3 up;
+	virtual ~InputManager() = default;
 
-	glm::mat4 projectionMatrix;
-	glm::mat4 transformMatrix;
-	glm::mat4 combinedMatrix;
+	virtual void update(float deltaTime) = 0;
 
-	explicit Camera(float viewportWidth = Game::screenWidth, float viewportHeight = Game::screenHeight);
+	virtual bool isKeyPressed(const SDL_Scancode &key) const = 0;
+	virtual bool isKeyJustPressed(const SDL_Scancode &key) const = 0;
 
-	void update();
+	virtual bool isModPressed(const SDL_Keymod &mod) const = 0;
 
-	void setToOrtho(bool yDown, float viewportWidth, float viewportHeight);
+	virtual bool isCtrlPressed() const = 0;
+	virtual bool isShiftPressed() const = 0;
+	virtual bool isAltPressed() const = 0;
 
-	Camera &setNearPlane(float nearPlane) {
-		this->nearPlane = nearPlane;
-		return *this;
-	}
-
-	float getNearPlane() const {
-		return nearPlane;
-	}
-
-	Camera &setFarPlane(float farPlane) {
-		this->farPlane = farPlane;
-		return *this;
-	}
-
-	float getFarPlane() const {
-		return farPlane;
-	}
-
-	Camera &setZoom(float zoom) {
-		this->zoom = zoom;
-		return *this;
-	}
-
-	float getZoom() const {
-		return zoom;
-	}
-
-	glm::vec3 unproject(const glm::vec3 &position) const;
+protected:
+	static constexpr float JUST_PRESSED_THRESHOLD = 0.0001f;
 };
 
 }
 
-#endif /* INCLUDE_APG_CAMERA_HPP_ */
+#endif /* INCLUDE_APG_INPUTMANAGER_HPP_ */

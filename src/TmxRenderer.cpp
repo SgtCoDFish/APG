@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,8 @@
 #include <utility>
 #include <string>
 
+#include <glm/vec2.hpp>
+
 #include "tmxparser/TmxMap.h"
 #include "tmxparser/TmxLayer.h"
 #include "tmxparser/TmxTileset.h"
@@ -41,17 +43,13 @@
 #include "tmxparser/TmxObjectGroup.h"
 #include "tmxparser/TmxObject.h"
 
-#include "APG/APGeasylogging.hpp"
-
-#include "APG/APGCommon.hpp"
-#include "APG/Tileset.hpp"
 #include "APG/SXXDL.hpp"
-#include "APG/TmxRenderer.hpp"
-#include "APG/AnimatedSprite.hpp"
-
+#include "APG/core/APGeasylogging.hpp"
+#include "APG/core/APGCommon.hpp"
+#include "APG/graphics/Tileset.hpp"
+#include "APG/graphics/AnimatedSprite.hpp"
+#include "APG/tiled/TmxRenderer.hpp"
 #include "APG/internal/Assert.hpp"
-
-#include <glm/vec2.hpp>
 
 std::unordered_map<std::string, std::shared_ptr<APG::Tileset>> APG::TmxRenderer::tmxTilesets;
 

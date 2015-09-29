@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,41 +25,36 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_APG_SPRITEBASE_HPP_
-#define INCLUDE_APG_SPRITEBASE_HPP_
+#ifndef GLTMXRENDERER_HPP_
+#define GLTMXRENDERER_HPP_
 
-#include <cstdint>
+#include "APG/graphics/SpriteBatch.hpp"
+#include "APG/tiled/TmxRenderer.hpp"
+
+namespace Tmx {
+class Layer;
+}
 
 namespace APG {
-class Texture;
 
-class SpriteBase {
-public:
-	virtual ~SpriteBase() = default;
-	virtual Texture * getTexture() const = 0;
-
-	virtual uint32_t getWidth() const = 0;
-
-	virtual uint32_t getHeight() const = 0;
-
-	virtual float getU() const = 0;
-	virtual float getV() const = 0;
-	virtual float getU2() const = 0;
-	virtual float getV2() const = 0;
-
-	inline void setHash(uint64_t hash) {
-		this->hash = hash;
-	}
-
-	inline uint64_t getHash() const {
-		return hash;
-	}
-
+class GLTmxRenderer final : public TmxRenderer {
 private:
-	uint64_t hash = 0;
+	SpriteBatch *batch;
 
+public:
+	explicit GLTmxRenderer(const std::unique_ptr<Tmx::Map> &map, const std::unique_ptr<SpriteBatch> &batch) :
+			        GLTmxRenderer(map.get(), batch.get()) {
+	}
+
+	explicit GLTmxRenderer(Tmx::Map * const map, SpriteBatch * const batch);
+	virtual ~GLTmxRenderer() = default;
+
+	virtual void renderAll(float deltaTime);
+
+	virtual void renderLayer(Tmx::TileLayer * const layer) override;
+	virtual void renderObjectGroup(const std::vector<TiledObject> &objects) override;
 };
 
 }
 
-#endif /* INCLUDE_APG_SPRITEBASE_HPP_ */
+#endif /* GLTMXRENDERER_HPP_ */

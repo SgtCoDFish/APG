@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,32 +25,29 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_APG_INPUTMANAGER_HPP_
-#define INCLUDE_APG_INPUTMANAGER_HPP_
+#ifndef INCLUDE_APG_GRAPHICS_INDEXBUFFEROBJECT_HPP_
+#define INCLUDE_APG_GRAPHICS_INDEXBUFFEROBJECT_HPP_
 
-#include <SDL2/SDL.h>
+#include <cstdint>
+
+#include "APG/graphics/Buffer.hpp"
 
 namespace APG {
 
-class InputManager {
-protected:
-	static constexpr float JUST_PRESSED_THRESHOLD = 0.0001f;
-
+class IndexBufferObject : public UInt16Buffer {
 public:
-	virtual ~InputManager() = default;
+	explicit IndexBufferObject(bool isStatic = false) :
+			        IndexBufferObject { isStatic, nullptr, 0 } {
+	}
 
-	virtual void update(float deltaTime) = 0;
+	IndexBufferObject(bool isStatic, uint16_t indices[], int32_t indexCount) :
+			        UInt16Buffer(BufferType::ELEMENT_ARRAY, (isStatic ? DrawType::STATIC_DRAW : DrawType::DYNAMIC_DRAW),
+			                indices, indexCount) {
+	}
 
-	virtual bool isKeyPressed(const SDL_Scancode &key) const = 0;
-	virtual bool isKeyJustPressed(const SDL_Scancode &key) const = 0;
-
-	virtual bool isModPressed(const SDL_Keymod &mod) const = 0;
-
-	virtual bool isCtrlPressed() const = 0;
-	virtual bool isShiftPressed() const = 0;
-	virtual bool isAltPressed() const = 0;
+	virtual ~IndexBufferObject() = default;
 };
 
 }
 
-#endif /* INCLUDE_APG_INPUTMANAGER_HPP_ */
+#endif /* INDEXBUFFEROBJECT_HPP_ */

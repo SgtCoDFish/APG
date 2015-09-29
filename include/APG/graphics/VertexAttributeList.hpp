@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,59 +25,57 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef APGGAME_HPP_
-#define APGGAME_HPP_
+#ifndef INCLUDE_APG_GRAPHICS_VERTEXATTRIBUTELIST_HPP_
+#define INCLUDE_APG_GRAPHICS_VERTEXATTRIBUTELIST_HPP_
 
 #include <cstdint>
 
-#include <string>
+#include <vector>
+
+#include "APG/graphics/VertexAttribute.hpp"
 
 namespace APG {
-class InputManager;
-class AudioManager;
-class FontManager;
 
-/**
- * Note that only one Game is expected to be made, and the public static screen size variables will be wrong if you create more than one.
- */
-class Game {
-protected:
-	void setupLoggingDefault();
-
+class VertexAttributeList final {
 public:
-	static uint32_t screenWidth;
-	static uint32_t screenHeight;
+	explicit VertexAttributeList(std::initializer_list<VertexAttribute> initList);
+	explicit VertexAttributeList(std::vector<VertexAttribute> &attVec);
 
-	static void setLoggerToAPGStyle(const std::string &loggerName);
-
-	explicit Game(uint32_t screenWidth, uint32_t screenHeight);
-
-	virtual ~Game() = default;
+	~VertexAttributeList() = default;
 
 	/**
-	 * Should carry out initialisation of the game.
-	 * @return true if successful, false if an error state has been set.
+	 * @param attribute the attribute to be copied into this list.
 	 */
-	virtual bool init() = 0;
+	void addAttribute(const VertexAttribute &attribute);
 
 	/**
-	 * Called every frame. Should call render.
-	 * @param deltaTime the amount of time elapsed since the last frame.
-	 * @return true if it's time to quit, false otherwise.
+	 * @param attribute the attribute to be moved into this list.
 	 */
-	virtual bool update(float deltaTime) = 0;
+	void addAttribute(VertexAttribute &&attribute);
 
-	/**
-	 * Should be called in update(float) every frame and render the whole visible screen.
-	 * @param deltaTime the amount of time elapsed since the last frame.
-	 */
-	virtual void render(float deltaTime) = 0;
+	inline uint16_t getStride() const {
+		return stride;
+	}
 
-	virtual const InputManager *input() const = 0;
-	virtual const AudioManager *audio() const = 0;
-	virtual const FontManager *font() const = 0;
+	inline int getAttributeCount() const {
+		return attributes.size();
+	}
+
+	inline const std::vector<VertexAttribute> &getAttributes() const {
+		return attributes;
+	}
+
+	const VertexAttribute &operator[](unsigned int index) const {
+		return attributes[index];
+	}
+
+private:
+	std::vector<VertexAttribute> attributes;
+
+	uint16_t stride = 0;
+	void calculateOffsets();
 };
 
 }
 
-#endif /* APGGAME_HPP_ */
+#endif /* VERTEXATTRIBUTELIST_HPP_ */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -27,10 +27,10 @@
 
 #include <cstdint>
 
-#include "APG/Buffer.hpp"
-#include "APG/VertexBufferObject.hpp"
-#include "APG/VertexAttribute.hpp"
-#include "APG/ShaderProgram.hpp"
+#include "APG/graphics/Buffer.hpp"
+#include "APG/graphics/VertexBufferObject.hpp"
+#include "APG/graphics/VertexAttribute.hpp"
+#include "APG/graphics/ShaderProgram.hpp"
 
 APG::VertexBufferObject::VertexBufferObject(std::initializer_list<APG::VertexAttribute> initList) :
 		        VertexBufferObject(false, initList) {

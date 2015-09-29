@@ -25,23 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_APG_SDLAUDIOMANAGER_HPP_
-#define INCLUDE_APG_SDLAUDIOMANAGER_HPP_
+#ifndef INCLUDE_APG_AUDIO_SDLAUDIOMANAGER_HPP_
+#define INCLUDE_APG_AUDIO_SDLAUDIOMANAGER_HPP_
 
 #include <unordered_map>
 
 #include <SDL2/SDL_mixer.h>
 
 #include "APG/SXXDL.hpp"
-#include "APG/Audio.hpp"
+#include "APG/audio/Audio.hpp"
 
 namespace APG {
 
 class SDLAudioManager : public AudioManager {
-private:
-	std::unordered_map<music_handle, SXXDL::mixer::music_ptr> loadedMusic;
-	std::unordered_map<sound_handle, SXXDL::mixer::sound_ptr> loadedSounds;
-
 public:
 	explicit SDLAudioManager(int frequency = MIX_DEFAULT_FREQUENCY, uint16_t format = MIX_DEFAULT_FORMAT,
 	        int channelCount = 8);
@@ -73,6 +69,10 @@ public:
 	 * @return a raw chunk pointer to the underlying SDL data; use with caution as this could conflict with the audio manager's use of the object.
 	 */
 	Mix_Chunk * getRawChunkPointer(const sound_handle &handle);
+
+private:
+	std::unordered_map<music_handle, SXXDL::mixer::music_ptr> loadedMusic;
+	std::unordered_map<sound_handle, SXXDL::mixer::sound_ptr> loadedSounds;
 };
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -41,12 +41,11 @@
 
 #include <tmxparser/Tmx.h>
 
-#include "APG/APGeasylogging.hpp"
-INITIALIZE_EASYLOGGINGPP
-
-#include "APG/Game.hpp"
 #include "APG/SXXDL.hpp"
-#include "APG/SDLTmxRenderer.hpp"
+#include "APG/core/APGeasylogging.hpp"
+INITIALIZE_EASYLOGGINGPP
+#include "APG/core/Game.hpp"
+#include "APG/tiled/SDLTmxRenderer.hpp"
 
 #include "test/APGSDLRenderTest.hpp"
 

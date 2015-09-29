@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,36 +25,47 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RPGCOMMON_HPP_
-#define RPGCOMMON_HPP_
+#ifndef INCLUDE_APG_INPUT_SDLINPUTMANAGER_HPP_
+#define INCLUDE_APG_INPUT_SDLINPUTMANAGER_HPP_
 
-#include <memory>
+#include <cstdint>
 
-#include <glm/vec2.hpp>
-#include <glm/vec4.hpp>
+#include <array>
+
+#include <SDL2/SDL.h>
+
+#include "APG/input/InputManager.hpp"
 
 namespace APG {
 
-struct Vertex {
-	float x;
-	float y;
+class SDLInputManager : public InputManager {
+public:
+	explicit SDLInputManager();
+	virtual ~SDLInputManager() = default;
 
-	float c;
+	virtual void update(float deltaTime) override;
 
-	float u;
-	float v;
+	virtual bool isKeyPressed(const SDL_Scancode &key) const override;
+	virtual bool isKeyJustPressed(const SDL_Scancode &key) const override;
+
+	virtual bool isModPressed(const SDL_Keymod &mod) const override;
+
+	virtual bool isCtrlPressed() const override;
+	virtual bool isShiftPressed() const override;
+	virtual bool isAltPressed() const override;
+
+	void handleInputEvent(SDL_Event &event);
+
+	bool isSDLKeyCodePressed(const SDL_Scancode &keysym) const;
+
+private:
+	std::array<bool, SDL_Scancode::SDL_NUM_SCANCODES> justPressed;
+	std::array<bool, SDL_Scancode::SDL_NUM_SCANCODES> canJustPress;
+
+	const uint8_t *keyState = nullptr;
+	SDL_Keymod mods = SDL_Keymod::KMOD_NONE;
 };
 
-static const int VERTEX_SIZE = 5;
-
-namespace internal {
-static const int DEFAULT_SOUND_HANDLE_COUNT = 256;
-static const int DEFAULT_MUSIC_HANDLE_COUNT = 128;
-static const int DEFAULT_FONT_HANDLE_COUNT = 16;
-
-static const int MAX_SUPPORTED_TEXTURES = 32;
 }
 
-}
-
-#endif /* RPGCOMMON_HPP_ */
+#endif /* INCLUDE_APG_SDLINPUTMANAGER_HPP_ */

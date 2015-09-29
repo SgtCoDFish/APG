@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -34,15 +34,14 @@
 
 #include <glm/vec2.hpp>
 
-#include "APG/SpriteBatch.hpp"
-#include "APG/ShaderProgram.hpp"
-#include "APG/Buffer.hpp"
-#include "APG/APGCommon.hpp"
-#include "APG/Sprite.hpp"
-#include "APG/Mesh.hpp"
-#include "APG/VertexAttribute.hpp"
-#include "APG/Game.hpp"
-
+#include "APG/core/APGCommon.hpp"
+#include "APG/core/Game.hpp"
+#include "APG/graphics/SpriteBatch.hpp"
+#include "APG/graphics/ShaderProgram.hpp"
+#include "APG/graphics/Buffer.hpp"
+#include "APG/graphics/Sprite.hpp"
+#include "APG/graphics/Mesh.hpp"
+#include "APG/graphics/VertexAttribute.hpp"
 #include "APG/internal/Assert.hpp"
 
 const char * const APG::SpriteBatch::POSITION_ATTRIBUTE = "position";

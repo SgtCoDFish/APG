@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -30,12 +30,22 @@
 
 #include <cstdint>
 
-#include "APG/SDLGame.hpp"
-#include "APG/SpriteBatch.hpp"
+#include "APG/core/SDLGame.hpp"
+#include "APG/graphics/SpriteBatch.hpp"
 
 namespace APG {
 
-class APGAudioTest : public SDLGame {
+class APGAudioTest final : public SDLGame {
+public:
+	explicit APGAudioTest(const uint32_t windowWidth = 1280u, const uint32_t windowHeight = 720u) :
+			        SDLGame("APG Audio Test", windowWidth, windowHeight) {
+	}
+
+	virtual ~APGAudioTest() = default;
+
+	bool init() override;
+	void render(float deltaTime) override;
+
 private:
 	AudioManager::music_handle testHandle = -1;
 	AudioManager::sound_handle soundHandle = -1;
@@ -47,16 +57,6 @@ private:
 
 	FontManager::font_handle font = -1;
 	SpriteBase * fontSprite = nullptr;
-
-public:
-	explicit APGAudioTest(const uint32_t windowWidth = 1280u, const uint32_t windowHeight = 720u) :
-			        SDLGame("APG Audio Test", windowWidth, windowHeight) {
-	}
-
-	virtual ~APGAudioTest() = default;
-
-	bool init() override;
-	void render(float deltaTime) override;
 };
 
 }

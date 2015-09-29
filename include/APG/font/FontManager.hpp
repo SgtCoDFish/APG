@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,57 +25,52 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef VERTEXATTRIBUTELIST_HPP_
-#define VERTEXATTRIBUTELIST_HPP_
+#ifndef INCLUDE_APG_FONT_FONTMANAGER_HPP_
+#define INCLUDE_APG_FONT_FONTMANAGER_HPP_
 
 #include <cstdint>
 
-#include <vector>
+#include <string>
+#include <deque>
+#include <type_traits>
 
-#include "APG/VertexAttribute.hpp"
+#include <glm/glm.hpp>
+
+#include "APG/core/APGCommon.hpp"
 
 namespace APG {
+class SpriteBase;
 
-class VertexAttributeList final {
-private:
-	std::vector<VertexAttribute> attributes;
+enum class FontRenderMethod {
+	FAST, NICE
+};
 
-	uint16_t stride = 0;
-	void calculateOffsets();
-
+class FontManager {
 public:
-	explicit VertexAttributeList(std::initializer_list<VertexAttribute> initList);
-	explicit VertexAttributeList(std::vector<VertexAttribute> &attVec);
+	using font_handle = int32_t;
 
-	~VertexAttributeList() = default;
+	static_assert(std::is_copy_constructible<font_handle>(), "Font handle type must be copy constructible");
 
-	/**
-	 * @param attribute the attribute to be copied into this list.
-	 */
-	void addAttribute(const VertexAttribute &attribute);
+	explicit FontManager(int initialFontHandleCount = internal::DEFAULT_FONT_HANDLE_COUNT);
+	virtual ~FontManager() = default;
 
-	/**
-	 * @param attribute the attribute to be moved into this list.
-	 */
-	void addAttribute(VertexAttribute &&attribute);
+	virtual font_handle loadFontFile(const std::string &filename, int pointSize) = 0;
+	virtual void freeFont(font_handle &handle) = 0;
 
-	inline uint16_t getStride() const {
-		return stride;
-	}
+	virtual void setFontColor(const font_handle &handle, const glm::vec4 &color) = 0;
 
-	inline int getAttributeCount() const {
-		return attributes.size();
-	}
+	virtual glm::ivec2 estimateSizeOf(const font_handle &fontHandle, const std::string &text) = 0;
+	virtual SpriteBase *renderText(const font_handle &fontHandle, const std::string &text, bool ignoreWhitespace = true, const FontRenderMethod method =
+	        FontRenderMethod::FAST) = 0;
 
-	inline const std::vector<VertexAttribute> &getAttributes() const {
-		return attributes;
-	}
+protected:
+	std::deque<font_handle> availableFontHandles;
+	void fillDefaultQueue(int initialFontHandleCount);
 
-	const VertexAttribute &operator[](unsigned int index) const {
-		return attributes[index];
-	}
+	font_handle getNextFontHandle();
+	void freeFontHandle(font_handle handle);
 };
 
 }
 
-#endif /* VERTEXATTRIBUTELIST_HPP_ */
+#endif /* INCLUDE_APG_FONTMANAGER_HPP_ */

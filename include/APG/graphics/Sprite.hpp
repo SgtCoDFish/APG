@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,38 +25,82 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef VERTEXBUFFEROBJECT_HPP_
-#define VERTEXBUFFEROBJECT_HPP_
+#ifndef INCLUDE_APG_GRAPHICS_SPRITE_HPP_
+#define INCLUDE_APG_GRAPHICS_SPRITE_HPP_
 
 #include <cstdint>
 
-#include "APG/Buffer.hpp"
-#include "APG/VertexAttributeList.hpp"
-#include "APG/ShaderProgram.hpp"
+#include <memory>
+
+#include "APG/graphics/Buffer.hpp"
+#include "APG/graphics/SpriteBase.hpp"
 
 namespace APG {
 
-/**
- * A float buffer for vertices with vertex attributes added in for good measure.
- */
-class VertexBufferObject : public FloatBuffer {
-private:
-	VertexAttributeList attributeList;
+class Texture;
 
+class Sprite : public SpriteBase {
 public:
-	explicit VertexBufferObject(std::initializer_list<VertexAttribute> initList);
-	VertexBufferObject(bool isStatic, std::initializer_list<VertexAttribute> initList);
-	VertexBufferObject(bool isStatic, std::initializer_list<VertexAttribute> initList, float vertices[],
-	        int vertexCount);
-	virtual ~VertexBufferObject() = default;
-
-	inline const VertexAttributeList &getAttributes() const {
-		return attributeList;
+	explicit Sprite(const std::unique_ptr<Texture> &texture) :
+			        Sprite(texture.get()) {
 	}
 
-	void bind(ShaderProgram * const program);
+	explicit Sprite(const std::unique_ptr<Texture> &texture, uint32_t texX, uint32_t texY, uint32_t width,
+	        uint32_t height) :
+			        Sprite(texture.get(), texX, texY, width, height) {
+	}
+
+	explicit Sprite(Texture * const texture);
+	explicit Sprite(Texture * const texture, uint32_t texX, uint32_t texY, uint32_t width, uint32_t height);
+
+	virtual ~Sprite() = default;
+
+	Sprite(Sprite &sprite) = default;
+	Sprite(Sprite &&sprite) = default;
+	Sprite &operator =(Sprite &sprite) = default;
+	Sprite &operator =(Sprite &&sprite) = default;
+
+	virtual Texture * getTexture() const override {
+		return texture;
+	}
+
+	virtual uint32_t getWidth() const override {
+		return width;
+	}
+
+	virtual uint32_t getHeight() const override {
+		return height;
+	}
+
+	virtual float getU() const override {
+		return u1;
+	}
+
+	virtual float getV() const override {
+		return v1;
+	}
+
+	virtual float getU2() const override {
+		return u2;
+	}
+
+	virtual float getV2() const override {
+		return v2;
+	}
+
+protected:
+	Texture * texture = nullptr;
+
+	uint32_t texX = 0, texY = 0;
+
+	uint32_t width = 0, height = 0;
+
+	float u1 = 0.0f, v1 = 0.0f;
+	float u2 = 0.0f, v2 = 0.0f;
+
+	void calculateUV();
 };
 
 }
 
-#endif /* VERTEXBUFFEROBJECT_HPP_ */
+#endif /* SPRITE_HPP_ */

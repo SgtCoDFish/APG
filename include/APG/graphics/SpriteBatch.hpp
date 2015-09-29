@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SPRITEBATCH_HPP_
-#define SPRITEBATCH_HPP_
+#ifndef INCLUDE_APG_GRAPHICS_SPRITEBATCH_HPP_
+#define INCLUDE_APG_GRAPHICS_SPRITEBATCH_HPP_
 
 #include <cstdint>
 
@@ -34,14 +34,14 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "APG/Buffer.hpp"
-#include "APG/Texture.hpp"
-#include "APG/ShaderProgram.hpp"
-#include "APG/VAO.hpp"
-#include "APG/Mesh.hpp"
-#include "APG/VertexBufferObject.hpp"
-#include "APG/IndexBufferObject.hpp"
-#include "APG/SpriteBase.hpp"
+#include "APG/graphics/Buffer.hpp"
+#include "APG/graphics/Texture.hpp"
+#include "APG/graphics/ShaderProgram.hpp"
+#include "APG/graphics/VAO.hpp"
+#include "APG/graphics/Mesh.hpp"
+#include "APG/graphics/VertexBufferObject.hpp"
+#include "APG/graphics/IndexBufferObject.hpp"
+#include "APG/graphics/SpriteBase.hpp"
 
 namespace APG {
 
@@ -78,8 +78,6 @@ private:
 	void setupMatrices();
 
 public:
-	static const uint32_t DEFAULT_BUFFER_SIZE;
-
 	explicit SpriteBatch(const std::unique_ptr<ShaderProgram> &program, uint32_t bufferSize = DEFAULT_BUFFER_SIZE) :
 			        SpriteBatch(program.get(), bufferSize) {
 	}
@@ -109,11 +107,11 @@ public:
 		return color;
 	}
 
-	void setColor(const glm::vec4 &newColor) {
+	inline void setColor(const glm::vec4 &newColor) {
 		color = glm::vec4(newColor);
 	}
 
-	void setColor(float r, float g, float b, float a) {
+	inline void setColor(float r, float g, float b, float a) {
 		color.r = r;
 		color.g = g;
 		color.b = b;
@@ -123,6 +121,7 @@ public:
 	void setProjectionMatrix(const glm::mat4 &matrix);
 
 	static std::unique_ptr<APG::ShaderProgram> createDefaultShader();
+	static const uint32_t DEFAULT_BUFFER_SIZE;
 };
 
 }

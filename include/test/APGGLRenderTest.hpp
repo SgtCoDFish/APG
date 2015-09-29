@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef APGGLRENDERTEST_HPP_
-#define APGGLRENDERTEST_HPP_
+#ifndef INCLUDE_TEST_APGGLRENDERTEST_HPP_
+#define INCLUDE_TEST_APGGLRENDERTEST_HPP_
 
 #include <string>
 #include <memory>
@@ -34,24 +34,40 @@
 
 #include <SDL2/SDL.h>
 
-#include "APG/Game.hpp"
-#include "APG/SDLGame.hpp"
-#include "APG/APGCommon.hpp"
-#include "APG/SXXDL.hpp"
-#include "APG/ShaderProgram.hpp"
-#include "APG/GLTmxRenderer.hpp"
-#include "APG/Buffer.hpp"
-#include "APG/VAO.hpp"
-#include "APG/Texture.hpp"
-#include "APG/SpriteBatch.hpp"
-#include "APG/Sprite.hpp"
-#include "APG/Camera.hpp"
-
 #include "tmxparser/TmxMap.h"
+
+#include "APG/SXXDL.hpp"
+#include "APG/core/Game.hpp"
+#include "APG/core/SDLGame.hpp"
+#include "APG/core/APGCommon.hpp"
+#include "APG/graphics/ShaderProgram.hpp"
+#include "APG/graphics/Buffer.hpp"
+#include "APG/graphics/VAO.hpp"
+#include "APG/graphics/Texture.hpp"
+#include "APG/graphics/SpriteBatch.hpp"
+#include "APG/graphics/Sprite.hpp"
+#include "APG/graphics/Camera.hpp"
+#include "APG/tiled/GLTmxRenderer.hpp"
 
 namespace APG {
 
 class APGGLRenderTest final : public APG::SDLGame {
+public:
+	explicit APGGLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
+	        uint32_t glContextMajor = 3, uint32_t glContextMinor = 2, uint32_t windowX = SDL_WINDOWPOS_CENTERED,
+	        uint32_t windowY = SDL_WINDOWPOS_CENTERED) :
+			        SDLGame(windowTitle, windowWidth, windowHeight, glContextMajor, glContextMinor, windowX, windowY) {
+	}
+
+	virtual ~APGGLRenderTest() = default;
+
+	bool init() override;
+	void render(float deltaTime) override;
+
+	const Tmx::Map *getMap() const {
+		return map1.get();
+	}
+
 private:
 	static const char *vertexShaderFilename;
 	static const char *fragmentShaderFilename;
@@ -80,22 +96,6 @@ private:
 	FontManager::font_handle font = -1;
 
 	SpriteBase *fontSprite = nullptr;
-
-public:
-	explicit APGGLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
-	        uint32_t glContextMajor = 3, uint32_t glContextMinor = 2, uint32_t windowX = SDL_WINDOWPOS_CENTERED,
-	        uint32_t windowY = SDL_WINDOWPOS_CENTERED) :
-			        SDLGame(windowTitle, windowWidth, windowHeight, glContextMajor, glContextMinor, windowX, windowY) {
-	}
-
-	virtual ~APGGLRenderTest() = default;
-
-	bool init() override;
-	void render(float deltaTime) override;
-
-	const Tmx::Map *getMap() const {
-		return map1.get();
-	}
 };
 
 }

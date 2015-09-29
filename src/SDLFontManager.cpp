@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -32,14 +32,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-#include "APG/APGeasylogging.hpp"
-
-#include "APG/SDLFontManager.hpp"
-#include "APG/SpriteBase.hpp"
 #include "APG/SXXDL.hpp"
-#include "APG/Texture.hpp"
-#include "APG/Sprite.hpp"
-
+#include "APG/core/APGeasylogging.hpp"
+#include "APG/font/SDLFontManager.hpp"
+#include "APG/graphics/SpriteBase.hpp"
+#include "APG/graphics/Texture.hpp"
+#include "APG/graphics/Sprite.hpp"
 #include "APG/internal/Assert.hpp"
 
 const int APG::SDLFontManager::MAX_OWNED_TEXTURES;

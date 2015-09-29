@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -33,16 +33,16 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-#include "APG/Texture.hpp"
 #include "APG/SXXDL.hpp"
-#include "APG/ShaderProgram.hpp"
-
+#include "APG/graphics/Texture.hpp"
+#include "APG/graphics/ShaderProgram.hpp"
 #include "APG/internal/Assert.hpp"
 
 std::atomic<uint32_t> APG::Texture::availableTextureUnit(0);

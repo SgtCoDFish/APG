@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,10 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "APG/APGeasylogging.hpp"
-
-#include "APG/SDLAudioManager.hpp"
 #include "APG/internal/Assert.hpp"
+#include "APG/core/APGeasylogging.hpp"
+#include "APG/audio/SDLAudioManager.hpp"
 
 APG::SDLAudioManager::SDLAudioManager(int frequency, uint16_t format, int channelCount) :
 		        APG::AudioManager() {

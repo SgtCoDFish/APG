@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SDLGAME_HPP_
-#define SDLGAME_HPP_
+#ifndef INCLUDE_APG_CORE_SDLGAME_HPP_
+#define INCLUDE_APG_CORE_SDLGAME_HPP_
 
 #include <cstdint>
 
@@ -39,54 +39,18 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-#include "APG/APGeasylogging.hpp"
 
-#include "APG/Game.hpp"
 #include "APG/SXXDL.hpp"
-#include "APG/SDLInputManager.hpp"
-#include "APG/SDLAudioManager.hpp"
-#include "APG/SDLFontManager.hpp"
+#include "APG/core/Game.hpp"
+#include "APG/core/APGeasylogging.hpp"
+#include "APG/input/SDLInputManager.hpp"
+#include "APG/audio/SDLAudioManager.hpp"
+#include "APG/font/SDLFontManager.hpp"
 
 namespace APG {
 
 class SDLGame : public Game {
-protected:
-	SXXDL::window_ptr window = SXXDL::make_window_ptr(nullptr);
-	SDL_GLContext glContext = nullptr;
-
-	SDL_Event eventCache;
-
-	bool shouldQuit = false;
-
-	virtual void handleEvent(SDL_Event &event);
-
-	std::unique_ptr<SDLInputManager> inputManager = nullptr;
-	std::unique_ptr<SDLAudioManager> audioManager = nullptr;
-	std::unique_ptr<SDLFontManager> fontManager = nullptr;
-
 public:
-	/**
-	 * Defaults to SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS.
-	 *
-	 * Without these defaults at least, initialization will probably fail.
-	 */
-	static uint32_t SDL_INIT_FLAGS;
-
-	/**
-	 * Defaults to IMG_INIT_PNG.
-	 */
-	static uint32_t SDL_IMAGE_INIT_FLAGS;
-
-	/**
-	 * Defaults to MIX_INIT_OGG
-	 */
-	static uint32_t SDL_MIXER_INIT_FLAGS;
-
-	/**
-	 * Defaults to SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL.
-	 */
-	static uint32_t SDL_WINDOW_FLAGS;
-
 	explicit SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
 	        uint32_t glContextMajor = 3, uint32_t glContextMinor = 2, uint32_t windowX = SDL_WINDOWPOS_UNDEFINED,
 	        uint32_t windowY = SDL_WINDOWPOS_UNDEFINED);
@@ -114,6 +78,42 @@ public:
 	virtual const FontManager *font() const override {
 		return fontManager.get();
 	}
+
+	/**
+	 * Defaults to SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS.
+	 *
+	 * Without these defaults at least, initialization will probably fail.
+	 */
+	static uint32_t SDL_INIT_FLAGS;
+
+	/**
+	 * Defaults to IMG_INIT_PNG.
+	 */
+	static uint32_t SDL_IMAGE_INIT_FLAGS;
+
+	/**
+	 * Defaults to MIX_INIT_OGG
+	 */
+	static uint32_t SDL_MIXER_INIT_FLAGS;
+
+	/**
+	 * Defaults to SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL.
+	 */
+	static uint32_t SDL_WINDOW_FLAGS;
+
+protected:
+	SXXDL::window_ptr window = SXXDL::make_window_ptr(nullptr);
+	SDL_GLContext glContext = nullptr;
+
+	SDL_Event eventCache;
+
+	bool shouldQuit = false;
+
+	virtual void handleEvent(SDL_Event &event);
+
+	std::unique_ptr<SDLInputManager> inputManager = nullptr;
+	std::unique_ptr<SDLAudioManager> audioManager = nullptr;
+	std::unique_ptr<SDLFontManager> fontManager = nullptr;
 
 private:
 	void logSDLVersions() const;

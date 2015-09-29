@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef APGTILESET_HPP_
-#define APGTILESET_HPP_
+#ifndef INCLUDE_APG_GRAPHICS_TILESET_HPP_
+#define INCLUDE_APG_GRAPHICS_TILESET_HPP_
 
 #include <cstdint>
 
@@ -37,9 +37,8 @@
 #include "tmxparser/TmxTileset.h"
 #include "tmxparser/TmxImage.h"
 
-#include "APG/APGeasylogging.hpp"
-
-#include "APG/Texture.hpp"
+#include "APG/core/APGeasylogging.hpp"
+#include "APG/graphics/Texture.hpp"
 
 namespace APG {
 
@@ -48,39 +47,6 @@ namespace APG {
  * (imageWidth) % (tileWidth + spacing) == 0.
  */
 class Tileset : public Texture {
-private:
-	int32_t tileWidth = 0;
-	int32_t tileHeight = 0;
-
-	int32_t widthInTiles = 0;
-	int32_t heightInTiles = 0;
-
-	int32_t spacing = 0;
-
-	void calculateWidthInTiles() {
-		const auto gap = tileWidth + spacing;
-
-		if (getWidth() % gap != 0) {
-			el::Loggers::getLogger("APG")->warn(
-			        "Tileset %v may have an inconsistent spacing in the x direction; this could cause issues.",
-			        this->getFileName());
-		}
-
-		widthInTiles = getWidth() / gap;
-	}
-
-	void calculateHeightInTiles() {
-		const auto gap = tileHeight + spacing;
-
-		if (getHeight() % gap != 0) {
-			el::Loggers::getLogger("APG")->warn(
-			        "Tileset %v may have an inconsistent spacing in the y direction; this could cause issues.",
-			        this->getFileName());
-		}
-
-		heightInTiles = getHeight() / gap;
-	}
-
 public:
 	/**
 	 * Create a new tileset based on a Tmx Map. Normally, you'll want to use Tileset(std::string, Tmx::Tileset *) instead.
@@ -132,6 +98,39 @@ public:
 
 	int32_t getSpacing() const {
 		return spacing;
+	}
+
+private:
+	int32_t tileWidth = 0;
+	int32_t tileHeight = 0;
+
+	int32_t widthInTiles = 0;
+	int32_t heightInTiles = 0;
+
+	int32_t spacing = 0;
+
+	void calculateWidthInTiles() {
+		const auto gap = tileWidth + spacing;
+
+		if (getWidth() % gap != 0) {
+			el::Loggers::getLogger("APG")->warn(
+			        "Tileset %v may have an inconsistent spacing in the x direction; this could cause issues.",
+			        this->getFileName());
+		}
+
+		widthInTiles = getWidth() / gap;
+	}
+
+	void calculateHeightInTiles() {
+		const auto gap = tileHeight + spacing;
+
+		if (getHeight() % gap != 0) {
+			el::Loggers::getLogger("APG")->warn(
+			        "Tileset %v may have an inconsistent spacing in the y direction; this could cause issues.",
+			        this->getFileName());
+		}
+
+		heightInTiles = getHeight() / gap;
 	}
 };
 

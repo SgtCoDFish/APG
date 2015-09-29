@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -41,10 +41,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "APG/ShaderProgram.hpp"
-#include "APG/VertexAttribute.hpp"
-#include "APG/VertexAttributeList.hpp"
-
+#include "APG/graphics/ShaderProgram.hpp"
+#include "APG/graphics/VertexAttribute.hpp"
+#include "APG/graphics/VertexAttributeList.hpp"
 #include "APG/internal/Assert.hpp"
 
 APG::ShaderProgram::ShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef APGGLTEXTURE_HPP_
-#define APGGLTEXTURE_HPP_
+#ifndef INCLUDE_APG_GRAPHICS_TEXTURE_HPP_
+#define INCLUDE_APG_GRAPHICS_TEXTURE_HPP_
 
 #include <cstdint>
 
@@ -60,45 +60,6 @@ enum TextureFilterType {
 class ShaderProgram;
 
 class Texture {
-private:
-	std::string fileName;
-
-	static uint32_t TEXTURE_TARGETS[];
-	static std::atomic<uint32_t> availableTextureUnit;
-
-	uint32_t textureID = 0;
-
-	// the x at the end of the GL_TEXTUREx
-	uint32_t textureUnitInt = 0;
-
-	// the actual value of GL_TEXTUREx for some x
-	uint32_t textureUnitGL = 0;
-
-	void generateTextureID();
-	void loadTexture(SDL_Surface * const surface);
-
-	uint32_t width = 0;
-	uint32_t height = 0;
-
-	float invWidth = 0.0f;
-	float invHeight = 0.0f;
-
-	bool preserveSurface = false;
-	SXXDL::surface_ptr preservedSurface = SXXDL::make_surface_ptr(nullptr);
-
-	int32_t tempBindID = 0;
-	int32_t tempUnit = 0;
-	void tempBind();
-	void rebind();
-
-	TextureWrapType sWrap;
-	TextureWrapType tWrap;
-	void uploadWrapType() const;
-
-	TextureFilterType minFilter;
-	TextureFilterType magFilter;
-	void uploadFilter() const;
-
 public:
 	explicit Texture(const char * const fileName, bool preserveSurface = false) :
 			        Texture(std::string(fileName), preserveSurface) {
@@ -149,6 +110,45 @@ public:
 	const std::string &getFileName() const {
 		return fileName;
 	}
+
+private:
+	std::string fileName;
+
+	static uint32_t TEXTURE_TARGETS[];
+	static std::atomic<uint32_t> availableTextureUnit;
+
+	uint32_t textureID = 0;
+
+	// the x at the end of the GL_TEXTUREx
+	uint32_t textureUnitInt = 0;
+
+	// the actual value of GL_TEXTUREx for some x
+	uint32_t textureUnitGL = 0;
+
+	void generateTextureID();
+	void loadTexture(SDL_Surface * const surface);
+
+	uint32_t width = 0;
+	uint32_t height = 0;
+
+	float invWidth = 0.0f;
+	float invHeight = 0.0f;
+
+	bool preserveSurface = false;
+	SXXDL::surface_ptr preservedSurface = SXXDL::make_surface_ptr(nullptr);
+
+	int32_t tempBindID = 0;
+	int32_t tempUnit = 0;
+	void tempBind();
+	void rebind();
+
+	TextureWrapType sWrap;
+	TextureWrapType tWrap;
+	void uploadWrapType() const;
+
+	TextureFilterType minFilter;
+	TextureFilterType magFilter;
+	void uploadFilter() const;
 };
 
 using texture_ptr = std::unique_ptr<Texture>;

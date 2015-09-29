@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Ashley Davis (SgtCoDFish)
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,36 +25,51 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GLTMXRENDERER_HPP_
-#define GLTMXRENDERER_HPP_
+#ifndef INCLUDE_APG_TILED_TMXSDLRENDERER_HPP_
+#define INCLUDE_APG_TILED_TMXSDLRENDERER_HPP_
 
-#include "APG/SpriteBatch.hpp"
-#include "APG/TmxRenderer.hpp"
+#include <vector>
+
+#include "APG/SXXDL.hpp"
+#include "APG/core/APGCommon.hpp"
+#include "APG/tiled/TmxRenderer.hpp"
+
+#include <glm/vec2.hpp>
 
 namespace Tmx {
+class Tileset;
 class Layer;
 }
 
 namespace APG {
 
-class GLTmxRenderer final : public TmxRenderer {
-private:
-	SpriteBatch *batch;
-
+/**
+ * Contains methods for rendering a loaded TMX file using SDL2.
+ *
+ * Requires that SDL2 + SDL2_image have already been initialised. Doesn't yet support animated tiles.
+ */
+class SDLTmxRenderer final : public APG::TmxRenderer {
 public:
-	explicit GLTmxRenderer(const std::unique_ptr<Tmx::Map> &map, const std::unique_ptr<SpriteBatch> &batch) :
-			        GLTmxRenderer(map.get(), batch.get()) {
+	explicit SDLTmxRenderer(const std::unique_ptr<Tmx::Map> &map, const SXXDL::renderer_ptr &renderer) :
+			        SDLTmxRenderer(map.get(), renderer) {
 	}
 
-	explicit GLTmxRenderer(Tmx::Map * const map, SpriteBatch * const batch);
-	virtual ~GLTmxRenderer() = default;
+	explicit SDLTmxRenderer(Tmx::Map * const map, const SXXDL::renderer_ptr &renderer);
+	virtual ~SDLTmxRenderer() = default;
 
-	virtual void renderAll(float deltaTime);
+	void renderLayer(Tmx::TileLayer * const layer) override;
+	void renderObjectGroup(const std::vector<TiledObject> &objects) override;
 
-	virtual void renderLayer(Tmx::TileLayer * const layer) override;
-	virtual void renderObjectGroup(const std::vector<TiledObject> &objects) override;
+	// disallow copying because we own resources.
+	SDLTmxRenderer(SDLTmxRenderer &other) = delete;
+	SDLTmxRenderer(const SDLTmxRenderer &other) = delete;
+
+private:
+	const SXXDL::renderer_ptr &renderer;
+
+	std::vector<SXXDL::sdl_texture_ptr> sdlTextures;
 };
 
 }
 
-#endif /* GLTMXRENDERER_HPP_ */
+#endif /* TMXSDLRENDERER_HPP_ */
