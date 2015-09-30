@@ -50,11 +50,9 @@ namespace APG {
  */
 class SDLTmxRenderer final : public APG::TmxRenderer {
 public:
-	explicit SDLTmxRenderer(const std::unique_ptr<Tmx::Map> &map, const SXXDL::renderer_ptr &renderer) :
-			        SDLTmxRenderer(map.get(), renderer) {
-	}
-
+	explicit SDLTmxRenderer(std::unique_ptr<Tmx::Map> &&map, const SXXDL::renderer_ptr &renderer);
 	explicit SDLTmxRenderer(Tmx::Map * const map, const SXXDL::renderer_ptr &renderer);
+	explicit SDLTmxRenderer(const std::string &fileName, const SXXDL::renderer_ptr &renderer);
 	virtual ~SDLTmxRenderer() = default;
 
 	void renderLayer(Tmx::TileLayer * const layer) override;
@@ -68,6 +66,8 @@ private:
 	const SXXDL::renderer_ptr &renderer;
 
 	std::vector<SXXDL::sdl_texture_ptr> sdlTextures;
+
+	void setupTilesets();
 };
 
 }

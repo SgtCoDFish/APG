@@ -39,8 +39,23 @@
 #include "APG/internal/Assert.hpp"
 
 APG::SDLTmxRenderer::SDLTmxRenderer(Tmx::Map * const map, const SXXDL::renderer_ptr &renderer) :
-		        TmxRenderer(map),
+		        SDLTmxRenderer(std::unique_ptr<Tmx::Map>(map), renderer) {
+
+}
+
+APG::SDLTmxRenderer::SDLTmxRenderer(std::unique_ptr<Tmx::Map> &&map, const SXXDL::renderer_ptr &renderer) :
+		        TmxRenderer(std::move(map)),
 		        renderer { renderer } {
+	setupTilesets();
+}
+
+APG::SDLTmxRenderer::SDLTmxRenderer(const std::string &fileName, const SXXDL::renderer_ptr &renderer) :
+		        TmxRenderer(fileName),
+		        renderer { renderer } {
+	setupTilesets();
+}
+
+void APG::SDLTmxRenderer::setupTilesets() {
 	REQUIRE(map->GetOrientation() == Tmx::MapOrientation::TMX_MO_ORTHOGONAL,
 	        "SDLTmxRenderer only supports orthogonal maps.");
 

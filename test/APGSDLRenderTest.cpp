@@ -62,7 +62,7 @@ bool APGSDLRenderTest::init() {
 
 	SDL_SetRenderDrawColor(renderer.get(), 0x50, 0xAC, 0x3D, 0xFF);
 
-	mapOne = std::make_unique<Tmx::Map>();
+	auto mapOne = std::make_unique<Tmx::Map>();
 	mapOne->ParseFile(ASSET_PREFIX + "world1.tmx");
 
 	if (mapOne->HasError()) {
@@ -70,7 +70,7 @@ bool APGSDLRenderTest::init() {
 		return false;
 	}
 
-	mapTwo = std::make_unique<Tmx::Map>();
+	auto mapTwo = std::make_unique<Tmx::Map>();
 	mapTwo->ParseFile(ASSET_PREFIX + "sample_indoor.tmx");
 
 	if (mapTwo->HasError()) {
@@ -78,8 +78,8 @@ bool APGSDLRenderTest::init() {
 		return false;
 	}
 
-	rendererOne = std::make_unique<APG::SDLTmxRenderer>(mapOne.get(), renderer);
-	rendererTwo = std::make_unique<APG::SDLTmxRenderer>(mapTwo.get(), renderer);
+	rendererOne = std::make_unique<APG::SDLTmxRenderer>(std::move(mapOne), renderer);
+	rendererTwo = std::make_unique<APG::SDLTmxRenderer>(std::move(mapTwo), renderer);
 
 	currentRenderer = rendererOne.get();
 

@@ -50,9 +50,6 @@ public:
 private:
 	SXXDL::renderer_ptr renderer = SXXDL::make_renderer_ptr(nullptr);
 
-	std::unique_ptr<Tmx::Map> mapOne;
-	std::unique_ptr<Tmx::Map> mapTwo;
-
 	std::unique_ptr<APG::SDLTmxRenderer> rendererOne;
 	std::unique_ptr<APG::SDLTmxRenderer> rendererTwo;
 

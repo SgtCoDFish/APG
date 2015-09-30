@@ -58,7 +58,7 @@ const char * APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag.gls
 bool APG::APGGLRenderTest::init() {
 	const auto logger = el::Loggers::getLogger("APG");
 
-	map1 = std::make_unique<Tmx::Map>();
+	auto map1 = std::make_unique<Tmx::Map>();
 	map1->ParseFile("assets/sample_indoor.tmx");
 
 	if (map1->HasError()) {
@@ -66,7 +66,7 @@ bool APG::APGGLRenderTest::init() {
 		return false;
 	}
 
-	map2 = std::make_unique<Tmx::Map>();
+	auto map2 = std::make_unique<Tmx::Map>();
 	map2->ParseFile("assets/world1.tmx");
 
 	if (map2->HasError()) {
@@ -80,8 +80,8 @@ bool APG::APGGLRenderTest::init() {
 	camera->setToOrtho(false, screenWidth, screenHeight);
 	spriteBatch = std::make_unique<SpriteBatch>(shaderProgram.get());
 
-	rendererOne = std::make_unique<GLTmxRenderer>(map1, spriteBatch);
-	rendererTwo = std::make_unique<GLTmxRenderer>(map2, spriteBatch);
+	rendererOne = std::make_unique<GLTmxRenderer>(std::move(map1), spriteBatch.get());
+	rendererTwo = std::make_unique<GLTmxRenderer>(std::move(map2), spriteBatch.get());
 	currentRenderer = rendererOne.get();
 
 	playerTexture = std::make_unique<Texture>("assets/player.png");

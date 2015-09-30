@@ -38,21 +38,19 @@ class Layer;
 namespace APG {
 
 class GLTmxRenderer final : public TmxRenderer {
-private:
-	SpriteBatch *batch;
-
 public:
-	explicit GLTmxRenderer(const std::unique_ptr<Tmx::Map> &map, const std::unique_ptr<SpriteBatch> &batch) :
-			        GLTmxRenderer(map.get(), batch.get()) {
-	}
-
+	explicit GLTmxRenderer(std::unique_ptr<Tmx::Map> &&map, SpriteBatch * const batch);
 	explicit GLTmxRenderer(Tmx::Map * const map, SpriteBatch * const batch);
+	explicit GLTmxRenderer(const std::string &fileName, SpriteBatch * const batch);
 	virtual ~GLTmxRenderer() = default;
 
 	virtual void renderAll(float deltaTime);
 
 	virtual void renderLayer(Tmx::TileLayer * const layer) override;
 	virtual void renderObjectGroup(const std::vector<TiledObject> &objects) override;
+
+private:
+	SpriteBatch *batch;
 };
 
 }

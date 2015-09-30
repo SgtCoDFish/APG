@@ -25,8 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <iostream>
-
 #include <glm/vec2.hpp>
 
 #include "tmxparser/Tmx.h"
@@ -34,9 +32,20 @@
 #include "APG/graphics/Sprite.hpp"
 #include "APG/tiled/GLTmxRenderer.hpp"
 
-APG::GLTmxRenderer::GLTmxRenderer(Tmx::Map * const map, SpriteBatch * const inBatch) :
-		        TmxRenderer(map),
-		        batch(inBatch) {
+APG::GLTmxRenderer::GLTmxRenderer(Tmx::Map * const map, SpriteBatch * const batch) :
+		        GLTmxRenderer(std::unique_ptr<Tmx::Map>(map), batch) {
+}
+
+APG::GLTmxRenderer::GLTmxRenderer(std::unique_ptr<Tmx::Map> &&map, SpriteBatch * const batch) :
+		        TmxRenderer(std::move(map)),
+		        batch { batch } {
+}
+
+
+APG::GLTmxRenderer::GLTmxRenderer(const std::string &fileName, SpriteBatch * const batch) :
+		        TmxRenderer(fileName),
+		        batch { batch } {
+
 }
 
 void APG::GLTmxRenderer::renderAll(float deltaTime) {
@@ -48,7 +57,6 @@ void APG::GLTmxRenderer::renderAll(float deltaTime) {
 }
 
 void APG::GLTmxRenderer::renderLayer(Tmx::TileLayer * const layer) {
-//	std::cout << "Rendering layer \"" << layer->GetName() << "\"\n";
 	const uint32_t tileWidth = map->GetTileWidth();
 	const uint32_t tileHeight = map->GetTileHeight();
 

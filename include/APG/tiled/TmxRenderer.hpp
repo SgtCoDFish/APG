@@ -63,7 +63,7 @@ public:
 /**
  * Abstracts a renderer for a TMX file that can be loaded using the tmxparser library.
  *
- * Note that sprites from tilesets are stored in a map which hashes based on a uint64_t.
+ * Note that sprites from tilesets are stored in a hashmap which hashes based on a uint64_t.
  * Normally this is completely transparent and you don't need to worry about it at all,
  * but it assumes that there are no more than 1,000,000 sprites in a single OpenGL texture
  * unit. This would generally be far more than you'd ever see, but things will break if
@@ -71,11 +71,10 @@ public:
  */
 class TmxRenderer {
 public:
-	explicit TmxRenderer(const std::unique_ptr<Tmx::Map> &map) :
-			        TmxRenderer(map.get()) {
-	}
-
-	explicit TmxRenderer(Tmx::Map *map);
+	// TAKES OWNERSHIP
+	explicit TmxRenderer(std::unique_ptr<Tmx::Map> &&map);
+	explicit TmxRenderer(Tmx::Map * const map);
+	explicit TmxRenderer(const std::string &fileName);
 
 	virtual ~TmxRenderer() = default;
 
@@ -132,6 +131,9 @@ protected:
 	uint64_t calculateTileGID(Tmx::Tileset *tileset, Tmx::Tile *tile);
 
 private:
+	std::unique_ptr<Tmx::Map> ownedMap;
+
+	void init();
 	void reserveSpriteSpace();
 };
 

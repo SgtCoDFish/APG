@@ -53,8 +53,26 @@
 
 std::unordered_map<std::string, std::shared_ptr<APG::Tileset>> APG::TmxRenderer::tmxTilesets;
 
-APG::TmxRenderer::TmxRenderer(Tmx::Map *map) :
-		        map { map } {
+APG::TmxRenderer::TmxRenderer(Tmx::Map * const map) :
+		        TmxRenderer(std::unique_ptr<Tmx::Map>(map)) {
+
+}
+
+APG::TmxRenderer::TmxRenderer(std::unique_ptr<Tmx::Map> &&map) :
+		        ownedMap { std::move(map) } {
+	init();
+}
+
+APG::TmxRenderer::TmxRenderer(const std::string &fileName) {
+	ownedMap = std::make_unique<Tmx::Map>();
+	ownedMap->ParseFile(fileName);
+
+	init();
+}
+
+void APG::TmxRenderer::init() {
+	map = ownedMap.get();
+
 	loadTilesets();
 	loadObjects();
 }

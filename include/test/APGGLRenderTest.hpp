@@ -64,16 +64,9 @@ public:
 	bool init() override;
 	void render(float deltaTime) override;
 
-	const Tmx::Map *getMap() const {
-		return map1.get();
-	}
-
 private:
 	static const char *vertexShaderFilename;
 	static const char *fragmentShaderFilename;
-
-	std::unique_ptr<Tmx::Map> map1;
-	std::unique_ptr<Tmx::Map> map2;
 
 	std::unique_ptr<ShaderProgram> shaderProgram;
 
