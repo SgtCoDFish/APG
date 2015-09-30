@@ -78,7 +78,7 @@ public:
 
 	virtual ~TmxRenderer() = default;
 
-	virtual void renderLayer(Tmx::TileLayer * const layer) = 0;
+	virtual void renderLayer(const Tmx::TileLayer * const layer) = 0;
 	virtual void renderObjectGroup(const std::vector<TiledObject> &objects) = 0;
 
 	void renderAll(float deltaTime);

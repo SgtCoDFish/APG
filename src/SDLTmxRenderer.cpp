@@ -66,7 +66,7 @@ void APG::SDLTmxRenderer::setupTilesets() {
 	}
 }
 
-void APG::SDLTmxRenderer::renderLayer(Tmx::TileLayer * const layer) {
+void APG::SDLTmxRenderer::renderLayer(const Tmx::TileLayer * const layer) {
 	const auto tile_width = map->GetTileWidth();
 	const auto tile_height = map->GetTileHeight();
 

@@ -55,7 +55,7 @@ public:
 	explicit SDLTmxRenderer(const std::string &fileName, const SXXDL::renderer_ptr &renderer);
 	virtual ~SDLTmxRenderer() = default;
 
-	void renderLayer(Tmx::TileLayer * const layer) override;
+	void renderLayer(const Tmx::TileLayer * const layer) override;
 	void renderObjectGroup(const std::vector<TiledObject> &objects) override;
 
 	// disallow copying because we own resources.

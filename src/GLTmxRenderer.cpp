@@ -56,7 +56,7 @@ void APG::GLTmxRenderer::renderAll(float deltaTime) {
 	batch->end();
 }
 
-void APG::GLTmxRenderer::renderLayer(Tmx::TileLayer * const layer) {
+void APG::GLTmxRenderer::renderLayer(const Tmx::TileLayer * const layer) {
 	const uint32_t tileWidth = map->GetTileWidth();
 	const uint32_t tileHeight = map->GetTileHeight();
 
