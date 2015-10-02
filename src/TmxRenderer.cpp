@@ -224,9 +224,7 @@ void APG::TmxRenderer::loadObjects() {
 }
 
 void APG::TmxRenderer::renderAll(float deltaTime) {
-	for (auto &animation : loadedAnimatedSprites) {
-		animation.update(deltaTime);
-	}
+	update(deltaTime);
 
 	for (const auto &layer : map->GetLayers()) {
 		if (layer->IsVisible()) {
@@ -247,6 +245,12 @@ void APG::TmxRenderer::renderAll(float deltaTime) {
 			}
 			}
 		}
+	}
+}
+
+void APG::TmxRenderer::update(float deltaTime) {
+	for (auto &animation : loadedAnimatedSprites) {
+		animation.update(deltaTime);
 	}
 }
 

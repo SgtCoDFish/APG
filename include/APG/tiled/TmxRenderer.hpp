@@ -81,7 +81,11 @@ public:
 	virtual void renderLayer(const Tmx::TileLayer * const layer) = 0;
 	virtual void renderObjectGroup(const std::vector<TiledObject> &objects) = 0;
 
+	/**
+	 * Renders all the layers and calls update for you.
+	 */
 	void renderAll(float deltaTime);
+	void update(float deltaTime);
 
 	const Tmx::Map *getMap() {
 		return map;
