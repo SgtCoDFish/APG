@@ -223,8 +223,10 @@ void APG::TmxRenderer::loadObjects() {
 	}
 }
 
-void APG::TmxRenderer::renderAll(float deltaTime) {
-	update(deltaTime);
+void APG::TmxRenderer::renderAll(float deltaTime, bool autoUpdate) {
+	if (autoUpdate) {
+		update(deltaTime);
+	}
 
 	for (const auto &layer : map->GetLayers()) {
 		if (layer->IsVisible()) {

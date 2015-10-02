@@ -84,7 +84,7 @@ public:
 	/**
 	 * Renders all the layers and calls update for you.
 	 */
-	void renderAll(float deltaTime);
+	void renderAll(float deltaTime, bool autoUpdate = true);
 	void update(float deltaTime);
 
 	const Tmx::Map *getMap() {
