@@ -34,11 +34,11 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_net.h>
 
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-
 
 #include "APG/SXXDL.hpp"
 #include "APG/core/Game.hpp"
@@ -101,6 +101,21 @@ public:
 	 */
 	static uint32_t SDL_WINDOW_FLAGS;
 
+	/**
+	 * This method calls all of the SDL_Init related functions. These functions should only be called once in a program's lifetime.
+	 *
+	 * *** IF YOU CREATE OR SUBCLASS SDLGame YOU DON'T NEED TO CALL THIS METHOD ***
+	 *
+	 * However, if you don't need the whole APG SDLGame framework you can use this method (and SDLGame::shutdownSDL)
+	 * to make your life easier.
+	 */
+	static void initialiseSDL(el::Logger * logger = nullptr);
+
+	/**
+	 * See the note for SDLGame::initialiseSDL(). Should be called once at most per program run, and after all SDL related activity is completed.
+	 */
+	static void shutdownSDL();
+
 protected:
 	SXXDL::window_ptr window = SXXDL::make_window_ptr(nullptr);
 	SDL_GLContext glContext = nullptr;
@@ -115,10 +130,12 @@ protected:
 	std::unique_ptr<SDLAudioManager> audioManager = nullptr;
 	std::unique_ptr<SDLFontManager> fontManager = nullptr;
 
+	void resetGLErrors();
+
 private:
-	void logSDLVersions() const;
-	void debugSDLVersion(el::Logger * const logger, const char *libraryName, const SDL_version &compiledVersion,
-	        const SDL_version &linkedVersion) const;
+	static void logSDLVersions();
+	static void debugSDLVersion(el::Logger * const logger, const char *libraryName, const SDL_version &compiledVersion,
+	        const SDL_version &linkedVersion);
 };
 
 }
