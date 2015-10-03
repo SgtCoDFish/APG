@@ -83,10 +83,6 @@ SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t 
 }
 
 SDLGame::~SDLGame() {
-	fontManager = nullptr;
-	audioManager = nullptr;
-	inputManager = nullptr;
-
 	SDL_GL_DeleteContext(glContext);
 	SDLGame::shutdownSDL();
 }
@@ -154,7 +150,7 @@ void SDLGame::initialiseSDL(el::Logger * logger) {
 		logger->verbose(1, "Successfully initialised SDL2_net");
 	}
 
-	logSDLVersions();
+	SDLGame::logSDLVersions();
 }
 
 void SDLGame::shutdownSDL() {
@@ -184,23 +180,23 @@ void SDLGame::logSDLVersions() {
 	SDL_VERSION(&compiledVersion);
 	SDL_GetVersion(&sdlLinkedVersion);
 
-	debugSDLVersion(logger, "SDL2", compiledVersion, sdlLinkedVersion);
+	SDLGame::debugSDLVersion(logger, "SDL2", compiledVersion, sdlLinkedVersion);
 
 	SDL_IMAGE_VERSION(&compiledVersion);
 	const auto imgVersion = IMG_Linked_Version();
-	debugSDLVersion(logger, "SDL2_image", compiledVersion, *imgVersion);
+	SDLGame::debugSDLVersion(logger, "SDL2_image", compiledVersion, *imgVersion);
 
 	SDL_TTF_VERSION(&compiledVersion);
 	const auto ttfVersion = TTF_Linked_Version();
-	debugSDLVersion(logger, "SDL2_ttf", compiledVersion, *ttfVersion);
+	SDLGame::debugSDLVersion(logger, "SDL2_ttf", compiledVersion, *ttfVersion);
 
 	SDL_MIXER_VERSION(&compiledVersion);
 	const auto mixVersion = Mix_Linked_Version();
-	debugSDLVersion(logger, "SDL2_mixer", compiledVersion, *mixVersion);
+	SDLGame::debugSDLVersion(logger, "SDL2_mixer", compiledVersion, *mixVersion);
 
 	SDL_NET_VERSION(&compiledVersion);
 	const auto netVersion = SDLNet_Linked_Version();
-	debugSDLVersion(logger, "SDL2_net", compiledVersion, *netVersion);
+	SDLGame::debugSDLVersion(logger, "SDL2_net", compiledVersion, *netVersion);
 }
 
 void SDLGame::debugSDLVersion(el::Logger * const logger, const char *libraryName, const SDL_version &compiledVersion,
