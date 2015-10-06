@@ -83,6 +83,12 @@ SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t 
 }
 
 SDLGame::~SDLGame() {
+	// must explicitly reset because we're about to shut SDL down;
+	// if we didn't, we'd segfault because the deallocation functions
+	// won't be available
+	fontManager.reset();
+	audioManager.reset();
+
 	SDL_GL_DeleteContext(glContext);
 	SDLGame::shutdownSDL();
 }
