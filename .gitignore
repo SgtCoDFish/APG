@@ -30,6 +30,15 @@ Debug-SDL/*
 build
 build/
 
+build-gcc
+build-gcc/
+
+build-clang
+build-clang/
+
+build-msvc
+build-msvc/
+
 /Debug-sanitize/
 /Debug-GL/
 
