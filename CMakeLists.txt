@@ -38,7 +38,9 @@ endif ()
 
 option(EXCLUDE_GL_TEST "Should we exclude compiling the OpenGL TMX rendering test?" OFF)
 option(EXCLUDE_SDL_TEST "Should we exclude compiling the SDL TMX rendering test?" OFF)
-option(EXCLUDE_AUDIO_TEST "Should we exclude compiling the audio test? Required an additional file, test_music.ogg, to be added to the assets folder (and then re-running cmake)!" ON)
+option(EXCLUDE_AUDIO_TEST "Should we exclude compiling the audio test? Requires an additional file, test_music.ogg, to be added to the assets folder (and then re-running cmake)!" ON)
+
+option(EXCLUDE_RELEASE "Should we ignore building the release library? Saves time when only working with debug builds." OFF)
 
 add_definitions(-DGLM_FORCE_RADIANS)
 
@@ -53,8 +55,10 @@ include_directories("include" ${SDL2_INCLUDE_DIR} ${SDL2_TTF_INCLUDE_DIR} ${SDL2
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS}")
 add_library(APG-d ${APG_SOURCES})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_RELEASE_FLAGS}")
-add_library(APG ${APG_SOURCES})
+if ( NOT EXCLUDE_RELEASE ) 
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_RELEASE_FLAGS}")
+	add_library(APG ${APG_SOURCES})
+endif ()
 
 if ( NOT EXISTS ${PROJECT_SOURCE_DIR}/assets/test_music.ogg )
     if ( NOT EXCLUDE_AUDIO_TEST )
@@ -66,7 +70,7 @@ if ( (NOT EXCLUDE_SDL_TEST) OR (NOT EXCLUDE_GL_TEST) OR (NOT EXCLUDE_AUDIO_TEST)
 	file(MAKE_DIRECTORY assets)
 	file(COPY ${APG_TEST_ASSETS} DESTINATION assets)
 	set(EXAMPLE_LIBS ${SDL2_LIBRARY} ${SDL2_TTF_LIBRARIES} ${SDL2_IMAGE_LIBRARY} ${SDL2_MIXER_LIBRARY} ${SDL2_NET_LIBRARY} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${TMXPARSER_LIBRARY} ${OS_LIBS})	
-endif ( (NOT EXCLUDE_SDL_TEST) OR (NOT EXCLUDE_GL_TEST) OR (NOT EXCLUDE_AUDIO_TEST) )
+endif ( )
 
 if ( NOT EXCLUDE_SDL_TEST)
 	set (SDLRENDERTEST_FLAGS "")
@@ -96,5 +100,9 @@ if ( NOT EXCLUDE_AUDIO_TEST )
 endif ( NOT EXCLUDE_AUDIO_TEST )
 
 install (TARGETS APG-d DESTINATION lib)
-install (TARGETS APG DESTINATION lib)
+
+if ( NOT EXCLUDE_RELEASE ) 
+	install (TARGETS APG DESTINATION lib)
+endif () 
+
 install (DIRECTORY ${PROJECT_SOURCE_DIR}/include/APG DESTINATION include)
