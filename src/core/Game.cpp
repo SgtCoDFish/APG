@@ -33,19 +33,21 @@
 uint32_t APG::Game::screenWidth = 1280;
 uint32_t APG::Game::screenHeight = 720;
 
-APG::Game::Game(uint32_t screenWidth, uint32_t screenHeight) {
+namespace APG {
+
+Game::Game(uint32_t screenWidth, uint32_t screenHeight) {
 	Game::screenWidth = screenWidth;
 	Game::screenHeight = screenHeight;
 
-	setupLoggingDefault();
+	Game::setupLoggingDefault();
 	el::Loggers::getLogger("APG")->verbose(9, "Logging initialised.");
 }
 
-void APG::Game::setupLoggingDefault() {
+void Game::setupLoggingDefault() {
 	setLoggerToAPGStyle("APG");
 }
 
-void APG::Game::setLoggerToAPGStyle(const std::string &loggerName) {
+void Game::setLoggerToAPGStyle(const std::string &loggerName) {
 	auto conf = el::Configurations();
 
 	conf.setToDefault();
@@ -53,4 +55,6 @@ void APG::Game::setLoggerToAPGStyle(const std::string &loggerName) {
 	conf.set(el::Level::Verbose, el::ConfigurationType::Format,
 	        "%datetime{%h:%m:%s.%g} [%logger] [%levshort%vlevel] - %msg");
 	el::Loggers::reconfigureLogger(loggerName, conf);
+}
+
 }

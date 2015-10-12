@@ -41,14 +41,12 @@ class FontManager;
  * Note that only one Game is expected to be made, and the public static screen size variables will be wrong if you create more than one.
  */
 class Game {
-protected:
-	void setupLoggingDefault();
-
 public:
 	static uint32_t screenWidth;
 	static uint32_t screenHeight;
 
 	static void setLoggerToAPGStyle(const std::string &loggerName);
+	static void setupLoggingDefault();
 
 	explicit Game(uint32_t screenWidth, uint32_t screenHeight);
 
