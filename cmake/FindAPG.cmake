@@ -19,7 +19,7 @@ if(APG_DEBUG_LIBRARY OR APG_LIBRARY)
   set(APG_FOUND TRUE)
 else()
   set(APG_FOUND FALSE)
-endif(APG_DEBUG_LIBRARY OR APG_LIBRARY)
+endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(APG DEFAULT_MSG APG_DEBUG_LIBRARY APG_LIBRARY APG_INCLUDE_DIR)
