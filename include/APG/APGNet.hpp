@@ -25,30 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_APG_APG_HPP_
-#define INCLUDE_APG_APG_HPP_
+#ifndef INCLUDE_APG_APGNET_HPP_
+#define INCLUDE_APG_APGNET_HPP_
 
-// Include all APG files here.
+// Include all APG net files.
+#include "net/ByteBuffer.hpp"
 
-// Audio
-#include "APG/APGAudio.hpp"
-
-// core
-#include "APG/APGCore.hpp"
-
-// font
-#include "APG/APGFont.hpp"
-
-// graphics
-#include "APG/APGGraphics.hpp"
-
-// input
-#include "APG/APGInput.hpp"
-
-// net
-#include "APG/APGNet.hpp"
-
-// tiled
-#include "APG/APGTiled.hpp"
-
-#endif /* INCLUDE_APG_APG_HPP_ */
+#endif /* INCLUDE_APG_APGNET_HPP_ */
