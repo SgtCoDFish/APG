@@ -30,24 +30,67 @@
 
 #include <cstdint>
 
+#include <memory>
+#include <array>
+
+#include "ByteBuffer.hpp"
+
 namespace APG {
 /**
  * Simple base class for a socket.
  *
- * You'll probably want to use a derived version of this unless you're
+ * You'll probably want a derived class of this.
  */
-class Socket {
+class Socket : public ByteBuffer {
 public:
-	explicit Socket(const uint16_t port);
-	~Socket() = default;
+	explicit Socket(const char * remoteHost, uint16_t port, uint32_t bufferSize = BB_DEFAULT_SIZE);
+	virtual ~Socket() = default;
 
 	const uint16_t port;
+	const char * const remoteHost;
+
+	/**
+	 * Send data currently in the sendBuffer.
+	 */
+	virtual int send() = 0;
+
+	/**
+	 * Read data into readBuffer.
+	 */
+	virtual int recv(uint32_t length = 1024u) = 0;
+
+	bool hasError() const {
+		return error_;
+	}
+
+protected:
+	void setError();
+
+private:
+	bool error_;
 };
 
-class AcceptorSocket : public Socket {
+/**
+ * Also known as a server socket, accepting incoming connections and generating sockets for them.
+ */
+class AcceptorSocket : public ByteBuffer {
 public:
-	explicit AcceptorSocket(const uint16_t port);
-	~AcceptorSocket() = default;
+	explicit AcceptorSocket(uint16_t port, uint32_t bufferSize = BB_DEFAULT_SIZE);
+	virtual ~AcceptorSocket() = default;
+
+	const uint16_t port;
+
+	virtual std::unique_ptr<Socket> acceptSocket(float maxWaitInSeconds = -1.0f) = 0;
+
+	bool hasError() const {
+		return error_;
+	}
+
+protected:
+	void setError();
+
+private:
+	bool error_;
 };
 
 }

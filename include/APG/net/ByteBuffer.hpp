@@ -30,7 +30,7 @@
 #define BB_UTILITY
 
 // If defined, places the class into a namespace called bb
-#define BB_USE_NS
+//#define BB_USE_NS
 
 #include <cstdlib>
 #include <cstdint>
@@ -52,9 +52,9 @@ namespace bb {
 
 class ByteBuffer {
 public:
-	ByteBuffer(uint32_t size = BB_DEFAULT_SIZE);
-	ByteBuffer(uint8_t* arr, uint32_t size);
-	~ByteBuffer() = default;
+	explicit ByteBuffer(uint32_t size = BB_DEFAULT_SIZE);
+	explicit ByteBuffer(uint8_t* arr, uint32_t size);
+	virtual ~ByteBuffer() = default;
 
 	uint32_t bytesRemaining(); // Number of uint8_ts from the current read position till the end of the buffer
 	void clear(); // Clear our the vector and reset read and write positions
@@ -153,6 +153,11 @@ public:
 	void printHex();
 	void printPosition();
 #endif
+
+protected:
+	const std::vector<uint8_t> &getBuffer() const {
+		return buf;
+	}
 
 private:
 	uint32_t wpos;

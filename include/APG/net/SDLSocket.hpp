@@ -24,33 +24,61 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+
+#ifndef INCLUDE_APG_NET_SDLSOCKET_HPP_
+#define INCLUDE_APG_NET_SDLSOCKET_HPP_
+
 #include <cstdint>
 
-#include "APG/APGNet.hpp"
+#include <memory>
+
+#include <SDL2/SDL_net.h>
+
+#include "Socket.hpp"
+#include "ByteBuffer.hpp"
 
 namespace APG {
 
-Socket::Socket(const char * remoteHost_, uint16_t port_, uint32_t bufferSize_) :
-		        ByteBuffer(bufferSize_),
-		        port { port_ },
-		        remoteHost { remoteHost_ },
-		        error_ { false } {
+class SDLSocket : public Socket {
+public:
+	static SDLSocket fromRawSDLSocket(TCPsocket socket);
+
+	explicit SDLSocket(const char * hostName, uint16_t port);
+	virtual ~SDLSocket();
+
+	virtual int send() override final;
+	virtual int recv(uint32_t length = 1024u) override final;
+
+	const TCPsocket &getSDLSocket() const {
+		return internalSocket;
+	}
+
+private:
+	explicit SDLSocket(TCPsocket socket_, IPaddress *ip_, const char *remoteHost_, uint16_t port_);
+
+	TCPsocket internalSocket;
+	IPaddress internalIP;
+};
+
+class SDLAcceptorSocket final : public AcceptorSocket {
+public:
+	explicit SDLAcceptorSocket(uint16_t port);
+	virtual ~SDLAcceptorSocket();
+
+	virtual std::unique_ptr<Socket> acceptSocket(float maxWaitInSeconds = -1.0f) override final;
+
+	const TCPsocket &getSDLAcceptor() const {
+		return internalAcceptor;
+	}
+
+private:
+	TCPsocket internalAcceptor;
+	IPaddress internalIP;
+
+	float waitTime = 0.0f;
+};
 
 }
 
-void Socket::setError() {
-	error_ = true;
-}
-
-AcceptorSocket::AcceptorSocket(uint16_t port_, uint32_t bufferSize_) :
-		        ByteBuffer(bufferSize_),
-		        port { port_ },
-		        error_ { false } {
-
-}
-
-void AcceptorSocket::setError() {
-	error_ = true;
-}
-
-}
+#endif /* INCLUDE_APG_NET_SDLSOCKET_HPP_ */
