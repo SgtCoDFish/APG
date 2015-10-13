@@ -24,32 +24,18 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef INCLUDE_APG_NET_SOCKET_HPP_
-#define INCLUDE_APG_NET_SOCKET_HPP_
-
-#include <cstdint>
+#include "APG/APGNet.hpp"
 
 namespace APG {
-/**
- * Simple base class for a socket.
- *
- * You'll probably want to use a derived version of this unless you're
- */
-class Socket {
-public:
-	explicit Socket(const uint16_t port);
-	~Socket() = default;
 
-	const uint16_t port;
-};
-
-class AcceptorSocket : public Socket {
-public:
-	explicit AcceptorSocket(const uint16_t port);
-	~AcceptorSocket() = default;
-};
+Socket::Socket(uint16_t port) :
+		        port { port } {
 
 }
 
-#endif /* INCLUDE_APG_NET_SOCKET_HPP_ */
+AcceptorSocket::AcceptorSocket(uint16_t port) :
+		        Socket(port) {
+
+}
+
+}
