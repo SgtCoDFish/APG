@@ -25,12 +25,24 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_APG_APGNET_HPP_
-#define INCLUDE_APG_APGNET_HPP_
+#ifndef INCLUDE_APG_NET_SOCKET_HPP_
+#define INCLUDE_APG_NET_SOCKET_HPP_
 
-// Include all APG net files.
-#include "net/Socket.hpp"
-#include "net/ByteBuffer.hpp"
-#include "net/NetUtil.hpp"
+#include <cstdint>
 
-#endif /* INCLUDE_APG_APGNET_HPP_ */
+/**
+ * Simple base class for a socket.
+ *
+ * You'll probably want to use a derived version of this unless you're
+ */
+class Socket {
+public:
+	explicit Socket(const uint16_t);
+	~Socket() = default;
+
+	const uint16_t port;
+};
+
+
+
+#endif /* INCLUDE_APG_NET_SOCKET_HPP_ */

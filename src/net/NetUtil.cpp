@@ -24,13 +24,33 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include <cstdint>
 
-#ifndef INCLUDE_APG_APGNET_HPP_
-#define INCLUDE_APG_APGNET_HPP_
+#include "APG/net/NetUtil.hpp"
+#include "APG/core/APGeasylogging.hpp"
 
-// Include all APG net files.
-#include "net/Socket.hpp"
-#include "net/ByteBuffer.hpp"
-#include "net/NetUtil.hpp"
+namespace APG {
 
-#endif /* INCLUDE_APG_APGNET_HPP_ */
+bool NetUtil::validatePort(uint16_t port, bool shouldLog) {
+	auto logger = el::Loggers::getLogger("APG");
+
+	if (port == 0u) {
+		if (shouldLog) {
+			logger->error("Ports cannot open on 0.");
+		}
+
+		return false;
+	}
+
+	if (port <= 1024u) {
+		if(shouldLog) {
+			logger->warn("Port %v is a reserved port and probably shouldn't be used.", port);
+		}
+
+		return false;
+	}
+
+	return true;
+}
+
+}

@@ -24,13 +24,18 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef INCLUDE_APG_NET_NETUTIL_HPP_
+#define INCLUDE_APG_NET_NETUTIL_HPP_
 
-#ifndef INCLUDE_APG_APGNET_HPP_
-#define INCLUDE_APG_APGNET_HPP_
+#include <cstdint>
 
-// Include all APG net files.
-#include "net/Socket.hpp"
-#include "net/ByteBuffer.hpp"
-#include "net/NetUtil.hpp"
+namespace APG {
 
-#endif /* INCLUDE_APG_APGNET_HPP_ */
+class NetUtil {
+public:
+	static bool validatePort(uint16_t port, bool shouldLog = true);
+};
+
+}
+
+#endif /* INCLUDE_APG_NET_NETUTIL_HPP_ */
