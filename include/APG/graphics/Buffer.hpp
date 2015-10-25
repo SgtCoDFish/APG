@@ -104,7 +104,7 @@ public:
 	void upload() {
 		// TODO: This should be improved.
 		const auto bufferSize = elementCount * sizeof(T);
-		glBufferData(bufferType, bufferSize, &(bufferData.front()), drawType);
+		glBufferData(bufferType, bufferSize, bufferData.data(), drawType);
 
 		GLenum glError = glGetError();
 		if (glError != GL_NO_ERROR) {

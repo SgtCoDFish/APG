@@ -11,7 +11,7 @@ find_path(TMXPARSER_INCLUDE_DIR NAMES tmxparser/Tmx.h
 )
 
 find_library(TMXPARSER_LIBRARY NAMES tmxparser
-          DOC "The tmxparser library"
+		  DOC "The tmxparser library"
 )
 
 if(TMXPARSER_LIBRARY)

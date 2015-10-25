@@ -260,11 +260,11 @@ void APG::ShaderProgram::loadShader(const std::string &shaderSource, uint32_t ty
 	GLint logLength;
 	glGetShaderiv(*source, GL_INFO_LOG_LENGTH, &logLength);
 	if (logLength > 1) {
-		char buffer[logLength];
+		auto buffer = std::make_unique<char[]>(logLength);
 
-		glGetShaderInfoLog(*source, logLength, NULL, buffer);
+		glGetShaderInfoLog(*source, logLength, NULL, buffer.get());
 
-		statusStream << "Info log:\n" << buffer;
+		statusStream << "Info log:\n" << buffer.get();
 		statusStream << "Source:\n" << shaderSource << "\n\n";
 	}
 
@@ -300,11 +300,11 @@ void APG::ShaderProgram::combineProgram() {
 	glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &infoLogLength);
 
 	if (infoLogLength > 1) {
-		char buffer[infoLogLength];
+		auto buffer = std::make_unique<char[]>(infoLogLength);
 
-		glGetProgramInfoLog(shaderProgram, infoLogLength, nullptr, buffer);
+		glGetProgramInfoLog(shaderProgram, infoLogLength, nullptr, buffer.get());
 
-		linkStatusStream << buffer;
+		linkStatusStream << buffer.get();
 	}
 
 	GLenum glerror;
