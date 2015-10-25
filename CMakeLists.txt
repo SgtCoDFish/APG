@@ -23,18 +23,46 @@ find_package(GLEW REQUIRED)
 find_package(GLM REQUIRED)
 
 find_package(TmxParser REQUIRED)
+find_package(TinyXML2 REQUIRED)
+find_package(ZLIB REQUIRED)
 
 file(GLOB_RECURSE APG_SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 file(GLOB_RECURSE APG_HEADERS ${PROJECT_SOURCE_DIR}/include/*.hpp)
 file(GLOB_RECURSE APG_TEST_ASSETS ${PROJECT_SOURCE_DIR}/assets/*)
 
 if( DEFINED WIN32 )
-	set (OS_FLAGS "-mwindows")
-	set (OS_LIBS Version Imm32 winmm vorbisfile ogg vorbis mingw32)
+	if( MSVC )
+		set (OS_FLAGS "")
+		set (COMPILER_FLAGS "/GR /EHsc")
+		set (OS_LIBS "")
+		
+			# VS 2015 has a linker issue, this should fix it
+		if( MSVC_VERSION GREATER 1800)
+			message ("Using legacy STDIO fix for MSVC 15.")
+			set(OS_LIBS ${OS_LIBS} legacy_stdio_definitions)
+			set(EXTRA_SOURCES ${PROJECT_SOURCE_DIR}/MSVC/vs2015_io_fix.cpp)
+		endif()
+	else ()
+		# MinGW
+		set (OS_FLAGS "-mwindows")
+		set (OS_LIBS Version Imm32 winmm vorbisfile ogg vorbis mingw32)
+	endif ()
 else ()
 	set (OS_FLAGS "-fPIC")
 	set (OS_LIBS "")
 endif ()
+
+if ( NOT MSVC )
+	set(CMAKE_CXX_COMPILER_ARG1 "-std=c++1y")
+	set(COMPILER_FLAGS "-Wall -Wextra -Wno-unused-parameter ${OS_FLAGS}")
+	set(APG_DEBUG_FLAGS "-g3 -O0")
+	set(APG_RELEASE_FLAGS "-g0 -O3")
+else () 
+	set(APG_DEBUG_FLAGS "/Od /Gs")
+	set(APG_RELEASE_FLAGS "/Ox")
+endif ()
+
+set(APG_SOURCES ${APG_SOURCES} ${EXTRA_SOURCES})
 
 option(EXCLUDE_GL_TEST "Should we exclude compiling the OpenGL TMX rendering test?" OFF)
 option(EXCLUDE_SDL_TEST "Should we exclude compiling the SDL TMX rendering test?" OFF)
@@ -44,13 +72,19 @@ option(EXCLUDE_RELEASE "Should we ignore building the release library? Saves tim
 
 add_definitions(-DGLM_FORCE_RADIANS)
 
-set(CMAKE_CXX_COMPILER_ARG1 "-std=c++1y")
-set(CMAKE_CXX_FLAGS_BASE "-Wall -Wextra -Wno-unused-parameter ${OS_FLAGS}")
+set(CMAKE_CXX_FLAGS_BASE ${COMPILER_FLAGS})
 
-set(APG_DEBUG_FLAGS "-g3 -O0")
-set(APG_RELEASE_FLAGS "-g0 -O3")
-
-include_directories("include" ${SDL2_INCLUDE_DIR} ${SDL2_TTF_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR} ${SDL2_MIXER_INCLUDE_DIR} ${SDL2_NET_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} ${TMXPARSER_INCLUDE_DIR} ${GLM_INCLUDE_DIRS})
+include_directories("include" ${SDL2_INCLUDE_DIR}
+							${SDL2_TTF_INCLUDE_DIR}
+							${SDL2_IMAGE_INCLUDE_DIR}
+							${SDL2_MIXER_INCLUDE_DIR}
+							${SDL2_NET_INCLUDE_DIR}
+							${OPENGL_INCLUDE_DIR}
+							${GLEW_INCLUDE_DIRS}
+							${TMXPARSER_INCLUDE_DIR}
+							${TINYXML2_INCLUDE_DIR}
+							${ZLIB_INCLUDE_DIRS}
+							${GLM_INCLUDE_DIRS})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS}")
 add_library(APG-d ${APG_SOURCES})
@@ -69,7 +103,7 @@ endif ( NOT EXISTS ${PROJECT_SOURCE_DIR}/assets/test_music.ogg )
 if ( (NOT EXCLUDE_SDL_TEST) OR (NOT EXCLUDE_GL_TEST) OR (NOT EXCLUDE_AUDIO_TEST) ) 
 	file(MAKE_DIRECTORY assets)
 	file(COPY ${APG_TEST_ASSETS} DESTINATION assets)
-	set(EXAMPLE_LIBS ${SDL2_LIBRARY} ${SDL2_TTF_LIBRARIES} ${SDL2_IMAGE_LIBRARY} ${SDL2_MIXER_LIBRARY} ${SDL2_NET_LIBRARY} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${TMXPARSER_LIBRARY} ${OS_LIBS})	
+	set(EXAMPLE_LIBS ${SDL2_LIBRARY} ${SDL2_TTF_LIBRARIES} ${SDL2_IMAGE_LIBRARY} ${SDL2_MIXER_LIBRARY} ${SDL2_NET_LIBRARY} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${TMXPARSER_LIBRARY} ${TINYXML2_LIBRARIES} ${ZLIB_LIBRARIES} ${OS_LIBS})	
 endif ( )
 
 if ( NOT EXCLUDE_SDL_TEST)
@@ -77,7 +111,7 @@ if ( NOT EXCLUDE_SDL_TEST)
 	set (SDLRENDERTEST_SOURCES test/APGSDLRenderTest.cpp)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS} ${SDLRENDERTEST_FLAGS}")
 	
-	add_executable(SDLRenderTest ${SDLRENDERTEST_SOURCES})
+	add_executable(SDLRenderTest ${SDLRENDERTEST_SOURCES} ${EXTRA_SOURCES})
 	target_link_libraries(SDLRenderTest APG-d ${EXAMPLE_LIBS})
 endif ( NOT EXCLUDE_SDL_TEST )
 
@@ -86,7 +120,7 @@ if ( NOT EXCLUDE_GL_TEST )
 	set (GLRENDERTEST_SOURCES test/APGGLRenderTest.cpp)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS} ${GLRENDERTEST_FLAGS}")
 	
-	add_executable(GLRenderTest ${GLRENDERTEST_SOURCES})
+	add_executable(GLRenderTest ${GLRENDERTEST_SOURCES} ${EXTRA_SOURCES})
 	target_link_libraries(GLRenderTest APG-d ${EXAMPLE_LIBS})
 endif ( NOT EXCLUDE_GL_TEST )
 
@@ -95,7 +129,7 @@ if ( NOT EXCLUDE_AUDIO_TEST )
     set (AUDIOTEST_SOURCES test/APGAudioTest.cpp)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS} ${AUDIOTEST_FLAGS}")
 
-    add_executable(AudioTest ${AUDIOTEST_SOURCES})
+    add_executable(AudioTest ${AUDIOTEST_SOURCES} ${EXTRA_SOURCES})
     target_link_libraries(AudioTest APG-d ${EXAMPLE_LIBS})
 endif ( NOT EXCLUDE_AUDIO_TEST )
 
