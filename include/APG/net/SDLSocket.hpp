@@ -67,6 +67,7 @@ public:
 	virtual ~SDLAcceptorSocket();
 
 	virtual std::unique_ptr<Socket> acceptSocket(float maxWaitInSeconds = -1.0f) override final;
+	virtual std::unique_ptr<Socket> acceptSocketOnce() override final;
 
 	const TCPsocket &getSDLAcceptor() const {
 		return internalAcceptor;

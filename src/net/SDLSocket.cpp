@@ -75,7 +75,7 @@ int SDLSocket::send() {
 
 	auto sent = SDLNet_TCP_Send(internalSocket, buffer.data(), buffer.size());
 
-	if(sent < (int32_t)buffer.size()) {
+	if (sent < (int32_t) buffer.size()) {
 		el::Loggers::getLogger("APG")->error("Send error: %v", SDLNet_GetError());
 		setError();
 	}
@@ -87,7 +87,7 @@ int SDLSocket::recv(uint32_t length) {
 	auto tempSendBuffer = std::make_unique<uint8_t[]>(length);
 	auto received = SDLNet_TCP_Recv(internalSocket, tempSendBuffer.get(), length);
 
-	if(received <= 0) {
+	if (received <= 0) {
 		el::Loggers::getLogger("APG")->error("Couldn't read data: %v", SDLNet_GetError());
 		setError();
 	}
@@ -135,7 +135,7 @@ std::unique_ptr<Socket> SDLAcceptorSocket::acceptSocket(float maxWaitInSeconds) 
 
 			waitTime += deltaTime;
 
-			if(waitTime > maxWaitInSeconds) {
+			if (waitTime > maxWaitInSeconds) {
 				return std::unique_ptr<SDLSocket>();
 			}
 		}
@@ -145,6 +145,12 @@ std::unique_ptr<Socket> SDLAcceptorSocket::acceptSocket(float maxWaitInSeconds) 
 	}
 
 	return std::make_unique<SDLSocket>(std::move(SDLSocket::fromRawSDLSocket(socket)));
+}
+
+std::unique_ptr<Socket> SDLAcceptorSocket::acceptSocketOnce() {
+	TCPsocket socket = SDLNet_TCP_Accept(internalAcceptor);
+
+	return socket == nullptr ? nullptr : std::make_unique<SDLSocket>(std::move(SDLSocket::fromRawSDLSocket(socket)));
 }
 
 }

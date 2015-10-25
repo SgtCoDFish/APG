@@ -80,7 +80,23 @@ public:
 
 	const uint16_t port;
 
+	/**
+	 * Accept a socket from this acceptor.
+	 *
+	 * If maxWaitInSeconds is less than or equal to 0, this method will block until a socket is accepted (or some error occurs).
+	 * Otherwise, will wait for the specified amount of time.
+	 *
+	 * If no socket is found, for whatever reason, returns nullptr.
+	 * @param maxWaitInSeconds the maximum time to wait for a new socket.
+	 * @return the accepted socket, or nullptr if no socket was accepted.
+	 */
 	virtual std::unique_ptr<Socket> acceptSocket(float maxWaitInSeconds = -1.0f) = 0;
+
+	/**
+	 * Accepts a socket if there is one ready to be accepted, only trying once.
+	 * @return the socket that was waiting if one exists, or nullptr otherwise.
+	 */
+	virtual std::unique_ptr<Socket> acceptSocketOnce() = 0;
 
 	bool hasError() const {
 		return error_;
