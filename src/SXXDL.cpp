@@ -30,7 +30,6 @@
 #include <SDL2/SDL_mixer.h>
 
 #include "APG/SXXDL.hpp"
-#include "APG/core/APGeasylogging.hpp"
 
 SXXDL::window_ptr SXXDL::make_window_ptr(SDL_Window *window) {
 	return window_ptr(window, SDL_DestroyWindow);
@@ -61,8 +60,5 @@ SXXDL::mixer::sound_ptr SXXDL::mixer::make_sound_ptr(Mix_Chunk *chunk) {
 }
 
 SXXDL::mixer::music_ptr SXXDL::mixer::make_music_ptr(Mix_Music *music) {
-//	el::Loggers::getLogger("APG")->info("Creating music_ptr!");
-//	return music_ptr(music,
-//	        [](Mix_Music *music) {el::Loggers::getLogger("APG")->info("Freeing music_ptr!"); Mix_FreeMusic(music);});
 	return music_ptr(music, Mix_FreeMusic);
 }
