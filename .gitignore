@@ -27,6 +27,9 @@ Debug-SDL/*
 *.md.html
 *.swp
 
+dlls/*
+dlls
+
 build
 build/
 
