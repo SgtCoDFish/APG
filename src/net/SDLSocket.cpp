@@ -136,7 +136,7 @@ std::unique_ptr<Socket> SDLAcceptorSocket::acceptSocket(float maxWaitInSeconds) 
 			waitTime += deltaTime;
 
 			if (waitTime > maxWaitInSeconds) {
-				return std::unique_ptr<SDLSocket>();
+				return nullptr;
 			}
 		}
 	} else {
