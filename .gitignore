@@ -42,6 +42,9 @@ build-clang/
 build-msvc
 build-msvc/
 
+build-msvcdebug
+build-msvcdebug/
+
 /Debug-sanitize/
 /Debug-GL/
 

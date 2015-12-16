@@ -12,6 +12,14 @@ message("Conifguring APG version ${VERSION}.")
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+if ( CMAKE_BUILD_TYPE MATCHES Release)
+	message("Building release library.")
+	set (APG_DEBUG FALSE)
+else ()
+	message("Building debug library.")
+	set (APG_DEBUG TRUE)
+endif ()
+
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_mixer REQUIRED)
@@ -25,6 +33,8 @@ find_package(GLM REQUIRED)
 find_package(TmxParser REQUIRED)
 find_package(TinyXML2 REQUIRED)
 find_package(ZLIB REQUIRED)
+
+find_package(rapidjson REQUIRED)
 
 file(GLOB_RECURSE APG_SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 file(GLOB_RECURSE APG_HEADERS ${PROJECT_SOURCE_DIR}/include/*.hpp)
@@ -68,8 +78,6 @@ option(EXCLUDE_GL_TEST "Should we exclude compiling the OpenGL TMX rendering tes
 option(EXCLUDE_SDL_TEST "Should we exclude compiling the SDL TMX rendering test?" OFF)
 option(EXCLUDE_AUDIO_TEST "Should we exclude compiling the audio test? Requires an additional file, test_music.ogg, to be added to the assets folder (and then re-running cmake)!" ON)
 
-option(EXCLUDE_RELEASE "Should we ignore building the release library? Saves time when only working with debug builds." OFF)
-
 add_definitions(-DGLM_FORCE_RADIANS)
 
 set(CMAKE_CXX_FLAGS_BASE ${COMPILER_FLAGS})
@@ -86,13 +94,16 @@ include_directories("include" ${SDL2_INCLUDE_DIR}
 							${ZLIB_INCLUDE_DIRS}
 							${GLM_INCLUDE_DIRS})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS}")
-add_library(APG-d ${APG_SOURCES})
+set(APG_LIB_NAME ${CMAKE_PROJECT_NAME})
 
-if ( NOT EXCLUDE_RELEASE ) 
+if ( APG_DEBUG ) 
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS}")
+	set(APG_LIB_NAME "${APG_LIB_NAME}-d")
+else ()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_RELEASE_FLAGS}")
-	add_library(APG ${APG_SOURCES})
 endif ()
+
+add_library(${APG_LIB_NAME} ${APG_SOURCES})
 
 if ( NOT EXISTS ${PROJECT_SOURCE_DIR}/assets/test_music.ogg )
     if ( NOT EXCLUDE_AUDIO_TEST )
@@ -119,34 +130,29 @@ endif ( )
 if ( NOT EXCLUDE_SDL_TEST)
 	set (SDLRENDERTEST_FLAGS "")
 	set (SDLRENDERTEST_SOURCES test/APGSDLRenderTest.cpp)
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS} ${SDLRENDERTEST_FLAGS}")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SDLRENDERTEST_FLAGS}")
 	
 	add_executable(SDLRenderTest ${SDLRENDERTEST_SOURCES} ${EXTRA_SOURCES})
-	target_link_libraries(SDLRenderTest APG-d ${EXAMPLE_LIBS})
+	target_link_libraries(SDLRenderTest ${APG_LIB_NAME} ${EXAMPLE_LIBS})
 endif ( NOT EXCLUDE_SDL_TEST )
 
 if ( NOT EXCLUDE_GL_TEST )
 	set (GLRENDERTEST_FLAGS "")
 	set (GLRENDERTEST_SOURCES test/APGGLRenderTest.cpp)
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS} ${GLRENDERTEST_FLAGS}")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GLRENDERTEST_FLAGS}")
 	
 	add_executable(GLRenderTest ${GLRENDERTEST_SOURCES} ${EXTRA_SOURCES})
-	target_link_libraries(GLRenderTest APG-d ${EXAMPLE_LIBS})
+	target_link_libraries(GLRenderTest ${APG_LIB_NAME} ${EXAMPLE_LIBS})
 endif ( NOT EXCLUDE_GL_TEST )
 
 if ( NOT EXCLUDE_AUDIO_TEST )
     set (AUDIOTEST_FLAGS "")
     set (AUDIOTEST_SOURCES test/APGAudioTest.cpp)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS} ${AUDIOTEST_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${AUDIOTEST_FLAGS}")
 
     add_executable(AudioTest ${AUDIOTEST_SOURCES} ${EXTRA_SOURCES})
-    target_link_libraries(AudioTest APG-d ${EXAMPLE_LIBS})
+    target_link_libraries(AudioTest ${APG_LIB_NAME} ${EXAMPLE_LIBS})
 endif ( NOT EXCLUDE_AUDIO_TEST )
 
-install (TARGETS APG-d DESTINATION lib)
-
-if ( NOT EXCLUDE_RELEASE ) 
-	install (TARGETS APG DESTINATION lib)
-endif () 
-
+install (TARGETS ${APG_LIB_NAME} DESTINATION lib)
 install (DIRECTORY ${PROJECT_SOURCE_DIR}/include/APG DESTINATION include)

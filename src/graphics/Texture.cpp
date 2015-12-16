@@ -41,6 +41,7 @@
 #include <SDL2/SDL_image.h>
 
 #include "APG/SXXDL.hpp"
+#include "APG/core/APGeasylogging.hpp"
 #include "APG/graphics/Texture.hpp"
 #include "APG/graphics/ShaderProgram.hpp"
 #include "APG/internal/Assert.hpp"

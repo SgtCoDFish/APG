@@ -45,6 +45,7 @@
 #include "APG/graphics/VertexAttribute.hpp"
 #include "APG/graphics/VertexAttributeList.hpp"
 #include "APG/internal/Assert.hpp"
+#include "APG/core/APGeasylogging.hpp"
 
 APG::ShaderProgram::ShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource) {
 	loadShader(vertexShaderSource, GL_VERTEX_SHADER);
