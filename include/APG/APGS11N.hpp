@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 See AUTHORS file.
+ * Copyright (c) 2014, 2015 See AUTHORS file.
  * All rights reserved.
 
  * Redistribution and use in source and binary forms, with or without
@@ -25,33 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_APG_APG_HPP_
-#define INCLUDE_APG_APG_HPP_
+#ifndef INCLUDE_APG_APGS11N_HPP_
+#define INCLUDE_APG_APGS11N_HPP_
 
-// Include all APG files here.
+// include all APG S11N files
 
-// Audio
-#include "APG/APGAudio.hpp"
+#include "s11n/JSON.hpp"
 
-// core
-#include "APG/APGCore.hpp"
-
-// font
-#include "APG/APGFont.hpp"
-
-// graphics
-#include "APG/APGGraphics.hpp"
-
-// input
-#include "APG/APGInput.hpp"
-
-// net
-#include "APG/APGNet.hpp"
-
-// s11n
-#include "APG/APGS11N.hpp"
-
-// tiled
-#include "APG/APGTiled.hpp"
-
-#endif /* INCLUDE_APG_APG_HPP_ */
+#endif
