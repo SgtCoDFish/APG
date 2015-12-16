@@ -63,8 +63,16 @@ public:
 		return error_;
 	}
 
+	/**
+	 * Also clears the buffer and clears error state.
+	 */
+	void reconnect();
+
 protected:
+	virtual void connect() = 0;
+
 	void setError();
+	void clearError();
 
 private:
 	bool error_;

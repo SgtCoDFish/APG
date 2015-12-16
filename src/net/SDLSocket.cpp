@@ -37,20 +37,7 @@ namespace APG {
 
 SDLSocket::SDLSocket(const char *remoteHost_, uint16_t port_) :
 		        Socket(remoteHost_, port_) {
-	if (SDLNet_ResolveHost(&internalIP, remoteHost, port) != 0) {
-		el::Loggers::getLogger("APG")->error("Couldn't resolve host for socket for hostname \"%v\" on port %v.",
-		        remoteHost, port);
-		el::Loggers::getLogger("APG")->error("SDLNet Error: %v", SDLNet_GetError());
-		setError();
-	}
-
-	internalSocket = SDLNet_TCP_Open(&internalIP);
-
-	if (internalSocket == nullptr) {
-		el::Loggers::getLogger("APG")->error("Couldn't open socket for hostname \"%v\" on port %v.", remoteHost, port);
-		el::Loggers::getLogger("APG")->error("SDLNet Error: %v", SDLNet_GetError());
-		setError();
-	}
+	connect();
 }
 
 SDLSocket::SDLSocket(TCPsocket socket_, IPaddress *ip_, const char *remoteHost_, uint16_t port_) :
@@ -95,6 +82,23 @@ int SDLSocket::recv(uint32_t length) {
 	putBytes(tempSendBuffer.get(), received);
 
 	return received;
+}
+
+void SDLSocket::connect() {
+	if (SDLNet_ResolveHost(&internalIP, remoteHost, port) != 0) {
+		el::Loggers::getLogger("APG")->error("Couldn't resolve host for socket for hostname \"%v\" on port %v.",
+		        remoteHost, port);
+		el::Loggers::getLogger("APG")->error("SDLNet Error: %v", SDLNet_GetError());
+		setError();
+	}
+
+	internalSocket = SDLNet_TCP_Open(&internalIP);
+
+	if (internalSocket == nullptr) {
+		el::Loggers::getLogger("APG")->error("Couldn't open socket for hostname \"%v\" on port %v.", remoteHost, port);
+		el::Loggers::getLogger("APG")->error("SDLNet Error: %v", SDLNet_GetError());
+		setError();
+	}
 }
 
 SDLAcceptorSocket::SDLAcceptorSocket(uint16_t port_) :

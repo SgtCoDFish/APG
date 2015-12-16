@@ -54,6 +54,9 @@ public:
 		return internalSocket;
 	}
 
+protected:
+	virtual void connect() override final;
+
 private:
 	explicit SDLSocket(TCPsocket socket_, IPaddress *ip_, const char *remoteHost_, uint16_t port_);
 

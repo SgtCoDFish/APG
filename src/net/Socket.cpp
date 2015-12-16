@@ -38,6 +38,13 @@ Socket::Socket(const char * remoteHost_, uint16_t port_, uint32_t bufferSize_) :
 
 }
 
+void Socket::reconnect() {
+	clear();
+	error_ = false;
+
+	connect();
+}
+
 void Socket::setError() {
 	error_ = true;
 }
