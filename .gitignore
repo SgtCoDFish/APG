@@ -10,6 +10,8 @@ bin
 logs/*
 logs
 
+debug
+release
 Debug
 Release
 Debug-GL
