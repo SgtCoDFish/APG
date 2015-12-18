@@ -35,9 +35,11 @@
 
 namespace APG {
 
-SDLSocket::SDLSocket(const char *remoteHost_, uint16_t port_) :
+SDLSocket::SDLSocket(const char *remoteHost_, uint16_t port_, bool autoConnect) :
 		        Socket(remoteHost_, port_) {
-	connect();
+	if (autoConnect) {
+		connect();
+	}
 }
 
 SDLSocket::SDLSocket(TCPsocket socket_, IPaddress *ip_, const char *remoteHost_, uint16_t port_) :
@@ -58,7 +60,7 @@ SDLSocket::~SDLSocket() {
 }
 
 int SDLSocket::send() {
-	auto &buffer = getBuffer();
+	auto &buffer = this->getBuffer();
 
 	auto sent = SDLNet_TCP_Send(internalSocket, buffer.data(), buffer.size());
 
@@ -101,8 +103,18 @@ void SDLSocket::connect() {
 	}
 }
 
-SDLAcceptorSocket::SDLAcceptorSocket(uint16_t port_) :
+SDLAcceptorSocket::SDLAcceptorSocket(uint16_t port_, bool autoListen) :
 		        AcceptorSocket(port_) {
+	if (autoListen) {
+		listen();
+	}
+}
+
+SDLAcceptorSocket::~SDLAcceptorSocket() {
+	SDLNet_TCP_Close(internalAcceptor);
+}
+
+void SDLAcceptorSocket::listen() {
 	if (SDLNet_ResolveHost(&internalIP, nullptr, port) != 0) {
 		el::Loggers::getLogger("APG")->error("Couldn't resolve host for acceptor on port %v.", port);
 		el::Loggers::getLogger("APG")->error("SDLNet Error: %v", SDLNet_GetError());
@@ -116,10 +128,6 @@ SDLAcceptorSocket::SDLAcceptorSocket(uint16_t port_) :
 		el::Loggers::getLogger("APG")->error("SDLNet Error: %v", SDLNet_GetError());
 		setError();
 	}
-}
-
-SDLAcceptorSocket::~SDLAcceptorSocket() {
-	SDLNet_TCP_Close(internalAcceptor);
 }
 
 std::unique_ptr<Socket> SDLAcceptorSocket::acceptSocket(float maxWaitInSeconds) {

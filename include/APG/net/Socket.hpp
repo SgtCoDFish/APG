@@ -36,12 +36,33 @@
 #include "ByteBuffer.hpp"
 
 namespace APG {
+
 /**
- * Simple base class for a socket.
- *
- * You'll probably want a derived class of this.
+ * This is a class for implementing shared functionality between Socket and AcceptorSocket;
+ * you probably want one of those.
  */
-class Socket : public ByteBuffer {
+class SocketCommon : public ByteBuffer {
+public:
+	explicit SocketCommon(uint32_t bufferSize = BB_DEFAULT_SIZE);
+	virtual ~SocketCommon() = default;
+
+	void reconnect();
+
+	bool hasError() const {
+		return error_;
+	}
+
+protected:
+	virtual void connect() = 0;
+
+	void setError();
+	void clearError();
+
+private:
+	bool error_ = false;
+};
+
+class Socket : public SocketCommon {
 public:
 	explicit Socket(const char * remoteHost, uint16_t port, uint32_t bufferSize = BB_DEFAULT_SIZE);
 	virtual ~Socket() = default;
@@ -81,7 +102,7 @@ private:
 /**
  * Also known as a server socket, accepting incoming connections and generating sockets for them.
  */
-class AcceptorSocket : public ByteBuffer {
+class AcceptorSocket : public SocketCommon {
 public:
 	explicit AcceptorSocket(uint16_t port, uint32_t bufferSize = BB_DEFAULT_SIZE);
 	virtual ~AcceptorSocket() = default;
@@ -111,6 +132,12 @@ public:
 	}
 
 protected:
+	/**
+	 * Just calls listen.
+	 */
+	virtual void connect() override final;
+
+	virtual void listen() = 0;
 	void setError();
 
 private:

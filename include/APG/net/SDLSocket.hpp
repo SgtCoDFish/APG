@@ -44,7 +44,7 @@ class SDLSocket : public Socket {
 public:
 	static SDLSocket fromRawSDLSocket(TCPsocket socket);
 
-	explicit SDLSocket(const char * hostName, uint16_t port);
+	explicit SDLSocket(const char * hostName, uint16_t port, bool autoConnect = false);
 	virtual ~SDLSocket();
 
 	virtual int send() override final;
@@ -66,7 +66,7 @@ private:
 
 class SDLAcceptorSocket final : public AcceptorSocket {
 public:
-	explicit SDLAcceptorSocket(uint16_t port);
+	explicit SDLAcceptorSocket(uint16_t port, bool autoListen = false);
 	virtual ~SDLAcceptorSocket();
 
 	virtual std::unique_ptr<Socket> acceptSocket(float maxWaitInSeconds = -1.0f) override final;
@@ -75,6 +75,9 @@ public:
 	const TCPsocket &getSDLAcceptor() const {
 		return internalAcceptor;
 	}
+
+protected:
+	virtual void listen() override final;
 
 private:
 	TCPsocket internalAcceptor;

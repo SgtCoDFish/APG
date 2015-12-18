@@ -30,34 +30,41 @@
 
 namespace APG {
 
-Socket::Socket(const char * remoteHost_, uint16_t port_, uint32_t bufferSize_) :
-		        ByteBuffer(bufferSize_),
-		        port { port_ },
-		        remoteHost { remoteHost_ },
-		        error_ { false } {
+SocketCommon::SocketCommon(uint32_t bufferSize) :
+		        ByteBuffer(bufferSize) {
 
 }
 
-void Socket::reconnect() {
+void SocketCommon::reconnect() {
 	clear();
-	error_ = false;
+	clearError();
 
 	connect();
 }
 
-void Socket::setError() {
+void SocketCommon::setError() {
 	error_ = true;
+}
+
+void SocketCommon::clearError() {
+	error_ = false;
+}
+
+Socket::Socket(const char * remoteHost_, uint16_t port_, uint32_t bufferSize_) :
+		        SocketCommon(bufferSize_),
+		        port { port_ },
+		        remoteHost { remoteHost_ },
+		        error_ { false } {
 }
 
 AcceptorSocket::AcceptorSocket(uint16_t port_, uint32_t bufferSize_) :
-		        ByteBuffer(bufferSize_),
+		        SocketCommon(bufferSize_),
 		        port { port_ },
 		        error_ { false } {
-
 }
 
-void AcceptorSocket::setError() {
-	error_ = true;
+void AcceptorSocket::connect() {
+	listen();
 }
 
 }
