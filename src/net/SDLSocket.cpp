@@ -267,8 +267,6 @@ std::unique_ptr<Socket> SDLAcceptorSocket::acceptSocket(float maxWaitInSeconds) 
 		return nullptr;
 	}
 
-	el::Loggers::getLogger("APG")->info("Finished accept: %v.", SDLNet_GetError());
-
 	return SDLSocket::fromRawSDLSockets(readSocket, sendSocket);
 }
 
