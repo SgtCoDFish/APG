@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #ifndef INCLUDE_APG_NET_SDLSOCKET_HPP_
 #define INCLUDE_APG_NET_SDLSOCKET_HPP_
 
@@ -42,25 +41,37 @@ namespace APG {
 
 class SDLSocket : public Socket {
 public:
-	static SDLSocket fromRawSDLSocket(TCPsocket socket);
+	static std::unique_ptr<SDLSocket> fromRawSDLSockets(TCPsocket readSocket, TCPsocket sendSocket);
 
 	explicit SDLSocket(const char * hostName, uint16_t port, bool autoConnect = false);
+	/**
+	 * Not recommended for general use
+	 */
+	explicit SDLSocket(TCPsocket readSocket_, IPaddress *ip_, const char *remoteHost_, uint16_t port_,
+		        TCPsocket sendSocket_);
 	virtual ~SDLSocket();
 
 	virtual int send() override final;
 	virtual int recv(uint32_t length = 1024u) override final;
 
-	const TCPsocket &getSDLSocket() const {
-		return internalSocket;
+	const TCPsocket &getSDLReadSocket() const {
+		return internalReadSocket;
 	}
 
-protected:
+	const TCPsocket &getSDLSendSocket() const {
+		return internalSendSocket;
+	}
+
 	virtual void connect() override final;
+	virtual void disconnect() override final;
 
 private:
-	explicit SDLSocket(TCPsocket socket_, IPaddress *ip_, const char *remoteHost_, uint16_t port_);
+	TCPsocket internalReadSocket;
+	TCPsocket internalSendSocket;
 
-	TCPsocket internalSocket;
+	bool readConnected = false;
+	bool sendConnected = false;
+
 	IPaddress internalIP;
 };
 
@@ -76,12 +87,20 @@ public:
 		return internalAcceptor;
 	}
 
+	/**
+	 * Only disconnects the acceptor socket so no new connections can be established.
+	 * Sockets created by acceptSocket* are not affected.
+	 */
+	virtual void disconnect() override final;
+
 protected:
 	virtual void listen() override final;
 
 private:
 	TCPsocket internalAcceptor;
 	IPaddress internalIP;
+
+	bool acceptorConnected = false;
 
 	float waitTime = 0.0f;
 };

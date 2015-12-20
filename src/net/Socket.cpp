@@ -39,6 +39,7 @@ void SocketCommon::reconnect() {
 	clear();
 	clearError();
 
+	disconnect();
 	connect();
 }
 
@@ -53,14 +54,12 @@ void SocketCommon::clearError() {
 Socket::Socket(const char * remoteHost_, uint16_t port_, uint32_t bufferSize_) :
 		        SocketCommon(bufferSize_),
 		        port { port_ },
-		        remoteHost { remoteHost_ },
-		        error_ { false } {
+		        remoteHost { remoteHost_ } {
 }
 
 AcceptorSocket::AcceptorSocket(uint16_t port_, uint32_t bufferSize_) :
 		        SocketCommon(bufferSize_),
-		        port { port_ },
-		        error_ { false } {
+		        port { port_ } {
 }
 
 void AcceptorSocket::connect() {

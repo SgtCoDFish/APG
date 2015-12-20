@@ -37,6 +37,8 @@
 
 namespace APG {
 
+// TODO: Handle connections better ("connected" variable"?)
+
 /**
  * This is a class for implementing shared functionality between Socket and AcceptorSocket;
  * you probably want one of those.
@@ -46,17 +48,17 @@ public:
 	explicit SocketCommon(uint32_t bufferSize = BB_DEFAULT_SIZE);
 	virtual ~SocketCommon() = default;
 
+	virtual void connect() = 0;
+	virtual void disconnect() = 0;
+
 	void reconnect();
+
+	void setError();
+	void clearError();
 
 	bool hasError() const {
 		return error_;
 	}
-
-protected:
-	virtual void connect() = 0;
-
-	void setError();
-	void clearError();
 
 private:
 	bool error_ = false;
@@ -80,23 +82,8 @@ public:
 	 */
 	virtual int recv(uint32_t length = 1024u) = 0;
 
-	bool hasError() const {
-		return error_;
-	}
-
-	/**
-	 * Also clears the buffer and clears error state.
-	 */
-	void reconnect();
-
-protected:
 	virtual void connect() = 0;
-
-	void setError();
-	void clearError();
-
-private:
-	bool error_;
+	virtual void disconnect() = 0;
 };
 
 /**
@@ -127,21 +114,13 @@ public:
 	 */
 	virtual std::unique_ptr<Socket> acceptSocketOnce() = 0;
 
-	bool hasError() const {
-		return error_;
-	}
-
-protected:
 	/**
 	 * Just calls listen.
 	 */
 	virtual void connect() override final;
+protected:
 
 	virtual void listen() = 0;
-	void setError();
-
-private:
-	bool error_;
 };
 
 }
