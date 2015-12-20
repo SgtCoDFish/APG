@@ -42,22 +42,20 @@ SDLSocket::SDLSocket(const char *remoteHost_, uint16_t port_, bool autoConnect) 
 	}
 }
 
-SDLSocket::SDLSocket(TCPsocket readSocket_, IPaddress *ip_, const char *remoteHost_, uint16_t port_,
-        TCPsocket sendSocket_) :
+SDLSocket::SDLSocket(TCPsocket socket_, IPaddress *ip_, const char *remoteHost_, uint16_t port_) :
 		        Socket(remoteHost_, port_),
-		        readConnected { true },
-		        sendConnected { true } {
-	internalReadSocket = readSocket_;
-	internalSendSocket = sendSocket_;
+		        connected { true } {
+	internalSocket = socket_;
 
 	internalIP = *ip_;
 }
 
-std::unique_ptr<SDLSocket> SDLSocket::fromRawSDLSockets(TCPsocket readSocket, TCPsocket sendSocket) {
-	auto addr = SDLNet_TCP_GetPeerAddress(readSocket);
+std::unique_ptr<SDLSocket> SDLSocket::fromRawSDLSocket(TCPsocket socket) {
+	// TODO: Make this thread safe
+	auto addr = SDLNet_TCP_GetPeerAddress(socket);
 	const char * hostname = SDLNet_ResolveIP(addr);
 
-	return std::make_unique<SDLSocket>(readSocket, addr, hostname, addr->port, sendSocket);
+	return std::make_unique<SDLSocket>(socket, addr, hostname, addr->port);
 }
 
 SDLSocket::~SDLSocket() {
@@ -65,12 +63,8 @@ SDLSocket::~SDLSocket() {
 }
 
 void SDLSocket::disconnect() {
-	if (readConnected) {
-		SDLNet_TCP_Close(internalReadSocket);
-	}
-
-	if (sendConnected) {
-		SDLNet_TCP_Close(internalSendSocket);
+	if (connected) {
+		SDLNet_TCP_Close(internalSocket);
 	}
 }
 
@@ -82,7 +76,7 @@ int SDLSocket::send() {
 
 	auto &buffer = this->getBuffer();
 
-	auto sent = SDLNet_TCP_Send(internalSendSocket, buffer.data(), buffer.size());
+	auto sent = SDLNet_TCP_Send(internalSocket, buffer.data(), buffer.size());
 
 	if (sent < (int32_t) buffer.size()) {
 		el::Loggers::getLogger("APG")->error("Send error: %v", SDLNet_GetError());
@@ -99,7 +93,7 @@ int SDLSocket::recv(uint32_t length) {
 	}
 
 	auto tempSendBuffer = std::make_unique<uint8_t[]>(length);
-	auto received = SDLNet_TCP_Recv(internalReadSocket, tempSendBuffer.get(), length);
+	auto received = SDLNet_TCP_Recv(internalSocket, tempSendBuffer.get(), length);
 
 	if (received <= 0) {
 		el::Loggers::getLogger("APG")->error("Couldn't read data: %v", SDLNet_GetError());
@@ -122,9 +116,9 @@ void SDLSocket::connect() {
 		return;
 	}
 
-	internalSendSocket = SDLNet_TCP_Open(&internalIP);
+	internalSocket = SDLNet_TCP_Open(&internalIP);
 
-	if (internalSendSocket == nullptr) {
+	if (internalSocket == nullptr) {
 		el::Loggers::getLogger("APG")->error("Couldn't open send socket for hostname \"%v\" on port %v.", remoteHost,
 		        port);
 		el::Loggers::getLogger("APG")->error("SDLNet Error: %v", SDLNet_GetError());
@@ -132,52 +126,7 @@ void SDLSocket::connect() {
 		return;
 	}
 
-	sendConnected = true;
-
-	static const uint16_t port = 10666;
-	IPaddress acceptorIP;
-	// TODO remove hardcoded port
-	if (SDLNet_ResolveHost(&acceptorIP, nullptr, port) != 0) {
-		el::Loggers::getLogger("APG")->error("Couldn't open port %v for creating a read socket.", port);
-		setError();
-		return;
-	}
-
-	TCPsocket acceptorSocket = SDLNet_TCP_Open(&acceptorIP);
-
-	if (acceptorSocket == nullptr) {
-		el::Loggers::getLogger("APG")->error(
-		        "Couldn't open server (acceptor) socket on port %v to establish a readSocket.", port);
-		el::Loggers::getLogger("APG")->error("SDLNet Error: %v", SDLNet_GetError());
-		setError();
-		return;
-	}
-
-	auto startTime = std::chrono::high_resolution_clock::now();
-	while (true) {
-		internalReadSocket = SDLNet_TCP_Accept(acceptorSocket);
-
-		if (internalReadSocket != nullptr) {
-			break;
-		}
-
-		auto timeNow = std::chrono::high_resolution_clock::now();
-		const float deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count()
-		        / 1000.0f;
-
-		if (deltaTime > 5) {
-			el::Loggers::getLogger("APG")->error("Timeout when connecting readSocket.");
-
-			setError();
-			return;
-		}
-	}
-
-	if (acceptorSocket != nullptr) {
-		SDLNet_TCP_Close(acceptorSocket);
-	}
-
-	readConnected = true;
+	connected = true;
 }
 
 SDLAcceptorSocket::SDLAcceptorSocket(uint16_t port_, bool autoListen) :
@@ -220,14 +169,14 @@ void SDLAcceptorSocket::listen() {
 }
 
 std::unique_ptr<Socket> SDLAcceptorSocket::acceptSocket(float maxWaitInSeconds) {
-	TCPsocket readSocket;
+	TCPsocket socket;
 
 	if (maxWaitInSeconds > 0.0f) {
 		waitTime = 0.0f;
 
 		auto startTime = std::chrono::high_resolution_clock::now();
 
-		while ((readSocket = SDLNet_TCP_Accept(internalAcceptor)) == nullptr) {
+		while ((socket = SDLNet_TCP_Accept(internalAcceptor)) == nullptr) {
 			auto timeNow = std::chrono::high_resolution_clock::now();
 			const float deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count()
 			        / 1000.0f;
@@ -241,33 +190,11 @@ std::unique_ptr<Socket> SDLAcceptorSocket::acceptSocket(float maxWaitInSeconds) 
 			}
 		}
 	} else {
-		while ((readSocket = SDLNet_TCP_Accept(internalAcceptor)) == nullptr) {
+		while ((socket = SDLNet_TCP_Accept(internalAcceptor)) == nullptr) {
 		}
 	}
 
-	IPaddress * remoteAddr = SDLNet_TCP_GetPeerAddress(readSocket);
-
-	// TODO: Because of C, this isn't thread safe. Rewrite, possibly taking code from
-	// http://hg.libsdl.org/SDL_net/file/c7fa72f19b14/SDLnet.c#l164
-	const char * hostname = SDLNet_ResolveIP(remoteAddr);
-
-	TCPsocket sendSocket;
-
-	IPaddress remoteHost;
-	if (SDLNet_ResolveHost(&remoteHost, hostname, 10666) != 0) {
-		el::Loggers::getLogger("APG")->error("Couldn't resolve remote host when connecting sendSocket for host %v.",
-		        hostname);
-		return nullptr;
-	}
-
-	sendSocket = SDLNet_TCP_Open(&remoteHost);
-
-	if (sendSocket == nullptr) {
-		el::Loggers::getLogger("APG")->info("Couldn't connect send socket: %v.", SDLNet_GetError());
-		return nullptr;
-	}
-
-	return SDLSocket::fromRawSDLSockets(readSocket, sendSocket);
+	return SDLSocket::fromRawSDLSocket(socket);
 }
 
 std::unique_ptr<Socket> SDLAcceptorSocket::acceptSocketOnce() {
@@ -277,29 +204,7 @@ std::unique_ptr<Socket> SDLAcceptorSocket::acceptSocketOnce() {
 		return nullptr;
 	}
 
-	IPaddress * remoteAddr = SDLNet_TCP_GetPeerAddress(readSocket);
-
-	// TODO: Because of C, this isn't thread safe. Rewrite, possibly taking code from
-	// http://hg.libsdl.org/SDL_net/file/c7fa72f19b14/SDLnet.c#l164
-	const char * hostname = SDLNet_ResolveIP(remoteAddr);
-
-	TCPsocket sendSocket;
-
-	IPaddress remoteHost;
-	if (SDLNet_ResolveHost(&remoteHost, hostname, 10666) != 0) {
-		el::Loggers::getLogger("APG")->error("Couldn't resolve remote host when connecting sendSocket for host %v.",
-		        hostname);
-		return nullptr;
-	}
-
-	sendSocket = SDLNet_TCP_Open(&remoteHost);
-
-	if (sendSocket == nullptr) {
-		el::Loggers::getLogger("APG")->info("Couldn't connect send socket: %v.", SDLNet_GetError());
-		return nullptr;
-	}
-
-	return SDLSocket::fromRawSDLSockets(readSocket, sendSocket);
+	return SDLSocket::fromRawSDLSocket(readSocket);
 }
 
 }

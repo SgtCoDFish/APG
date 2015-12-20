@@ -41,36 +41,29 @@ namespace APG {
 
 class SDLSocket : public Socket {
 public:
-	static std::unique_ptr<SDLSocket> fromRawSDLSockets(TCPsocket readSocket, TCPsocket sendSocket);
+	static std::unique_ptr<SDLSocket> fromRawSDLSocket(TCPsocket socket);
 
 	explicit SDLSocket(const char * hostName, uint16_t port, bool autoConnect = false);
 	/**
 	 * Not recommended for general use
 	 */
-	explicit SDLSocket(TCPsocket readSocket_, IPaddress *ip_, const char *remoteHost_, uint16_t port_,
-		        TCPsocket sendSocket_);
+	explicit SDLSocket(TCPsocket readSocket_, IPaddress *ip_, const char *remoteHost_, uint16_t port_);
 	virtual ~SDLSocket();
 
 	virtual int send() override final;
 	virtual int recv(uint32_t length = 1024u) override final;
 
-	const TCPsocket &getSDLReadSocket() const {
-		return internalReadSocket;
-	}
-
-	const TCPsocket &getSDLSendSocket() const {
-		return internalSendSocket;
+	const TCPsocket &getSDLSocket() const {
+		return internalSocket;
 	}
 
 	virtual void connect() override final;
 	virtual void disconnect() override final;
 
 private:
-	TCPsocket internalReadSocket;
-	TCPsocket internalSendSocket;
+	TCPsocket internalSocket;
 
-	bool readConnected = false;
-	bool sendConnected = false;
+	bool connected = false;
 
 	IPaddress internalIP;
 };
