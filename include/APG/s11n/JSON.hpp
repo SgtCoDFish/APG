@@ -47,17 +47,37 @@
 #include "APG/core/APGeasylogging.hpp"
 
 namespace APG {
+class JSONCommon {
+public:
+	explicit JSONCommon() {
+		writer = std::make_unique<writerType>(buffer);
+	}
+
+	~JSONCommon() = default;
+
+protected:
+#ifdef APG_JSON_PRETTY
+	using writerType = rapidjson::PrettyWriter<rapidjson::StringBuffer>;
+#else
+	using writerType = rapidjson::Writer<rapidjson::StringBuffer>;
+#endif
+
+	rapidjson::StringBuffer buffer;
+
+	std::unique_ptr<rapidjson::Writer<rapidjson::StringBuffer>> writer;
+};
 
 /**
  * Should be specialised for each seraializable type T to override the
  * fromJSON and toJSON methods.
  *
- * APG provides a python autogeneration framework for doing exactly this for each type you want.
+ * APG provides a python auto-generation framework for doing exactly this for each type you want.
  */
-template<typename T> class JSONSerializer {
+template<typename T> class JSONSerializer : public JSONCommon {
 public:
-	explicit JSONSerializer() {
-		writer = std::make_unique<writerType>(buffer);
+	explicit JSONSerializer() :
+			        JSONCommon() {
+
 	}
 
 	~JSONSerializer() = default;
@@ -104,17 +124,7 @@ public:
 		return std::string(buffer.GetString());
 	}
 
-private:
-#ifdef APG_JSON_PRETTY
-	using writerType = rapidjson::PrettyWriter<rapidjson::StringBuffer>;
-#else
-	using writerType = rapidjson::Writer<rapidjson::StringBuffer>;
-#endif
-
-	rapidjson::StringBuffer buffer;
-
-	std::unique_ptr<rapidjson::Writer<rapidjson::StringBuffer>> writer;
-
+protected:
 	constexpr static const bool is_integral = std::is_scalar<T>::value;
 	constexpr static const bool is_floating_point = std::is_floating_point<T>::value;
 };
