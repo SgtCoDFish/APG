@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_SDL
+
 #include <cstdint>
 
 #include <SDL2/SDL.h>
@@ -85,3 +87,5 @@ bool APG::SDLInputManager::isAltPressed() const {
 bool APG::SDLInputManager::isSDLKeyCodePressed(const SDL_Scancode &keysym) const {
 	return keyState[keysym];
 }
+
+#endif

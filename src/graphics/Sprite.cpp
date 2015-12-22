@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include <memory>
@@ -61,3 +63,5 @@ void APG::Sprite::calculateUV() {
 	u2 = texture->getInvWidth() * (texX + width);
 	v2 = texture->getInvHeight() * (texY + height);
 }
+
+#endif

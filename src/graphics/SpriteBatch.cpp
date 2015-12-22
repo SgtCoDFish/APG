@@ -25,6 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_SDL
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include <string>
@@ -297,3 +300,7 @@ std::unique_ptr<APG::ShaderProgram> APG::SpriteBatch::createDefaultShader() {
 
 	return ShaderProgram::fromSource(vertexShader, fragmentShader);
 }
+
+#endif
+#endif
+

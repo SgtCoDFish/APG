@@ -35,6 +35,9 @@ dlls
 build
 build/
 
+build-nosdl/
+build-nosdl
+
 build-debug/
 build-debug
 

@@ -28,6 +28,8 @@
 #ifndef INCLUDE_APG_GRAPHICS_MESH_HPP_
 #define INCLUDE_APG_GRAPHICS_MESH_HPP_
 
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include "APG/graphics/VertexAttribute.hpp"
@@ -48,5 +50,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif /* MESH_HPP_ */

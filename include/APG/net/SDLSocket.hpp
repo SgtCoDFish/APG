@@ -28,11 +28,15 @@
 #ifndef INCLUDE_APG_NET_SDLSOCKET_HPP_
 #define INCLUDE_APG_NET_SDLSOCKET_HPP_
 
+#ifndef APG_NO_SDL
+
 #include <cstdint>
 
 #include <memory>
 
 #include <SDL2/SDL_net.h>
+
+#include "APG/SXXDL.hpp"
 
 #include "Socket.hpp"
 #include "ByteBuffer.hpp"
@@ -53,6 +57,8 @@ public:
 	virtual int send() override final;
 	virtual int recv(uint32_t length = 1024u) override final;
 
+	virtual bool waitForActivity(uint32_t millisecondsToWait = 0u) override final;
+
 	const TCPsocket &getSDLSocket() const {
 		return internalSocket;
 	}
@@ -61,7 +67,10 @@ public:
 	virtual void disconnect() override final;
 
 private:
+	void addToSet();
+
 	TCPsocket internalSocket;
+	SXXDL::net::socket_set_ptr socketSet = SXXDL::net::make_socket_set_ptr(nullptr);
 
 	bool connected = false;
 
@@ -99,5 +108,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif /* INCLUDE_APG_NET_SDLSOCKET_HPP_ */

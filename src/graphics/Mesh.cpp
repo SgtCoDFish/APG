@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include "APG/graphics/Mesh.hpp"
@@ -38,3 +40,5 @@ APG::Mesh::Mesh(bool staticVertices, bool staticIndices, std::initializer_list<A
 		        vertexBuffer(staticVertices, attList),
 		        indexBuffer(staticIndices) {
 }
+
+#endif

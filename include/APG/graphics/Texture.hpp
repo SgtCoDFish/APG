@@ -28,6 +28,9 @@
 #ifndef INCLUDE_APG_GRAPHICS_TEXTURE_HPP_
 #define INCLUDE_APG_GRAPHICS_TEXTURE_HPP_
 
+#ifndef APG_NO_SDL
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include <atomic>
@@ -154,5 +157,8 @@ private:
 using texture_ptr = std::unique_ptr<Texture>;
 
 }
+
+#endif
+#endif
 
 #endif /* TEXTURE_HPP_ */

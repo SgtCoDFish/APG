@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_SDL
+
 #include <cstdint>
 
 #include <vector>
@@ -293,3 +295,5 @@ void APG::TmxRenderer::initialiseStaticTilesets() {
 		tmxTilesets.reserve(internal::MAX_SUPPORTED_TEXTURES);
 	}
 }
+
+#endif

@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_SDL
+
 #include "APG/net/SDLSocket.hpp"
 #include "APG/core/APGeasylogging.hpp"
 
@@ -48,6 +50,8 @@ SDLSocket::SDLSocket(TCPsocket socket_, IPaddress *ip_, const char *remoteHost_,
 	internalSocket = socket_;
 
 	internalIP = *ip_;
+
+	addToSet();
 }
 
 std::unique_ptr<SDLSocket> SDLSocket::fromRawSDLSocket(TCPsocket socket) {
@@ -95,7 +99,7 @@ int SDLSocket::recv(uint32_t length) {
 	auto tempSendBuffer = std::make_unique<uint8_t[]>(length);
 	auto received = SDLNet_TCP_Recv(internalSocket, tempSendBuffer.get(), length);
 
-	if (received <= 0) {
+	if (received < 0) {
 		el::Loggers::getLogger("APG")->error("Couldn't read data: %v", SDLNet_GetError());
 		setError();
 	}
@@ -103,6 +107,16 @@ int SDLSocket::recv(uint32_t length) {
 	putBytes(tempSendBuffer.get(), received);
 
 	return received;
+}
+
+bool SDLSocket::waitForActivity(uint32_t millisecondsToWait) {
+	const int active = SDLNet_CheckSockets(socketSet.get(), millisecondsToWait);
+
+	if(active == -1) {
+		el::Loggers::getLogger("APG")->warn("SDLNet_CheckSockets returned an error code in waitForActivity: %v", SDLNet_GetError());
+	}
+
+	return active == 1;
 }
 
 void SDLSocket::connect() {
@@ -127,6 +141,14 @@ void SDLSocket::connect() {
 	}
 
 	connected = true;
+
+	addToSet();
+}
+
+void SDLSocket::addToSet() {
+	socketSet = SXXDL::net::make_socket_set_ptr(SDLNet_AllocSocketSet(1));
+
+	SDLNet_TCP_AddSocket(socketSet.get(), internalSocket);
 }
 
 SDLAcceptorSocket::SDLAcceptorSocket(uint16_t port_, bool autoListen) :
@@ -208,3 +230,5 @@ std::unique_ptr<Socket> SDLAcceptorSocket::acceptSocketOnce() {
 }
 
 }
+
+#endif

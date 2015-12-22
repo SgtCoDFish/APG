@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include "APG/graphics/Buffer.hpp"
@@ -53,3 +55,5 @@ void APG::VertexBufferObject::bind(ShaderProgram * const program) {
 
 	program->setVertexAttributes(attributeList);
 }
+
+#endif

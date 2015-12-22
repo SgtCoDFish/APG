@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_SDL
+
 #include <string>
 #include <sstream>
 
@@ -112,3 +114,5 @@ void APG::SDLTmxRenderer::renderLayer(const Tmx::TileLayer * const layer) {
 void APG::SDLTmxRenderer::renderObjectGroup(const std::vector<TiledObject> &objects) {
 	el::Loggers::getLogger("APG")->fatal("SDL renderer cannot render object groups yet.");
 }
+
+#endif

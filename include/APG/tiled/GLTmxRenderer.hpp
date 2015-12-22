@@ -28,6 +28,9 @@
 #ifndef GLTMXRENDERER_HPP_
 #define GLTMXRENDERER_HPP_
 
+#ifndef APG_NO_SDL
+#ifndef APG_NO_GL
+
 #include "APG/graphics/SpriteBatch.hpp"
 #include "APG/tiled/TmxRenderer.hpp"
 
@@ -54,5 +57,8 @@ private:
 };
 
 }
+
+#endif
+#endif
 
 #endif /* GLTMXRENDERER_HPP_ */

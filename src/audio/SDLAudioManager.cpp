@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_SDL
+
 #include "APG/internal/Assert.hpp"
 #include "APG/core/APGeasylogging.hpp"
 #include "APG/audio/SDLAudioManager.hpp"
@@ -40,7 +42,7 @@ APG::SDLAudioManager::SDLAudioManager(int frequency, uint16_t format, int channe
 
 	Mix_AllocateChannels(channelCount);
 
-	logger->info("Successfully started SDL_mixer with %v channels.", channelCount);
+	logger->verbose(1, "Successfully started SDL_mixer with %v channels.", channelCount);
 }
 
 APG::SDLAudioManager::~SDLAudioManager() {
@@ -157,3 +159,5 @@ Mix_Music * APG::SDLAudioManager::getRawMusicPointer(const music_handle &handle)
 Mix_Chunk * APG::SDLAudioManager::getRawChunkPointer(const sound_handle &handle) {
 	return (*loadedSounds.find(handle)).second.get();
 }
+
+#endif

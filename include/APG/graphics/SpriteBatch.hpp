@@ -28,6 +28,8 @@
 #ifndef INCLUDE_APG_GRAPHICS_SPRITEBATCH_HPP_
 #define INCLUDE_APG_GRAPHICS_SPRITEBATCH_HPP_
 
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include <memory>
@@ -125,5 +127,7 @@ public:
 };
 
 }
+
+#endif
 
 #endif /* SPRITEBATCH_HPP_ */

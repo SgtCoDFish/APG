@@ -25,6 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_SDL
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include <initializer_list>
@@ -238,4 +241,7 @@ std::vector<APG::Sprite> APG::AnimatedSprite::splitTexture(Texture * texture, ui
 
 	return loadedFrames;
 }
+
+#endif
+#endif
 

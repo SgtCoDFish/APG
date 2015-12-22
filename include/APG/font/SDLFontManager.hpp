@@ -28,6 +28,8 @@
 #ifndef INCLUDE_APG_FONT_SDLFONTMANAGER_HPP_
 #define INCLUDE_APG_FONT_SDLFONTMANAGER_HPP_
 
+#ifndef APG_NO_SDL
+
 #include <cstdint>
 
 #include <unordered_map>
@@ -98,5 +100,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif /* INCLUDE_APG_SDLFONTMANAGER_HPP_ */

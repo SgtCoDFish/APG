@@ -38,6 +38,7 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 
 #ifdef BB_UTILITY
 #include <iostream>
@@ -89,21 +90,44 @@ public:
 	// Read
 
 	uint8_t peek() const; // Relative peek. Reads and returns the next uint8_t in the buffer from the current position but does not increment the read position
+
 	uint8_t get() const; // Relative get method. Reads the uint8_t at the buffers current position then increments the position
 	uint8_t get(uint32_t index) const; // Absolute get method. Read uint8_t at index
+
 	void getBytes(uint8_t* buf, uint32_t len) const; // Absolute read into array buf of length len
+
 	char getChar() const; // Relative
 	char getChar(uint32_t index) const; // Absolute
+
 	double getDouble() const;
 	double getDouble(uint32_t index) const;
+
 	float getFloat() const;
 	float getFloat(uint32_t index) const;
+
+	uint32_t getUInt32() const;
+	uint32_t getUInt32(uint32_t index) const;
 	uint32_t getInt() const;
 	uint32_t getInt(uint32_t index) const;
+
+	uint64_t getUInt64() const;
+	uint64_t getUInt64(uint32_t index) const;
 	uint64_t getLong() const;
 	uint64_t getLong(uint32_t index) const;
+
 	uint16_t getShort() const;
 	uint16_t getShort(uint32_t index) const;
+	uint16_t getUInt16() const;
+	uint16_t getUInt16(uint32_t index) const;
+
+	/**
+	 * Read until '\0' is found, and then return the string generated, assuming UTF-8.
+	 */
+	std::string getStringByNullCharacter() const;
+	std::string getStringByNullCharacter(uint32_t index) const;
+
+	std::string getStringByLength(size_t length) const;
+	std::string getStringByLength(size_t length, uint32_t index) const;
 
 	// Write
 
@@ -118,12 +142,24 @@ public:
 	void putDouble(double value, uint32_t index);
 	void putFloat(float value);
 	void putFloat(float value, uint32_t index);
+
+	void putUInt32(uint32_t value);
+	void putUInt32(uint32_t value, uint32_t index);
 	void putInt(uint32_t value);
 	void putInt(uint32_t value, uint32_t index);
+
+	void putUInt64(uint64_t value);
+	void putUInt64(uint64_t value, uint32_t index);
 	void putLong(uint64_t value);
 	void putLong(uint64_t value, uint32_t index);
+
+	void putUInt16(uint16_t value);
+	void putUInt16(uint16_t value, uint32_t index);
 	void putShort(uint16_t value);
 	void putShort(uint16_t value, uint32_t index);
+
+	void putString(const std::string &str);
+	void putString(const std::string &str, uint32_t index);
 
 	// Buffer Position Accessors & Mutators
 

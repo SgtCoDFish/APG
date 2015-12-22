@@ -73,14 +73,25 @@ public:
 	const char * const remoteHost;
 
 	/**
-	 * Send data currently in the sendBuffer.
+	 * Send data currently in the buffer.
+	 * @return the number of bytes sent
 	 */
 	virtual int send() = 0;
 
 	/**
 	 * Read data into readBuffer.
+	 * @return the number of bytes read.
 	 */
 	virtual int recv(uint32_t length = 1024u) = 0;
+
+	/**
+	 * Wait for millisecondsToWait for activity on the socket (e.g. data to read).
+	 *
+	 * If millisecondsToWait == 0 (the default) we just wait for input.
+	 *
+	 * @return true if activity was detected before timeout or if millisecondsToWait was 0, false otherwise
+	 */
+	virtual bool waitForActivity(uint32_t millisecondsToWait = 0u) = 0;
 
 	virtual void connect() = 0;
 	virtual void disconnect() = 0;

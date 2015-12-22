@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_SDL
+
 #include <cstdint>
 
 #include <string>
@@ -303,3 +305,5 @@ APG::SpriteBase * APG::SDLFontManager::renderTextWithWhitespace(const StoredFont
 
 	return ownedSprites[ownedSpriteID].get();
 }
+
+#endif

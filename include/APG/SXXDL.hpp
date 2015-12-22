@@ -33,6 +33,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_net.h>
 
 namespace SXXDL {
 
@@ -63,6 +64,16 @@ using sound_ptr = std::unique_ptr<Mix_Chunk, void (*)(Mix_Chunk *)>;
 music_ptr make_music_ptr(Mix_Music *music);
 sound_ptr make_sound_ptr(Mix_Chunk *chunk);
 
+}
+
+namespace net {
+
+/**
+ * This feels hideous because SDL does weird things with their typedefs and pointer types.
+ */
+using socket_set_ptr = std::unique_ptr<struct _SDLNet_SocketSet, void(*)(SDLNet_SocketSet)>;
+
+socket_set_ptr make_socket_set_ptr(SDLNet_SocketSet socketSet);
 }
 
 }

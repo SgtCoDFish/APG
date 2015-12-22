@@ -28,6 +28,8 @@
 #ifndef INCLUDE_APG_GRAPHICS_SPRITE_HPP_
 #define INCLUDE_APG_GRAPHICS_SPRITE_HPP_
 
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include <memory>
@@ -102,5 +104,7 @@ protected:
 };
 
 }
+
+#endif
 
 #endif /* SPRITE_HPP_ */

@@ -28,6 +28,9 @@
 #ifndef INCLUDE_APG_TILED_TMXRENDERER_HPP_
 #define INCLUDE_APG_TILED_TMXRENDERER_HPP_
 
+// TODO: Remove dependence on SDL
+#ifndef APG_NO_SDL
+
 #include <vector>
 #include <unordered_map>
 
@@ -143,4 +146,6 @@ private:
 
 }
 
-#endif /* GENTMXRENDERER_HPP_ */
+#endif
+
+#endif /* TMXRENDERER_HPP_ */

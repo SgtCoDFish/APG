@@ -28,6 +28,8 @@
 #ifndef INCLUDE_APG_GRAPHICS_VERTEXBUFFEROBJECT_HPP_
 #define INCLUDE_APG_GRAPHICS_VERTEXBUFFEROBJECT_HPP_
 
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include "APG/graphics/Buffer.hpp"
@@ -58,5 +60,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif /* VERTEXBUFFEROBJECT_HPP_ */

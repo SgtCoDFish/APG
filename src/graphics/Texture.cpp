@@ -25,6 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_SDL
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include <atomic>
@@ -240,3 +243,6 @@ void APG::Texture::generateMipMaps() {
 void APG::Texture::attachToShader(const char * const uniformName, ShaderProgram * const program) const {
 	program->setUniformi(uniformName, textureUnitInt);
 }
+
+#endif
+#endif

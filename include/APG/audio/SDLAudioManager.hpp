@@ -28,6 +28,8 @@
 #ifndef INCLUDE_APG_AUDIO_SDLAUDIOMANAGER_HPP_
 #define INCLUDE_APG_AUDIO_SDLAUDIOMANAGER_HPP_
 
+#ifndef APG_NO_SDL
+
 #include <unordered_map>
 
 #include <SDL2/SDL_mixer.h>
@@ -76,5 +78,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif /* INCLUDE_APG_SDLAUDIOMANAGER_HPP_ */

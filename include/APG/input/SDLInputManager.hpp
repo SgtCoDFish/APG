@@ -28,6 +28,8 @@
 #ifndef INCLUDE_APG_INPUT_SDLINPUTMANAGER_HPP_
 #define INCLUDE_APG_INPUT_SDLINPUTMANAGER_HPP_
 
+#ifndef APG_NO_SDL
+
 #include <cstdint>
 
 #include <array>
@@ -67,5 +69,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif /* INCLUDE_APG_SDLINPUTMANAGER_HPP_ */

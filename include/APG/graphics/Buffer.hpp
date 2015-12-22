@@ -28,6 +28,8 @@
 #ifndef INCLUDE_APG_GRAPHICS_BUFFER_HPP_
 #define INCLUDE_APG_GRAPHICS_BUFFER_HPP_
 
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include <string>
@@ -193,5 +195,7 @@ using Int16Buffer = Buffer<int16_t, GL_SHORT>;
 using Int8Buffer = Buffer<int8_t, GL_BYTE>;
 
 }
+
+#endif /* APG_NO_GL */
 
 #endif /* APG__BUFFER_HPP_ */

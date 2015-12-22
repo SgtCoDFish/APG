@@ -28,6 +28,8 @@
 #ifndef INCLUDE_APG_GRAPHICS_INDEXBUFFEROBJECT_HPP_
 #define INCLUDE_APG_GRAPHICS_INDEXBUFFEROBJECT_HPP_
 
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include "APG/graphics/Buffer.hpp"
@@ -49,5 +51,7 @@ public:
 };
 
 }
+
+#endif
 
 #endif /* INDEXBUFFEROBJECT_HPP_ */

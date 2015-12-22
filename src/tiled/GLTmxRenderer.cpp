@@ -25,6 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_SDL
+#ifndef APG_NO_GL
+
 #include <glm/vec2.hpp>
 
 #include "tmxparser/Tmx.h"
@@ -84,3 +87,6 @@ void APG::GLTmxRenderer::renderObjectGroup(const std::vector<TiledObject> &objec
 		batch->draw(obj.sprite, obj.position.x, obj.position.y);
 	}
 }
+
+#endif
+#endif

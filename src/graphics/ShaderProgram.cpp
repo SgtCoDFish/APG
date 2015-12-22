@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include <sstream>
@@ -351,3 +353,5 @@ uint32_t *APG::ShaderProgram::validateTypeAndGet(uint32_t type) {
 	}
 	}
 }
+
+#endif

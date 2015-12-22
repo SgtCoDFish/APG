@@ -28,6 +28,8 @@
 #ifndef INCLUDE_APG_TILED_TMXSDLRENDERER_HPP_
 #define INCLUDE_APG_TILED_TMXSDLRENDERER_HPP_
 
+#ifndef APG_NO_SDL
+
 #include <vector>
 
 #include "APG/SXXDL.hpp"
@@ -71,5 +73,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif /* TMXSDLRENDERER_HPP_ */

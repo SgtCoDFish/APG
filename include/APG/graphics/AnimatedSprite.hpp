@@ -28,6 +28,9 @@
 #ifndef INCLUDE_GRAPHICS_ANIMATED_SPRITE
 #define INCLUDE_GRAPHICS_ANIMATED_SPRITE
 
+#ifndef APG_NO_SDL
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include <initializer_list>
@@ -159,6 +162,9 @@ private:
 };
 
 }
+
+#endif
+#endif
 
 #endif
 

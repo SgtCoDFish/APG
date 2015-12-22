@@ -20,6 +20,10 @@
  Adapted from https://github.com/RamseyK/ByteBufferCpp
  */
 
+#include <vector>
+#include <utility>
+#include <algorithm>
+
 #include "APG/net/ByteBuffer.hpp"
 
 namespace APG {
@@ -92,7 +96,7 @@ void ByteBuffer::clear() {
  * @return A pointer to the newly cloned ByteBuffer. NULL if no more memory available
  */
 std::unique_ptr<ByteBuffer> ByteBuffer::clone() {
-	std::unique_ptr < ByteBuffer > ret = std::make_unique < ByteBuffer > (buf.size());
+	std::unique_ptr<ByteBuffer> ret = std::make_unique<ByteBuffer>(buf.size());
 
 	// Copy data
 	for (uint32_t i = 0; i < buf.size(); i++) {
@@ -164,16 +168,20 @@ uint32_t ByteBuffer::size() {
 void ByteBuffer::replace(uint8_t key, uint8_t rep, uint32_t start, bool firstOccuranceOnly) {
 	uint32_t len = buf.size();
 	for (uint32_t i = start; i < len; i++) {
-		uint8_t data = read < uint8_t > (i);
+		uint8_t data = read<uint8_t>(i);
+
 		// Wasn't actually found, bounds of buffer were exceeded
-		if ((key != 0) && (data == 0))
+		if ((key != 0) && (data == 0)) {
 			break;
+		}
 
 		// Key was found in array, perform replacement
 		if (data == key) {
 			buf[i] = rep;
-			if (firstOccuranceOnly)
+
+			if (firstOccuranceOnly) {
 				return;
+			}
 		}
 	}
 }
@@ -181,7 +189,7 @@ void ByteBuffer::replace(uint8_t key, uint8_t rep, uint32_t start, bool firstOcc
 // Read Functions
 
 uint8_t ByteBuffer::peek() const {
-	return read < uint8_t > (rpos);
+	return read<uint8_t>(rpos);
 }
 
 uint8_t ByteBuffer::get() const {
@@ -189,7 +197,7 @@ uint8_t ByteBuffer::get() const {
 }
 
 uint8_t ByteBuffer::get(uint32_t index) const {
-	return read < uint8_t > (index);
+	return read<uint8_t>(index);
 }
 
 void ByteBuffer::getBytes(uint8_t* buf, uint32_t len) const {
@@ -222,28 +230,107 @@ float ByteBuffer::getFloat(uint32_t index) const {
 	return read<float>(index);
 }
 
-uint32_t ByteBuffer::getInt() const {
+uint32_t ByteBuffer::getUInt32() const {
 	return read<uint32_t>();
 }
 
-uint32_t ByteBuffer::getInt(uint32_t index) const {
-	return read < uint32_t > (index);
+uint32_t ByteBuffer::getUInt32(uint32_t index) const {
+	return read<uint32_t>(index);
 }
 
-uint64_t ByteBuffer::getLong() const {
+uint32_t ByteBuffer::getInt() const {
+	return getUInt32();
+}
+
+uint32_t ByteBuffer::getInt(uint32_t index) const {
+	return getUInt32(index);
+}
+
+uint64_t ByteBuffer::getUInt64() const {
 	return read<uint64_t>();
 }
 
-uint64_t ByteBuffer::getLong(uint32_t index) const {
-	return read < uint64_t > (index);
+uint64_t ByteBuffer::getUInt64(uint32_t index) const {
+	return read<uint64_t>(index);
 }
 
-uint16_t ByteBuffer::getShort() const {
+uint64_t ByteBuffer::getLong() const {
+	return getUInt64();
+}
+
+uint64_t ByteBuffer::getLong(uint32_t index) const {
+	return getUInt64(index);
+}
+
+uint16_t ByteBuffer::getUInt16() const {
 	return read<uint16_t>();
 }
 
+uint16_t ByteBuffer::getUInt16(uint32_t index) const {
+	return read<uint16_t>(index);
+}
+
+uint16_t ByteBuffer::getShort() const {
+	return getUInt16();
+}
+
 uint16_t ByteBuffer::getShort(uint32_t index) const {
-	return read < uint16_t > (index);
+	return getUInt16(index);
+}
+
+std::string ByteBuffer::getStringByNullCharacter() const {
+	std::vector<char> strBuf;
+	strBuf.reserve(std::min<size_t>(64u, buf.size() - rpos));
+
+	bool done = false;
+	while (!done) {
+		char charRead = read<char>();
+
+		done = (charRead == '\0');
+
+		strBuf.emplace_back(std::move(charRead));
+	}
+
+	return std::string(strBuf.data());
+}
+
+std::string ByteBuffer::getStringByNullCharacter(uint32_t index) const {
+	std::vector<char> strBuf;
+	strBuf.reserve(std::min<size_t>(64u, buf.size() - rpos));
+
+	bool done = false;
+	while (!done) {
+		char charRead = read<char>(index);
+		index++;
+
+		done = (charRead == '\0');
+
+		strBuf.emplace_back(std::move(charRead));
+	}
+
+	return std::string(strBuf.data());
+}
+
+std::string ByteBuffer::getStringByLength(size_t length) const {
+	std::vector<char> strBuf;
+	strBuf.reserve(length);
+
+	for (size_t i = 0u; i < length; i++) {
+		strBuf.emplace_back(read<char>());
+	}
+
+	return std::string(strBuf.data(), length);
+}
+
+std::string ByteBuffer::getStringByLength(size_t length, uint32_t index) const {
+	std::vector<char> strBuf;
+	strBuf.reserve(length);
+
+	for (size_t i = index; i < length; i++) {
+		strBuf.emplace_back(read<char>(i));
+	}
+
+	return std::string(strBuf.data(), length);
 }
 
 // Write Functions
@@ -251,21 +338,21 @@ uint16_t ByteBuffer::getShort(uint32_t index) const {
 void ByteBuffer::put(ByteBuffer* src) {
 	uint32_t len = src->size();
 	for (uint32_t i = 0; i < len; i++)
-		append < uint8_t > (src->get(i));
+		append<uint8_t>(src->get(i));
 }
 
 void ByteBuffer::put(uint8_t b) {
-	append < uint8_t > (b);
+	append<uint8_t>(b);
 }
 
 void ByteBuffer::put(uint8_t b, uint32_t index) {
-	insert < uint8_t > (b, index);
+	insert<uint8_t>(b, index);
 }
 
 void ByteBuffer::putBytes(uint8_t* b, uint32_t len) {
 	// Insert the data one byte at a time into the internal buffer at position i+starting index
 	for (uint32_t i = 0; i < len; i++)
-		append < uint8_t > (b[i]);
+		append<uint8_t>(b[i]);
 }
 
 void ByteBuffer::putBytes(uint8_t* b, uint32_t len, uint32_t index) {
@@ -273,7 +360,7 @@ void ByteBuffer::putBytes(uint8_t* b, uint32_t len, uint32_t index) {
 
 	// Insert the data one byte at a time into the internal buffer at position i+starting index
 	for (uint32_t i = 0; i < len; i++)
-		append < uint8_t > (b[i]);
+		append<uint8_t>(b[i]);
 }
 
 void ByteBuffer::putChar(char value) {
@@ -299,28 +386,65 @@ void ByteBuffer::putFloat(float value, uint32_t index) {
 	insert<float>(value, index);
 }
 
+void ByteBuffer::putUInt32(uint32_t value) {
+	append<uint32_t>(value);
+}
+
+void ByteBuffer::putUInt32(uint32_t value, uint32_t index) {
+	insert<uint32_t>(value, index);
+}
+
 void ByteBuffer::putInt(uint32_t value) {
-	append < uint32_t > (value);
+	putUInt32(value);
 }
 
 void ByteBuffer::putInt(uint32_t value, uint32_t index) {
-	insert < uint32_t > (value, index);
+	putUInt32(value, index);
+}
+
+void ByteBuffer::putUInt64(uint64_t value) {
+	append<uint64_t>(value);
+}
+
+void ByteBuffer::putUInt64(uint64_t value, uint32_t index) {
+	insert<uint64_t>(value, index);
 }
 
 void ByteBuffer::putLong(uint64_t value) {
-	append < uint64_t > (value);
+	putUInt64(value);
 }
 
 void ByteBuffer::putLong(uint64_t value, uint32_t index) {
-	insert < uint64_t > (value, index);
+	putUInt64(value, index);
+}
+
+void ByteBuffer::putUInt16(uint16_t value) {
+	append<uint16_t>(value);
+}
+
+void ByteBuffer::putUInt16(uint16_t value, uint32_t index) {
+	insert<uint16_t>(value, index);
 }
 
 void ByteBuffer::putShort(uint16_t value) {
-	append < uint16_t > (value);
+	putUInt16(value);
 }
 
 void ByteBuffer::putShort(uint16_t value, uint32_t index) {
-	insert < uint16_t > (value, index);
+	putUInt16(value, index);
+}
+
+void ByteBuffer::putString(const std::string &str) {
+	for (const char &c : str) {
+		append<char>(c);
+	}
+}
+
+void ByteBuffer::putString(const std::string &str, uint32_t index) {
+	for(const char &c : str) {
+		insert<char>(c, index);
+		index++;
+	}
 }
 
 // Utility Functions

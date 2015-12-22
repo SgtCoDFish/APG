@@ -28,6 +28,9 @@
 #ifndef INCLUDE_APG_GRAPHICS_TILESET_HPP_
 #define INCLUDE_APG_GRAPHICS_TILESET_HPP_
 
+#ifndef APG_NO_SDL
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include <string>
@@ -135,5 +138,8 @@ private:
 };
 
 }
+
+#endif
+#endif
 
 #endif /* APGTILESET_HPP_ */

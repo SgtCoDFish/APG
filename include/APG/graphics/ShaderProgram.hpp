@@ -28,6 +28,8 @@
 #ifndef INCLUDE_APG_GRAPHICS_SHADERPROGRAM_HPP_
 #define INCLUDE_APG_GRAPHICS_SHADERPROGRAM_HPP_
 
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include <string>
@@ -114,5 +116,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif /* SHADERPROGRAM_HPP_ */

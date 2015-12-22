@@ -28,6 +28,8 @@
 #ifndef INCLUDE_APG_CORE_SDLGAME_HPP_
 #define INCLUDE_APG_CORE_SDLGAME_HPP_
 
+#ifndef APG_NO_SDL
+
 #include <cstdint>
 
 #include <SDL2/SDL.h>
@@ -140,4 +142,6 @@ private:
 
 }
 
-#endif /* SDLGAME_HPP_ */
+#endif
+
+#endif

@@ -20,48 +20,44 @@ else ()
     set (APG_DEBUG TRUE)
 endif ()
 
+option(APG_NO_SDL "Do not build any component of APG which uses SDL; removes SDL as a dependency. At present this leaves most of APG fairly unusable. Also currently sets APG_NO_GL." OFF)
+option(APG_NO_GL "Do not build any component of APG which uses OpenGL/GLEW, removing those as dependencies. Affects graphics rendering capabilities. Also currently sets APG_NO_SDL." OFF)
+
 option(EXCLUDE_GL_TEST "Should we exclude compiling the OpenGL TMX rendering test?" OFF)
 option(EXCLUDE_SDL_TEST "Should we exclude compiling the SDL TMX rendering test?" OFF)
 option(EXCLUDE_AUDIO_TEST "Should we exclude compiling the audio test? Requires an additional file, test_music.ogg, to be added to the assets folder (and then re-running cmake)!" ON)
 
-option(EXCLUDE_APGMAIN "Should we exclude building the main APG library, which has many dependencies?" OFF)
-option(EXCLUDE_APGTILED "Should we exclude building the APG tiled library?" OFF)
-option(EXCLUDE_APGNET "Should we exclude building the APGnet library, which depends on SDL2_net?" OFF)
-
-if ( EXCLUDE_APGMAIN AND EXCLUDE_APGTILED AND EXCLUDE_APGNET )
-    message(FATAL_ERROR "All libraries excluded, nothing to do!")
+if( APG_NO_GL OR APG_NO_SDL )
+    message("Disabling GL, SDL and all tests because either APG_NO_GL or APG_NO_SDL was specified.")
+    set(APG_NO_SDL ON)
+    set(APG_NO_GL ON)
+    
+    set(EXCLUDE_GL_TEST ON)
+    set(EXCLUDE_SDL_TEST ON)
+    set(EXCLUDE_AUDIO_TEST ON)
 endif ()
 
-if ( EXCLUDE_APGMAIN OR EXCLUDE_APGTILED OR EXCLUDE_APGNET )
-    message("Warning: library exclusion not yet implemented.")
-endif ()
+message ("Finding dependencies for APG.") 
 
-message ("Finding dependencies for the main APG library.") 
-
-find_package(GLM REQUIRED)
-find_package(rapidjson REQUIRED)
-
-if ( NOT EXCLUDE_APGMAIN OR NOT EXCLUDE_APGTILED )
+if ( NOT APG_NO_SDL )
     find_package(SDL2 REQUIRED)
     find_package(SDL2_image REQUIRED)
     find_package(SDL2_mixer REQUIRED)
     find_package(SDL2_ttf REQUIRED)
-    
+    find_package(SDL2_net REQUIRED)
+endif ()
+
+if ( NOT APG_NO_GL )
     find_package(OpenGL REQUIRED)
     find_package(GLEW REQUIRED)
 endif ()
 
-if ( NOT EXCLUDE_APGTILED )
-    message ("Finding dependencies for APGtiled")
-    find_package(TmxParser REQUIRED)
-    find_package(TinyXML2 REQUIRED)
-    find_package(ZLIB REQUIRED)
-endif ()
+find_package(GLM REQUIRED)
+find_package(rapidjson REQUIRED)
 
-if ( NOT EXCLUDE_APGNET )
-    message ("Finding dependencies for APGnet")
-    find_package(SDL2_net REQUIRED)
-endif ()
+find_package(TmxParser REQUIRED)
+find_package(TinyXML2 REQUIRED)
+find_package(ZLIB REQUIRED)
 
 file(GLOB_RECURSE APG_SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 file(GLOB_RECURSE APG_HEADERS ${PROJECT_SOURCE_DIR}/include/*.hpp)
@@ -103,50 +99,54 @@ set(APG_SOURCES ${APG_SOURCES} ${EXTRA_SOURCES})
 
 add_definitions(-DGLM_FORCE_RADIANS)
 
+if ( APG_NO_SDL )
+    add_definitions(-DAPG_NO_SDL)
+endif ()
+
+if ( APG_NO_GL )
+    add_definitions(-DAPG_NO_GL)
+endif()
+
 set(CMAKE_CXX_FLAGS_BASE ${COMPILER_FLAGS})
 
 include_directories("include"
-                    ${SDL2_INCLUDE_DIR}
-                    ${SDL2_TTF_INCLUDE_DIR}
-                    ${SDL2_IMAGE_INCLUDE_DIR}
-                    ${SDL2_MIXER_INCLUDE_DIR}
-                    ${OPENGL_INCLUDE_DIR}
-                    ${GLEW_INCLUDE_DIRS}
                     ${GLM_INCLUDE_DIRS}
+                    ${TMXPARSER_INCLUDE_DIR}
+                    ${TINYXML2_INCLUDE_DIR}
+                    ${ZLIB_INCLUDE_DIRS}
                     )
 
-if ( NOT EXCLUDE_APGTILED )
-    include_directories(${TMXPARSER_INCLUDE_DIR}
-                        ${TINYXML2_INCLUDE_DIR}
-                        ${ZLIB_INCLUDE_DIRS}
+if ( NOT APG_NO_SDL )
+    include_directories(${SDL2_INCLUDE_DIR}
+                        ${SDL2_TTF_INCLUDE_DIR}
+                        ${SDL2_IMAGE_INCLUDE_DIR}
+                        ${SDL2_MIXER_INCLUDE_DIR}
+                        ${SDL2_NET_INCLUDE_DIR}
                         )
 endif ()
 
-if ( NOT EXCLUDE_APGNET )
-    include_directories(${SDL2_NET_INCLUDE_DIR}
+if ( NOT APG_NO_GL )
+    include_directories(${OPENGL_INCLUDE_DIR}
+                        ${GLEW_INCLUDE_DIRS}
                         )
 endif ()
 
 set(APG_LIB_NAME ${CMAKE_PROJECT_NAME})
-set(APGTILED_LIB_NAME "${CMAKE_PROJECT_NAME}tiled")
-set(APGNET_LIB_NAME "${CMAKE_PROJECT_NAME}net")
 
 if ( APG_DEBUG ) 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS}")
     set(APG_LIB_NAME "${APG_LIB_NAME}-d")
-    set(APGTILED_LIB_NAME "${APGTILED_LIB_NAME}-d")
-    set(APGNET_LIB_NAME "${APGNET_LIB_NAME}-d")
 else ()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_RELEASE_FLAGS}")
 endif ()
 
 add_library(${APG_LIB_NAME} ${APG_SOURCES})
 
-if ( NOT EXISTS ${PROJECT_SOURCE_DIR}/assets/test_music.ogg )
-    if ( NOT EXCLUDE_AUDIO_TEST )
+if ( NOT EXCLUDE_AUDIO_TEST )
+    if ( NOT EXISTS ${PROJECT_SOURCE_DIR}/assets/test_music.ogg )
         message("You haven't added a \"test_music.ogg\" file to the assets folder. Without this, the audio test will fail to run; don't forget to add it!")
-    endif ( NOT EXCLUDE_AUDIO_TEST )
-endif ( NOT EXISTS ${PROJECT_SOURCE_DIR}/assets/test_music.ogg )
+    endif ( )
+endif ( )
 
 if ( (NOT EXCLUDE_SDL_TEST) OR (NOT EXCLUDE_GL_TEST) OR (NOT EXCLUDE_AUDIO_TEST) ) 
 	file(MAKE_DIRECTORY assets)

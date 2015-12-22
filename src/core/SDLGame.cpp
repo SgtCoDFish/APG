@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_SDL
+
 #include <cstdint>
 
 #include <string>
@@ -213,3 +215,5 @@ void SDLGame::debugSDLVersion(el::Logger * const logger, const char *libraryName
 }
 
 }
+
+#endif

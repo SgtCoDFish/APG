@@ -25,9 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_SDL
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_net.h>
 
 #include "APG/SXXDL.hpp"
 
@@ -62,3 +65,9 @@ SXXDL::mixer::sound_ptr SXXDL::mixer::make_sound_ptr(Mix_Chunk *chunk) {
 SXXDL::mixer::music_ptr SXXDL::mixer::make_music_ptr(Mix_Music *music) {
 	return music_ptr(music, Mix_FreeMusic);
 }
+
+SXXDL::net::socket_set_ptr SXXDL::net::make_socket_set_ptr(SDLNet_SocketSet socketSet) {
+	return socket_set_ptr(socketSet, SDLNet_FreeSocketSet);
+}
+
+#endif
