@@ -32,30 +32,7 @@ Debug-SDL/*
 dlls/*
 dlls
 
-build
-build/
-
-build-nosdl/
-build-nosdl
-
-build-debug/
-build-debug
-
-build-gcc
-build-gcc/
-
-build-clang
-build-clang/
-
-build-msvc
-build-msvc/
-
-build-msvcdebug
-build-msvcdebug/
-
-/Debug-sanitize/
-/Debug-GL/
+build*/
 
 assets/test_music.ogg
 
-/Debug-Audio/
