@@ -17,6 +17,14 @@
 
 #ifndef EASYLOGGINGPP_H
 #define EASYLOGGINGPP_H
+
+// WIN32_LEAN_AND_MEAN should be defined at build time
+// but we need it especially here so we're going to make sure
+#ifndef WIN32_LEAN_AND_MEAN
+#	define WIN32_LEAN_AND_MEAN
+#endif
+
+#define ELPP_WINSOCK2
 // Compilers and C++0x/C++11 Evaluation
 #if defined(__GNUC__)
 #   define ELPP_COMPILER_GCC 1

@@ -29,16 +29,23 @@
 #define INCLUDE_APG_NET_NATIVESOCKET_HPP_
 
 #ifndef APG_NO_NATIVE
-#ifndef _WIN32
 
 #include <string>
 #include <memory>
 
 #ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
+// WIN32_LEAN_AND_MEAN should be defined at build time
+// but we need it so we're going to make sure here
+#ifndef WIN32_LEAN_AND_MEAN
+#	define WIN32_LEAN_AND_MEAN
+#endif
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
+
+#include <windows.h>
+// this lets us check for things like EWOULDBLOCK
+#define errno WSAGetLastError()
 #else
 #include <sys/select.h>
 #include <sys/socket.h>
@@ -81,6 +88,14 @@ public:
 	static int setNonBlocking(int socketFD);
 
 	static addrinfo_ptr make_addrinfo_ptr(addrinfo *ainfo);
+	
+	static std::string getErrorMessage(int errorCode);
+	
+#ifdef _WIN32
+	static constexpr const int APGWOULDBLOCK = WSAEWOULDBLOCK;
+#else
+	static constexpr const int APGWOULDBLOCK = EWOULDBLOCK;
+#endif
 };
 
 class NativeSocket : public Socket {
@@ -156,7 +171,6 @@ private:
 
 }
 
-#endif
-#endif
+#endif // notAPG_NO_NATIVE
 
 #endif /* INCLUDE_APG_NET_NATIVESOCKET_HPP_ */

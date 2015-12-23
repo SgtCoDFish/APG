@@ -35,7 +35,6 @@
  */
 
 #ifndef APG_NO_NATIVE
-#ifndef _WIN32
 
 #include <cstdio>
 #include <cstring>
@@ -113,7 +112,7 @@ int NativeSocket::send() {
 		if (sent >= 0) {
 			el::Loggers::getLogger("APG")->warn("Warning: %v bytes sent of %v bytes total.", sent, buf.size());
 		} else {
-			el::Loggers::getLogger("APG")->error("Send error: %v", std::strerror(errno));
+			el::Loggers::getLogger("APG")->error("Send error: %v", NativeSocketUtil::getErrorMessage(errno));
 			setError();
 			return 0;
 		}
@@ -132,11 +131,11 @@ int NativeSocket::recv(uint32_t length) {
 	auto bytesReceived = ::recv(internalSocket, reinterpret_cast<char *>(tempBuffer.get()), length, 0);
 
 	if (bytesReceived <= 0) {
-		if (bytesReceived == 0 || errno == EAGAIN || errno == EWOULDBLOCK) {
+		if (bytesReceived == 0 || errno == EAGAIN || errno == NativeSocketUtil::APGWOULDBLOCK) {
 			// remote connection closed/nonblock takes effect
 			return 0;
 		} else {
-			el::Loggers::getLogger("APG")->error("Recv error: %v", std::strerror(errno));
+			el::Loggers::getLogger("APG")->error("Recv error: %v", NativeSocketUtil::getErrorMessage(errno));
 			setError();
 			return -1;
 		}
@@ -160,7 +159,7 @@ bool NativeSocket::waitForActivity(uint32_t millisecondsToWait) {
 			// timeout
 			return false;
 		} else {
-			el::Loggers::getLogger("APG")->error("::select entered an error state: %v", std::strerror(errno));
+			el::Loggers::getLogger("APG")->error("::select entered an error state: %v", NativeSocketUtil::getErrorMessage(errno));
 			setError();
 			return false;
 		}
@@ -243,7 +242,7 @@ std::unique_ptr<Socket> NativeAcceptorSocket::acceptSocket(float maxWaitInSecond
 		// socket is set to O_NONBLOCK in listen() so -1 can mean
 		// errno was set to EWOULDBLOCK and no actual error occurred.
 		while ((newFD = ::accept(internalListener, (sockaddr *) &theirAddr, &addrLen)) == -1) {
-			if (errno == EWOULDBLOCK) {
+			if (errno == NativeSocketUtil::APGWOULDBLOCK) {
 				auto timeNow = std::chrono::high_resolution_clock::now();
 				const float deltaTime =
 				        std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count() / 1000.0f;
@@ -256,17 +255,17 @@ std::unique_ptr<Socket> NativeAcceptorSocket::acceptSocket(float maxWaitInSecond
 					return nullptr;
 				}
 			} else {
-				el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v", std::strerror(errno));
+				el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v", NativeSocketUtil::getErrorMessage(errno));
 				setError();
 				return nullptr;
 			}
 		}
 	} else {
 		while ((newFD = ::accept(internalListener, (sockaddr *) &theirAddr, &addrLen)) == -1) {
-			if (errno == EWOULDBLOCK) {
+			if (errno == NativeSocketUtil::APGWOULDBLOCK) {
 				continue;
 			} else {
-				el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v", std::strerror(errno));
+				el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v", NativeSocketUtil::getErrorMessage(errno));
 				setError();
 				return nullptr;
 			}
@@ -282,12 +281,13 @@ std::unique_ptr<Socket> NativeAcceptorSocket::acceptSocketOnce() {
 	socklen_t addrLen;
 
 	if ((newFD = ::accept(internalListener, (sockaddr *) &theirAddr, &addrLen)) == -1) {
-		// We almost expect that it'll block, but certainly it's not an error.
-		if (errno != EWOULDBLOCK) {
-			el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v", std::strerror(errno));
+		// We almost expect that it would have blocked, but certainly it's not an error.
+		if (errno != NativeSocketUtil::APGWOULDBLOCK) {
+			el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v", NativeSocketUtil::getErrorMessage(errno));
 			setError();
-			return nullptr;
 		}
+		
+		return nullptr;
 	}
 
 	return NativeSocket::fromRawFileDescriptor(newFD, theirAddr);
@@ -319,19 +319,19 @@ void NativeAcceptorSocket::listen() {
 	internalListener = NativeSocketUtil::findValidSocket(retHolder, nullptr, true);
 
 	if (internalListener == -1) {
-		logger->error("Couldn't find a valid socket to listen on: %v", std::strerror(errno));
+		logger->error("Couldn't find a valid socket to listen on: %v", NativeSocketUtil::getErrorMessage(errno));
 		setError();
 		return;
 	}
 	
 	if (NativeSocketUtil::setNonBlocking(internalListener) != 0) {
-		logger->error("Couldn't set non-blocking state on listening socket: %v", std::strerror(errno));
+		logger->error("Couldn't set non-blocking state on listening socket: %v", NativeSocketUtil::getErrorMessage(errno));
 		setError();
 		return;
 	}
 
 	if (::listen(internalListener, NativeAcceptorSocket::CONNECTION_BACKLOG_SIZE) == -1) {
-		logger->error("Couldn't complete ::listen: %v", std::strerror(errno));
+		logger->error("Couldn't complete ::listen: %v", NativeSocketUtil::getErrorMessage(errno));
 		setError();
 		return;
 	}
@@ -405,7 +405,7 @@ void NativeSocket::nativeSocketInit() {
 #ifdef _WIN32
 	WSADATA wsaData;
 
-	int result = WSAStartup(MAKEWORD(1, 1), &wsaData);
+	int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
 	if(result != 0) {
 		el::Loggers::getLogger("APG")->fatal("Couldn't initialise winsock2.");
@@ -433,7 +433,26 @@ void NativeSocket::nativeSocketCleanup() {
 #endif
 }
 
+std::string NativeSocketUtil::getErrorMessage(int errorCode) {
+#ifdef _WIN32
+	static constexpr const int ERR_BUF_SIZE = 256;
+	char charBuf[ERR_BUF_SIZE];
+	
+	const int retCount = ::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,//
+					nullptr, //
+					errorCode,
+					0, //
+					charBuf, //
+					ERR_BUF_SIZE, //
+					nullptr
+					);
+		
+	return std::string(charBuf, retCount);
+#else
+	return std::string(std::strerror(errorCode));
+#endif
 }
 
-#endif
+}
+
 #endif
