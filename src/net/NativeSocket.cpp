@@ -35,6 +35,7 @@
  */
 
 #ifndef APG_NO_NATIVE
+#ifndef _WIN32
 
 #include <cstdio>
 #include <cstring>
@@ -105,7 +106,7 @@ int NativeSocket::send() {
 	int sent = 0;
 
 	while (sent < total) {
-		sent += ::send(internalSocket, buf.data() + sent * sizeof(uint8_t), buf.size() - sent, 0);
+		sent += ::send(internalSocket, reinterpret_cast<const char *>(buf.data()) + sent * sizeof(uint8_t), buf.size() - sent, 0);
 	}
 
 	if (sent < (int32_t) buf.size()) {
@@ -128,7 +129,7 @@ int NativeSocket::recv(uint32_t length) {
 	}
 
 	auto tempBuffer = std::make_unique<uint8_t[]>(length);
-	auto bytesReceived = ::recv(internalSocket, tempBuffer.get(), length, 0);
+	auto bytesReceived = ::recv(internalSocket, reinterpret_cast<char *>(tempBuffer.get()), length, 0);
 
 	if (bytesReceived <= 0) {
 		if (bytesReceived == 0 || errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -322,8 +323,8 @@ void NativeAcceptorSocket::listen() {
 		setError();
 		return;
 	}
-
-	if (::fcntl(internalListener, F_SETFL, O_NONBLOCK) != 0) {
+	
+	if (NativeSocketUtil::setNonBlocking(internalListener) != 0) {
 		logger->error("Couldn't set non-blocking state on listening socket: %v", std::strerror(errno));
 		setError();
 		return;
@@ -391,11 +392,20 @@ int NativeSocketUtil::closeSocket(int socketFD) {
 #endif
 }
 
+int NativeSocketUtil::setNonBlocking(int socketFD) {
+#ifdef _WIN32
+	static u_long NON_BLOCK = 1UL; 
+	return ::ioctlsocket(socketFD, FIONBIO, &NON_BLOCK);
+#else
+	return ::fcntl(internalListener, F_SETFL, O_NONBLOCK);
+#endif	
+}
+
 void NativeSocket::nativeSocketInit() {
 #ifdef _WIN32
 	WSADATA wsaData;
 
-	int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	int result = WSAStartup(MAKEWORD(1, 1), &wsaData);
 
 	if(result != 0) {
 		el::Loggers::getLogger("APG")->fatal("Couldn't initialise winsock2.");
@@ -425,4 +435,5 @@ void NativeSocket::nativeSocketCleanup() {
 
 }
 
+#endif
 #endif

@@ -29,6 +29,7 @@
 #define INCLUDE_APG_NET_NATIVESOCKET_HPP_
 
 #ifndef APG_NO_NATIVE
+#ifndef _WIN32
 
 #include <string>
 #include <memory>
@@ -67,7 +68,17 @@ public:
 	 */
 	static int findValidSocket(const addrinfo_ptr &ptr, addrinfo ** targetStruct, bool bind = false);
 
+	/**
+	 * Close the given socket FD; implemented here to handle differences between Windows and other
+	 * platforms.
+	 */
 	static int closeSocket(int socketFD);
+	
+	/**
+	 * Sets the given socket to non-blocking mode. Implemented here to mitigate differences
+	 * between Windows and other platforms.
+	 */
+	static int setNonBlocking(int socketFD);
 
 	static addrinfo_ptr make_addrinfo_ptr(addrinfo *ainfo);
 };
@@ -145,6 +156,7 @@ private:
 
 }
 
+#endif
 #endif
 
 #endif /* INCLUDE_APG_NET_NATIVESOCKET_HPP_ */
