@@ -28,6 +28,8 @@
 #ifndef INCLUDE_APG_INPUT_INPUTMANAGER_HPP_
 #define INCLUDE_APG_INPUT_INPUTMANAGER_HPP_
 
+#ifndef APG_NO_SDL
+
 #include <SDL2/SDL.h>
 
 namespace APG {
@@ -52,5 +54,7 @@ protected:
 };
 
 }
+
+#endif
 
 #endif /* INCLUDE_APG_INPUTMANAGER_HPP_ */

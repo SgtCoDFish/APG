@@ -272,7 +272,7 @@ std::unique_ptr<Socket> NativeAcceptorSocket::acceptSocket(float maxWaitInSecond
 		}
 	}
 
-	return NativeSocket::fromRawFileDescriptor(newFD, std::move(theirAddr));
+	return NativeSocket::fromRawFileDescriptor(newFD, theirAddr);
 }
 
 std::unique_ptr<Socket> NativeAcceptorSocket::acceptSocketOnce() {
@@ -289,7 +289,7 @@ std::unique_ptr<Socket> NativeAcceptorSocket::acceptSocketOnce() {
 		}
 	}
 
-	return NativeSocket::fromRawFileDescriptor(newFD, std::move(theirAddr));
+	return NativeSocket::fromRawFileDescriptor(newFD, theirAddr);
 }
 
 void NativeAcceptorSocket::listen() {
