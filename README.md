@@ -17,7 +17,9 @@ stop having to worry about cleanup.
 - A SpriteBatch class similar to the one in [LibGDX](https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/graphics/g2d/SpriteBatch.java) which aims to minimise draw calls for 2D sprites.
 - Two renderers for TMX maps; one using pure SDL2 `SDL_Renderer` functions, one using pure modern OpenGL (core context).
 - An SDL2 input manager for the keyboard supporting "isPressed" and "isJustPressed" as required.
-- An SDL2 audio manager for playing a channel of music and multiple channels of sound effects.
+- An SDL2_mixer audio manager for playing a channel of music and multiple channels of sound effects.
+- SDL2_net/Native Socket wrappers for networking including a modified version of [ByteBufferCpp](https://github.com/SgtCoDFish/ByteBufferCpp) for handling data.
+- The ability to compile without SDL/GL at all, allowing you to use the rest of the library freely and reduce dependencies/library size if you don't need some components (ideal for, for example, servers which share some data structures with the client).
 
 How To Use
 ----------

@@ -32,6 +32,7 @@
 
 #include <cstdint>
 
+#include <string>
 #include <memory>
 
 #include <SDL2/SDL_net.h>
@@ -47,9 +48,9 @@ class SDLSocket : public Socket {
 public:
 	static std::unique_ptr<SDLSocket> fromRawSDLSocket(TCPsocket socket);
 
-	explicit SDLSocket(const char * hostName, uint16_t port, bool autoConnect = false);
+	explicit SDLSocket(const std::string &hostName, uint16_t port, bool autoConnect = false, uint32_t bufferSize = BB_DEFAULT_SIZE);
 	/**
-	 * Not recommended for general use
+	 * Not recommended for general use, mainly used by unique_ptr
 	 */
 	explicit SDLSocket(TCPsocket readSocket_, IPaddress *ip_, const char *remoteHost_, uint16_t port_);
 	virtual ~SDLSocket();
@@ -79,7 +80,7 @@ private:
 
 class SDLAcceptorSocket final : public AcceptorSocket {
 public:
-	explicit SDLAcceptorSocket(uint16_t port, bool autoListen = false);
+	explicit SDLAcceptorSocket(uint16_t port, bool autoListen = false, uint32_t bufferSize = BB_DEFAULT_SIZE);
 	virtual ~SDLAcceptorSocket();
 
 	virtual std::unique_ptr<Socket> acceptSocket(float maxWaitInSeconds = -1.0f) override final;

@@ -51,7 +51,7 @@ void SocketCommon::clearError() {
 	error_ = false;
 }
 
-Socket::Socket(const char * remoteHost_, uint16_t port_, uint32_t bufferSize_) :
+Socket::Socket(const std::string &remoteHost_, uint16_t port_, uint32_t bufferSize_) :
 		        SocketCommon(bufferSize_),
 		        port { port_ },
 		        remoteHost { remoteHost_ } {

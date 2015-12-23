@@ -5,7 +5,7 @@ project(APG)
 
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 3)
-set(VERSION_PATCH 0)
+set(VERSION_PATCH 5)
 
 set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 message("Conifguring APG version ${VERSION}.")
@@ -20,8 +20,9 @@ else ()
     set (APG_DEBUG TRUE)
 endif ()
 
-option(APG_NO_SDL "Do not build any component of APG which uses SDL; removes SDL as a dependency. At present this leaves most of APG fairly unusable. Also currently sets APG_NO_GL." OFF)
-option(APG_NO_GL "Do not build any component of APG which uses OpenGL/GLEW, removing those as dependencies. Affects graphics rendering capabilities. Also currently sets APG_NO_SDL." OFF)
+option(APG_NO_SDL "Do not build any component which uses SDL; removes SDL as a dependency. At present this leaves most of APG fairly unusable. Also currently sets APG_NO_GL." OFF)
+option(APG_NO_GL "Do not build any component which uses OpenGL/GLEW, removing those as dependencies. Affects graphics rendering capabilities. Also currently sets APG_NO_SDL." OFF)
+option(APG_NO_NATIVE "Do not build any component which uses functionality which differs across platforms (think #ifdef _WIN32). Useful if you're trying to build on some arcane platform." OFF)
 
 option(EXCLUDE_GL_TEST "Should we exclude compiling the OpenGL TMX rendering test?" OFF)
 option(EXCLUDE_SDL_TEST "Should we exclude compiling the SDL TMX rendering test?" OFF)
@@ -36,6 +37,10 @@ if( APG_NO_GL OR APG_NO_SDL )
     set(EXCLUDE_SDL_TEST ON)
     set(EXCLUDE_AUDIO_TEST ON)
 endif ()
+
+if( APG_NO_NATIVE )
+    message("Warning: APG_NO_NATIVE is not thoroughly tested so there could be bugs!")
+endif()
 
 message ("Finding dependencies for APG.") 
 
@@ -78,7 +83,7 @@ if( DEFINED WIN32 )
     else ()
         # MinGW
         set (OS_FLAGS "-mwindows")
-        set (OS_LIBS Version Imm32 winmm vorbisfile ogg vorbis mingw32)
+        set (OS_LIBS Version Imm32 winmm vorbisfile ogg vorbis winsock32 mingw32)
     endif ()
 else ()
     set (OS_FLAGS "-fPIC")
@@ -105,6 +110,10 @@ endif ()
 
 if ( APG_NO_GL )
     add_definitions(-DAPG_NO_GL)
+endif()
+
+if ( APG_NO_NATIVE)
+    add_definitions(-DAPG_NO_NATIVE)
 endif()
 
 set(CMAKE_CXX_FLAGS_BASE ${COMPILER_FLAGS})

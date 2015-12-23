@@ -28,6 +28,9 @@
 #ifndef INCLUDE_APG_GRAPHICS_VAOINCLUDE_HPP_
 #define INCLUDE_APG_GRAPHICS_VAOINCLUDE_HPP_
 
+#ifndef APG_NO_SDL
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 namespace APG {
@@ -48,5 +51,8 @@ private:
 };
 
 }
+
+#endif
+#endif
 
 #endif /* VAOINCLUDE_HPP_ */

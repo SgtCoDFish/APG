@@ -33,5 +33,6 @@
 #include "net/ByteBuffer.hpp"
 #include "net/NetUtil.hpp"
 #include "net/SDLSocket.hpp"
+#include "net/NativeSocket.hpp"
 
 #endif /* INCLUDE_APG_APGNET_HPP_ */

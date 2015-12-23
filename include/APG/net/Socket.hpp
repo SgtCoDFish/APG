@@ -32,13 +32,11 @@
 
 #include <memory>
 #include <array>
+#include <string>
 
 #include "ByteBuffer.hpp"
 
 namespace APG {
-
-// TODO: Handle connections better ("connected" variable"?)
-
 /**
  * This is a class for implementing shared functionality between Socket and AcceptorSocket;
  * you probably want one of those.
@@ -66,21 +64,23 @@ private:
 
 class Socket : public SocketCommon {
 public:
-	explicit Socket(const char * remoteHost, uint16_t port, uint32_t bufferSize = BB_DEFAULT_SIZE);
+	explicit Socket(const std::string &remoteHost, uint16_t port, uint32_t bufferSize = BB_DEFAULT_SIZE);
 	virtual ~Socket() = default;
 
 	const uint16_t port;
-	const char * const remoteHost;
+	const std::string remoteHost;
 
 	/**
-	 * Send data currently in the buffer.
-	 * @return the number of bytes sent
+	 * Send all data currently in the buffer.
+	 * @return the number of bytes sent which should match the size() of the buffer; less on error.
 	 */
 	virtual int send() = 0;
 
+	// TODO: sendOnce() ?
+
 	/**
-	 * Read data into readBuffer.
-	 * @return the number of bytes read.
+	 * Read up to length bytes of data into the buffer.
+	 * @return the number of bytes actually read; 0 if an error occurred.
 	 */
 	virtual int recv(uint32_t length = 1024u) = 0;
 

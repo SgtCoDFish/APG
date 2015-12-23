@@ -25,6 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef APG_NO_SDL
+#ifndef APG_NO_GL
+
 #include <cstdint>
 
 #include <GL/glew.h>
@@ -43,3 +46,5 @@ void APG::VAO::bind() const {
 	glBindVertexArray(vaoID);
 }
 
+#endif
+#endif

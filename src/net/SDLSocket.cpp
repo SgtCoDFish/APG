@@ -37,8 +37,8 @@
 
 namespace APG {
 
-SDLSocket::SDLSocket(const char *remoteHost_, uint16_t port_, bool autoConnect) :
-		        Socket(remoteHost_, port_) {
+SDLSocket::SDLSocket(const std::string &remoteHost_, uint16_t port_, bool autoConnect, uint32_t bufferSize_) :
+		        Socket(remoteHost_, port_, bufferSize_) {
 	if (autoConnect) {
 		connect();
 	}
@@ -70,6 +70,8 @@ void SDLSocket::disconnect() {
 	if (connected) {
 		SDLNet_TCP_Close(internalSocket);
 	}
+
+	connected = false;
 }
 
 int SDLSocket::send() {
@@ -78,13 +80,18 @@ int SDLSocket::send() {
 		return 0;
 	}
 
-	auto &buffer = this->getBuffer();
+	auto &buf = getBuffer();
 
-	auto sent = SDLNet_TCP_Send(internalSocket, buffer.data(), buffer.size());
+	auto sent = SDLNet_TCP_Send(internalSocket, buf.data(), buf.size());
 
-	if (sent < (int32_t) buffer.size()) {
-		el::Loggers::getLogger("APG")->error("Send error: %v", SDLNet_GetError());
-		setError();
+	if (sent < (int32_t) buf.size()) {
+		if (sent > 0) {
+			el::Loggers::getLogger("APG")->warn("Warning: %v bytes sent of %v bytes total.", sent, buf.size());
+		} else {
+			el::Loggers::getLogger("APG")->error("Send error: %v", SDLNet_GetError());
+			setError();
+			return 0;
+		}
 	}
 
 	return sent;
@@ -112,8 +119,9 @@ int SDLSocket::recv(uint32_t length) {
 bool SDLSocket::waitForActivity(uint32_t millisecondsToWait) {
 	const int active = SDLNet_CheckSockets(socketSet.get(), millisecondsToWait);
 
-	if(active == -1) {
-		el::Loggers::getLogger("APG")->warn("SDLNet_CheckSockets returned an error code in waitForActivity: %v", SDLNet_GetError());
+	if (active == -1) {
+		el::Loggers::getLogger("APG")->warn("SDLNet_CheckSockets returned an error code in waitForActivity: %v",
+		        SDLNet_GetError());
 	}
 
 	return active == 1;
@@ -122,7 +130,7 @@ bool SDLSocket::waitForActivity(uint32_t millisecondsToWait) {
 void SDLSocket::connect() {
 	disconnect();
 
-	if (SDLNet_ResolveHost(&internalIP, remoteHost, port) != 0) {
+	if (SDLNet_ResolveHost(&internalIP, remoteHost.c_str(), port) != 0) {
 		el::Loggers::getLogger("APG")->error("Couldn't resolve host for socket for hostname \"%v\" on port %v.",
 		        remoteHost, port);
 		el::Loggers::getLogger("APG")->error("SDLNet Error: %v", SDLNet_GetError());
@@ -151,8 +159,8 @@ void SDLSocket::addToSet() {
 	SDLNet_TCP_AddSocket(socketSet.get(), internalSocket);
 }
 
-SDLAcceptorSocket::SDLAcceptorSocket(uint16_t port_, bool autoListen) :
-		        AcceptorSocket(port_) {
+SDLAcceptorSocket::SDLAcceptorSocket(uint16_t port_, bool autoListen, uint32_t bufferSize) :
+		        AcceptorSocket(port_, bufferSize) {
 	if (autoListen) {
 		listen();
 	}
