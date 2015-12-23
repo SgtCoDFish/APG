@@ -397,7 +397,7 @@ int NativeSocketUtil::setNonBlocking(int socketFD) {
 	static u_long NON_BLOCK = 1UL; 
 	return ::ioctlsocket(socketFD, FIONBIO, &NON_BLOCK);
 #else
-	return ::fcntl(internalListener, F_SETFL, O_NONBLOCK);
+	return ::fcntl(socketFD, F_SETFL, O_NONBLOCK);
 #endif	
 }
 
