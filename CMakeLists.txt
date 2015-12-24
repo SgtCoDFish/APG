@@ -116,7 +116,8 @@ if ( APG_NO_NATIVE)
     add_definitions(-DAPG_NO_NATIVE)
 endif()
 
-set(CMAKE_CXX_FLAGS_BASE ${COMPILER_FLAGS})
+set(CMAKE_CXX_FLAGS_BASE "${CMAKE_CXX_FLAGS_BASE} ${COMPILER_FLAGS}")
+message(${CMAKE_CXX_FLAGS_BASE})
 
 include_directories("include"
                     ${GLM_INCLUDE_DIRS}
