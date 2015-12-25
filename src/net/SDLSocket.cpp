@@ -45,8 +45,7 @@ SDLSocket::SDLSocket(const std::string &remoteHost_, uint16_t port_, bool autoCo
 }
 
 SDLSocket::SDLSocket(TCPsocket socket_, IPaddress *ip_, const char *remoteHost_, uint16_t port_) :
-		        Socket(remoteHost_, port_),
-		        connected { true } {
+		        Socket(remoteHost_, port_) {
 	internalSocket = socket_;
 
 	internalIP = *ip_;
@@ -67,11 +66,11 @@ SDLSocket::~SDLSocket() {
 }
 
 void SDLSocket::disconnect() {
-	if (connected) {
+	if (isConnected()) {
 		SDLNet_TCP_Close(internalSocket);
 	}
 
-	connected = false;
+	setNotConnected();
 }
 
 int SDLSocket::send() {
@@ -116,15 +115,30 @@ int SDLSocket::recv(uint32_t length) {
 	return received;
 }
 
+bool SDLSocket::hasActivity() {
+	const auto active = SDLNet_CheckSockets(socketSet.get(), 0);
+
+	if(active == -1) {
+		el::Loggers::getLogger("APG")->error("SDLNet_CheckSockets returned an error code in waitForActivity: %v",
+				        SDLNet_GetError());
+		setError();
+		return false;
+	}
+
+	return active > 0;
+}
+
 bool SDLSocket::waitForActivity(uint32_t millisecondsToWait) {
 	const int active = SDLNet_CheckSockets(socketSet.get(), millisecondsToWait);
 
 	if (active == -1) {
-		el::Loggers::getLogger("APG")->warn("SDLNet_CheckSockets returned an error code in waitForActivity: %v",
+		el::Loggers::getLogger("APG")->error("SDLNet_CheckSockets returned an error code in waitForActivity: %v",
 		        SDLNet_GetError());
+		setError();
+		return false;
 	}
 
-	return active == 1;
+	return active > 0;
 }
 
 void SDLSocket::connect() {
@@ -148,7 +162,7 @@ void SDLSocket::connect() {
 		return;
 	}
 
-	connected = true;
+	setConnected();
 
 	addToSet();
 }
@@ -171,9 +185,11 @@ SDLAcceptorSocket::~SDLAcceptorSocket() {
 }
 
 void SDLAcceptorSocket::disconnect() {
-	if (acceptorConnected) {
+	if (isConnected()) {
 		SDLNet_TCP_Close(internalAcceptor);
 	}
+
+	setNotConnected();
 }
 
 void SDLAcceptorSocket::listen() {
@@ -195,7 +211,7 @@ void SDLAcceptorSocket::listen() {
 		return;
 	}
 
-	acceptorConnected = true;
+	setConnected();
 }
 
 std::unique_ptr<Socket> SDLAcceptorSocket::acceptSocket(float maxWaitInSeconds) {

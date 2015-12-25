@@ -58,6 +58,7 @@ public:
 	virtual int send() override final;
 	virtual int recv(uint32_t length = 1024u) override final;
 
+	virtual bool hasActivity() override final;
 	virtual bool waitForActivity(uint32_t millisecondsToWait = 0u) override final;
 
 	const TCPsocket &getSDLSocket() const {
@@ -72,8 +73,6 @@ private:
 
 	TCPsocket internalSocket;
 	SXXDL::net::socket_set_ptr socketSet = SXXDL::net::make_socket_set_ptr(nullptr);
-
-	bool connected = false;
 
 	IPaddress internalIP;
 };
@@ -102,8 +101,6 @@ protected:
 private:
 	TCPsocket internalAcceptor;
 	IPaddress internalIP;
-
-	bool acceptorConnected = false;
 
 	float waitTime = 0.0f;
 };

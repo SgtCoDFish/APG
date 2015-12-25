@@ -58,8 +58,7 @@ NativeSocket::NativeSocket(const char *remoteHost, uint16_t port, bool autoConne
 NativeSocket::NativeSocket(int fd, const std::string &remoteHost, uint16_t port, uint32_t bufferSize) :
 		        Socket(remoteHost, port, bufferSize),
 		        portString { std::to_string(port) },
-		        internalSocket { fd },
-		        connected { true } {
+		        internalSocket { fd } {
 	addToSet();
 }
 
@@ -105,7 +104,8 @@ int NativeSocket::send() {
 	int sent = 0;
 
 	while (sent < total) {
-		sent += ::send(internalSocket, reinterpret_cast<const char *>(buf.data()) + sent * sizeof(uint8_t), buf.size() - sent, 0);
+		sent += ::send(internalSocket, reinterpret_cast<const char *>(buf.data()) + sent * sizeof(uint8_t),
+		        buf.size() - sent, 0);
 	}
 
 	if (sent < (int32_t) buf.size()) {
@@ -146,20 +146,35 @@ int NativeSocket::recv(uint32_t length) {
 	return bytesReceived;
 }
 
+bool NativeSocket::hasActivity() {
+	const auto selRet = ::select(internalSocket + 1, &socketSet, nullptr, nullptr, nullptr);
+
+	if (selRet < 0) {
+		el::Loggers::getLogger("APG")->error("::select entered an error state: %v",
+		        NativeSocketUtil::getErrorMessage(errno));
+		setError();
+		return false;
+	}
+
+	return selRet > 0;
+}
+
 bool NativeSocket::waitForActivity(uint32_t millisecondsToWait) {
-//	static timeval timeval;
-//	timeval.tv_sec = -1;
-//	timeval.tv_usec = -1;
+	timeval timeval;
+	timeval.tv_sec = 0;
+	timeval.tv_usec = millisecondsToWait * 1000;
 
 // returns the number of FDs in set if successful (i.e. 1 here)
-	const auto selRet = ::select(internalSocket + 1, &socketSet, nullptr, nullptr, nullptr);
+	const auto selRet = ::select(internalSocket + 1, &socketSet, nullptr, nullptr,
+	        (millisecondsToWait > 0 ? &timeval : nullptr));
 
 	if (selRet <= 0) {
 		if (selRet == 0) {
 			// timeout
 			return false;
 		} else {
-			el::Loggers::getLogger("APG")->error("::select entered an error state: %v", NativeSocketUtil::getErrorMessage(errno));
+			el::Loggers::getLogger("APG")->error("::select entered an error state: %v",
+			        NativeSocketUtil::getErrorMessage(errno));
 			setError();
 			return false;
 		}
@@ -189,18 +204,18 @@ void NativeSocket::connect() {
 
 	logger->fatal("NativeSocket::connect NYI :(");
 
-	connected = true;
+	setConnected();
 	addToSet();
 }
 
 void NativeSocket::disconnect() {
-	if (connected) {
+	if (isConnected()) {
 		FD_CLR(internalSocket, &socketSet);
 
 		NativeSocketUtil::closeSocket(internalSocket);
 	}
 
-	connected = false;
+	setNotConnected();
 }
 
 void NativeSocket::addToSet() {
@@ -222,11 +237,11 @@ NativeAcceptorSocket::~NativeAcceptorSocket() {
 }
 
 void NativeAcceptorSocket::disconnect() {
-	if (listening) {
+	if (isConnected()) {
 		NativeSocketUtil::closeSocket(internalListener);
 	}
 
-	listening = false;
+	setNotConnected();
 }
 
 std::unique_ptr<Socket> NativeAcceptorSocket::acceptSocket(float maxWaitInSeconds) {
@@ -255,7 +270,8 @@ std::unique_ptr<Socket> NativeAcceptorSocket::acceptSocket(float maxWaitInSecond
 					return nullptr;
 				}
 			} else {
-				el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v", NativeSocketUtil::getErrorMessage(errno));
+				el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v",
+				        NativeSocketUtil::getErrorMessage(errno));
 				setError();
 				return nullptr;
 			}
@@ -265,7 +281,8 @@ std::unique_ptr<Socket> NativeAcceptorSocket::acceptSocket(float maxWaitInSecond
 			if (errno == NativeSocketUtil::APGWOULDBLOCK) {
 				continue;
 			} else {
-				el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v", NativeSocketUtil::getErrorMessage(errno));
+				el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v",
+				        NativeSocketUtil::getErrorMessage(errno));
 				setError();
 				return nullptr;
 			}
@@ -286,7 +303,7 @@ std::unique_ptr<Socket> NativeAcceptorSocket::acceptSocketOnce() {
 			el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v", NativeSocketUtil::getErrorMessage(errno));
 			setError();
 		}
-		
+
 		return nullptr;
 	}
 
@@ -323,9 +340,10 @@ void NativeAcceptorSocket::listen() {
 		setError();
 		return;
 	}
-	
+
 	if (NativeSocketUtil::setNonBlocking(internalListener) != 0) {
-		logger->error("Couldn't set non-blocking state on listening socket: %v", NativeSocketUtil::getErrorMessage(errno));
+		logger->error("Couldn't set non-blocking state on listening socket: %v",
+		        NativeSocketUtil::getErrorMessage(errno));
 		setError();
 		return;
 	}
@@ -336,7 +354,7 @@ void NativeAcceptorSocket::listen() {
 		return;
 	}
 
-	listening = true;
+	setConnected();
 }
 
 NativeSocketUtil::addrinfo_ptr NativeSocketUtil::make_addrinfo_ptr(addrinfo * ainfo) {
@@ -394,11 +412,11 @@ int NativeSocketUtil::closeSocket(int socketFD) {
 
 int NativeSocketUtil::setNonBlocking(int socketFD) {
 #ifdef _WIN32
-	static u_long NON_BLOCK = 1UL; 
+	static u_long NON_BLOCK = 1UL;
 	return ::ioctlsocket(socketFD, FIONBIO, &NON_BLOCK);
 #else
 	return ::fcntl(socketFD, F_SETFL, O_NONBLOCK);
-#endif	
+#endif
 }
 
 void NativeSocket::nativeSocketInit() {
@@ -437,16 +455,16 @@ std::string NativeSocketUtil::getErrorMessage(int errorCode) {
 #ifdef _WIN32
 	static constexpr const int ERR_BUF_SIZE = 256;
 	char charBuf[ERR_BUF_SIZE];
-	
-	const int retCount = ::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,//
-					nullptr, //
-					errorCode,
-					0, //
-					charBuf, //
-					ERR_BUF_SIZE, //
-					nullptr
-					);
-		
+
+	const int retCount = ::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,		//
+			nullptr,//
+			errorCode,
+			0,//
+			charBuf,//
+			ERR_BUF_SIZE,//
+			nullptr
+	);
+
 	return std::string(charBuf, retCount);
 #else
 	return std::string(std::strerror(errorCode));

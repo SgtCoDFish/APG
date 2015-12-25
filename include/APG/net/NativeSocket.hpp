@@ -80,7 +80,7 @@ public:
 	 * platforms.
 	 */
 	static int closeSocket(int socketFD);
-	
+
 	/**
 	 * Sets the given socket to non-blocking mode. Implemented here to mitigate differences
 	 * between Windows and other platforms.
@@ -88,9 +88,9 @@ public:
 	static int setNonBlocking(int socketFD);
 
 	static addrinfo_ptr make_addrinfo_ptr(addrinfo *ainfo);
-	
+
 	static std::string getErrorMessage(int errorCode);
-	
+
 #ifdef _WIN32
 	static constexpr const int APGWOULDBLOCK = WSAEWOULDBLOCK;
 #else
@@ -132,6 +132,8 @@ public:
 
 	virtual int recv(uint32_t length = 1024u) override final;
 
+	virtual bool hasActivity() override final;
+
 	virtual bool waitForActivity(uint32_t millisecondsToWait = 0u) override final;
 
 	virtual void connect() override final;
@@ -142,7 +144,6 @@ private:
 	const std::string portString;
 
 	int internalSocket = -1;
-	bool connected = false;
 
 	fd_set socketSet;
 };
@@ -163,7 +164,6 @@ protected:
 private:
 	static constexpr const int CONNECTION_BACKLOG_SIZE = 10;
 
-	bool listening = false;
 	const std::string portString;
 
 	int internalListener = -1;

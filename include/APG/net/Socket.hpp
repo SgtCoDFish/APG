@@ -58,8 +58,22 @@ public:
 		return error_;
 	}
 
+	bool isConnected() const {
+		return connected_;
+	}
+
+protected:
+	void setConnected() {
+		connected_ = true;
+	}
+
+	void setNotConnected() {
+		connected_ = false;
+	}
+
 private:
 	bool error_ = false;
+	bool connected_ = false;
 };
 
 class Socket : public SocketCommon {
@@ -83,6 +97,8 @@ public:
 	 * @return the number of bytes actually read; 0 if an error occurred.
 	 */
 	virtual int recv(uint32_t length = 1024u) = 0;
+
+	virtual bool hasActivity() = 0;
 
 	/**
 	 * Wait for millisecondsToWait for activity on the socket (e.g. data to read).
