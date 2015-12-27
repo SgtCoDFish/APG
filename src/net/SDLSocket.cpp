@@ -80,20 +80,34 @@ int SDLSocket::send() {
 	}
 
 	auto &buf = getBuffer();
+	unsigned int totalSent = 0;
 
-	auto sent = SDLNet_TCP_Send(internalSocket, buf.data(), buf.size());
+	while(totalSent < buf.size()) {
+		auto sent = SDLNet_TCP_Send(internalSocket, buf.data(), buf.size());
 
-	if (sent < (int32_t) buf.size()) {
-		if (sent > 0) {
-			el::Loggers::getLogger("APG")->warn("Warning: %v bytes sent of %v bytes total.", sent, buf.size());
-		} else {
+		if(sent <= 0) {
 			el::Loggers::getLogger("APG")->error("Send error: %v", SDLNet_GetError());
 			setError();
 			return 0;
 		}
+
+		totalSent += sent;
 	}
 
-	return sent;
+//	auto sent = ;
+//	el::Loggers::getLogger("SENTSENT")->warn("Sent %v bytes", sent);
+
+//	if (sent < (int32_t) buf.size()) {
+//		if (sent > 0) {
+//			el::Loggers::getLogger("APG")->warn("Warning: %v bytes sent of %v bytes total.", sent, buf.size());
+//		} else {
+//			el::Loggers::getLogger("APG")->error("Send error: %v", SDLNet_GetError());
+//			setError();
+//			return 0;
+//		}
+//	}
+
+	return totalSent;
 }
 
 int SDLSocket::recv(uint32_t length) {
