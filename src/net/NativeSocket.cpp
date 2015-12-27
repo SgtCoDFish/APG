@@ -83,7 +83,7 @@ std::unique_ptr<Socket> NativeSocket::fromRawFileDescriptor(int fd, sockaddr_sto
 		}
 	}
 
-	el::Loggers::getLogger("APG")->info("Got IP: %v, len: %v", ip, std::strlen(ip));
+//	el::Loggers::getLogger("APG")->info("Got IP: %v, len: %v", ip, std::strlen(ip));
 
 	return std::make_unique<NativeSocket>(fd, std::string(ip, std::strlen(ip)), port);
 }
