@@ -122,6 +122,7 @@ int SDLSocket::recv(uint32_t length) {
 	if (received < 0) {
 		el::Loggers::getLogger("APG")->error("Couldn't read data: %v", SDLNet_GetError());
 		setError();
+		return 0;
 	}
 
 	putBytes(tempSendBuffer.get(), received);

@@ -51,9 +51,9 @@ void Game::setLoggerToAPGStyle(const std::string &loggerName) {
 	auto conf = el::Configurations();
 
 	conf.setToDefault();
-	conf.setGlobally(el::ConfigurationType::Format, "%datetime{%h:%m:%s.%g} [%logger] [%levshort ] - %msg");
+	conf.setGlobally(el::ConfigurationType::Format, "%datetime{%H:%m:%s.%g} [%logger] [%levshort ] - %msg");
 	conf.set(el::Level::Verbose, el::ConfigurationType::Format,
-	        "%datetime{%h:%m:%s.%g} [%logger] [%levshort%vlevel] - %msg");
+	        "%datetime{%H:%m:%s.%g} [%logger] [%levshort%vlevel] - %msg");
 	el::Loggers::reconfigureLogger(loggerName, conf);
 }
 
