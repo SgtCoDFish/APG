@@ -119,7 +119,7 @@ public:
 	 */
 	static std::unique_ptr<Socket> fromRawFileDescriptor(int fd, sockaddr_storage theirAddr);
 
-	explicit NativeSocket(const char * remoteHost, uint16_t port, bool autoConnect = false, uint32_t bufferSize =
+	explicit NativeSocket(const std::string &remoteHost, uint16_t port, bool autoConnect = false, uint32_t bufferSize =
 	BB_DEFAULT_SIZE);
 
 	/**

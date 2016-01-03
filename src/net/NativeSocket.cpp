@@ -47,7 +47,7 @@
 
 namespace APG {
 
-NativeSocket::NativeSocket(const char *remoteHost, uint16_t port, bool autoConnect, uint32_t bufferSize) :
+NativeSocket::NativeSocket(const std::string &remoteHost, uint16_t port, bool autoConnect, uint32_t bufferSize) :
 		        Socket(remoteHost, port, bufferSize),
 		        portString { std::to_string(port) } {
 	if (autoConnect) {
