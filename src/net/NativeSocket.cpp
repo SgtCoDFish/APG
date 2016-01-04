@@ -71,21 +71,23 @@ std::unique_ptr<Socket> NativeSocket::fromRawFileDescriptor(int fd, sockaddr_sto
 		sockaddr_in *s = (sockaddr_in *) &addr;
 
 		port = ntohs(s->sin_port);
-		if (inet_ntop(AF_INET, &s->sin_addr, ip, INET6_ADDRSTRLEN) == nullptr) {
+
+		if (::inet_ntop(AF_INET, &s->sin_addr, ip, INET6_ADDRSTRLEN) == nullptr) {
 			std::strcpy(ip, "UNKNOWN4");
 		}
 	} else if (addr.ss_family == AF_INET6) {
 		sockaddr_in6 *s = (sockaddr_in6 *) &addr;
 
 		port = ntohs(s->sin6_port);
-		if (inet_ntop(AF_INET6, &s->sin6_addr, ip, INET6_ADDRSTRLEN) == nullptr) {
+
+		if (::inet_ntop(AF_INET6, &s->sin6_addr, ip, INET6_ADDRSTRLEN) == nullptr) {
 			std::strcpy(ip, "UNKNOWN6");
 		}
 	}
 
 //	el::Loggers::getLogger("APG")->info("Got IP: %v, len: %v", ip, std::strlen(ip));
 
-	return std::make_unique<NativeSocket>(fd, std::string(ip, std::strlen(ip)), port);
+	return std::make_unique<NativeSocket>(fd, std::string(ip, INET6_ADDRSTRLEN), port);
 }
 
 NativeSocket::~NativeSocket() {
@@ -188,7 +190,7 @@ void NativeSocket::connect() {
 	disconnect();
 
 	addrinfo hints;
-	std::memset(&hints, 0, sizeof (hints));
+	std::memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
@@ -264,7 +266,7 @@ std::unique_ptr<Socket> NativeDualAcceptorSocket::acceptSocket(float maxWaitInSe
 	static bool timeFor4 = false;
 	int newFD;
 	sockaddr_storage theirAddr;
-	socklen_t addrLen;
+	socklen_t addrLen = sizeof(theirAddr);
 
 	if (maxWaitInSeconds > 0.0f) {
 		float waitTime = 0.0f;
@@ -363,7 +365,7 @@ void NativeDualAcceptorSocket::listen() {
 	disconnect();
 
 	addrinfo hints;
-	std::memset(&hints, 0, sizeof (hints));
+	std::memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_socktype = SOCK_STREAM;
