@@ -552,7 +552,11 @@ NativeSocketUtil::DualSocketReturn NativeSocketUtil::findValidDualSockets(int &i
 		}
 
 		if (p->ai_family == AF_INET6) {
+#ifdef _WIN32
+			const char opt = '1';
+#else
 			int opt = 1;
+#endif
 
 			if (::setsockopt(tempSocketFD, IPPROTO_IPV6, IPV6_V6ONLY, &opt, sizeof(opt)) < 0) {
 				logger->error("Couldn't set IPV6_V6ONLY for IPv6 socket: %v", NativeSocketUtil::getErrorMessage(errno));
