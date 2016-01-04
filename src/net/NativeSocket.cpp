@@ -385,8 +385,10 @@ int NativeSocketUtil::findValidSocket(const addrinfo_ptr &ptr, addrinfo **target
 	for (p = ptr.get(); p != nullptr; p = p->ai_next) {
 		socketFD = ::socket(p->ai_family, p->ai_socktype, p->ai_protocol);
 
+		const std::string inetString = (p->ai_family == AF_INET ? "IPv4" : "IPv6");
+
 		if (socketFD == -1) {
-			logger->verbose(9, "Couldn't establish socket connection for addrinfo struct.");
+			logger->verbose(9, "Couldn't establish socket connection for addrinfo struct for %v.", inetString);
 			continue;
 		}
 
@@ -396,6 +398,7 @@ int NativeSocketUtil::findValidSocket(const addrinfo_ptr &ptr, addrinfo **target
 				logger->error("Couldn't bind socket.");
 				return -1;
 			} else {
+				logger->verbose(9, "Bound socket with ai_family %v.", inetString);
 				break;
 			}
 		} else {
@@ -404,6 +407,7 @@ int NativeSocketUtil::findValidSocket(const addrinfo_ptr &ptr, addrinfo **target
 				logger->error("Couldn't connect socket.");
 				return -1;
 			} else {
+				logger->verbose(9, "Connected socket with ai_family %v.", inetString);
 				break;
 			}
 		}
