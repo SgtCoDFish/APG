@@ -195,7 +195,7 @@ void NativeSocket::connect() {
 
 	const int addrRet = ::getaddrinfo(this->remoteHost.c_str(), this->portString.c_str(), &hints, &tempAI);
 	if (addrRet != 0) {
-		logger->error("Couldn't listen on port %v in NativeSocket: %v", port, ::gai_strerror(addrRet));
+		logger->error("Couldn't resolve hosts for \"%v\" in NativeSocket: %v", remoteHost, ::gai_strerror(addrRet));
 		setError();
 		return;
 	}
@@ -206,17 +206,18 @@ void NativeSocket::connect() {
 	internalSocket = NativeSocketUtil::findValidSocket(addrPtr, nullptr, false);
 
 	if (internalSocket == -1) {
-		logger->error("Couldn't find a valid socket to listen on: %v", NativeSocketUtil::getErrorMessage(errno));
+		logger->error("Couldn't connect to remote host (%v): %v", remoteHost, NativeSocketUtil::getErrorMessage(errno));
 		setError();
 		return;
 	}
 
 	if (NativeSocketUtil::setNonBlocking(internalSocket) != 0) {
-		logger->error("Couldn't set non-blocking state on listening socket: %v",
+		logger->error("Couldn't set non-blocking state for connection with native socket: %v",
 		        NativeSocketUtil::getErrorMessage(errno));
 		setError();
 		return;
 	}
+
 	setConnected();
 	addToSet();
 }
