@@ -187,7 +187,7 @@ void NativeSocket::connect() {
 	const auto logger = el::Loggers::getLogger("APG");
 	disconnect();
 
-	addrinfo hints;
+	addrinfo hints { };
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
@@ -195,15 +195,28 @@ void NativeSocket::connect() {
 
 	const int addrRet = ::getaddrinfo(this->remoteHost.c_str(), this->portString.c_str(), &hints, &tempAI);
 	if (addrRet != 0) {
-		logger->error("Couldn't listen on port %v in NativeAcceptorSocket: %v", port, ::gai_strerror(addrRet));
+		logger->error("Couldn't listen on port %v in NativeSocket: %v", port, ::gai_strerror(addrRet));
 		setError();
 		return;
 	}
 
 	auto addrPtr = NativeSocketUtil::make_addrinfo_ptr(tempAI);
 
-	logger->fatal("NativeSocket::connect NYI :(");
+	// will also connect
+	internalSocket = NativeSocketUtil::findValidSocket(addrPtr, nullptr, false);
 
+	if (internalSocket == -1) {
+		logger->error("Couldn't find a valid socket to listen on: %v", NativeSocketUtil::getErrorMessage(errno));
+		setError();
+		return;
+	}
+
+	if (NativeSocketUtil::setNonBlocking(internalSocket) != 0) {
+		logger->error("Couldn't set non-blocking state on listening socket: %v",
+		        NativeSocketUtil::getErrorMessage(errno));
+		setError();
+		return;
+	}
 	setConnected();
 	addToSet();
 }
@@ -315,11 +328,11 @@ void NativeAcceptorSocket::listen() {
 	disconnect();
 
 	// TODO: IPv6 here?
-	addrinfo hints;
-	hints.ai_family = AF_INET;
-	hints.ai_protocol = IPPROTO_TCP;
+	addrinfo hints { };
+	hints.ai_family = AF_UNSPEC;
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_socktype = SOCK_STREAM;
+//	hints.ai_protocol = IPPROTO_TCP;
 
 	addrinfo * retInfoTemp_;
 
