@@ -187,7 +187,8 @@ void NativeSocket::connect() {
 	const auto logger = el::Loggers::getLogger("APG");
 	disconnect();
 
-	addrinfo hints { };
+	addrinfo hints;
+	std::memset(&hints, 0, sizeof (hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
@@ -203,7 +204,7 @@ void NativeSocket::connect() {
 	auto addrPtr = NativeSocketUtil::make_addrinfo_ptr(tempAI);
 
 	// will also connect
-	internalSocket = NativeSocketUtil::findValidSocket(addrPtr, nullptr, false);
+	internalSocket = NativeSocketUtil::findValidSocket(addrPtr, false);
 
 	if (internalSocket == -1) {
 		logger->error("Couldn't connect to remote host (%v): %v", remoteHost, NativeSocketUtil::getErrorMessage(errno));
@@ -238,7 +239,7 @@ void NativeSocket::addToSet() {
 	FD_SET(internalSocket, &socketSet);
 }
 
-NativeAcceptorSocket::NativeAcceptorSocket(uint16_t port_, bool autoListen, uint32_t bufferSize_) :
+NativeDualAcceptorSocket::NativeDualAcceptorSocket(uint16_t port_, bool autoListen, uint32_t bufferSize_) :
 		        AcceptorSocket(port_, bufferSize_),
 		        portString { std::to_string(port) } {
 	if (autoListen) {
@@ -246,19 +247,21 @@ NativeAcceptorSocket::NativeAcceptorSocket(uint16_t port_, bool autoListen, uint
 	}
 }
 
-NativeAcceptorSocket::~NativeAcceptorSocket() {
+NativeDualAcceptorSocket::~NativeDualAcceptorSocket() {
 	disconnect();
 }
 
-void NativeAcceptorSocket::disconnect() {
+void NativeDualAcceptorSocket::disconnect() {
 	if (isConnected()) {
-		NativeSocketUtil::closeSocket(internalListener);
+		NativeSocketUtil::closeSocket(internalListener4);
+		NativeSocketUtil::closeSocket(internalListener6);
 	}
 
 	setNotConnected();
 }
 
-std::unique_ptr<Socket> NativeAcceptorSocket::acceptSocket(float maxWaitInSeconds) {
+std::unique_ptr<Socket> NativeDualAcceptorSocket::acceptSocket(float maxWaitInSeconds) {
+	static bool timeFor4 = false;
 	int newFD;
 	sockaddr_storage theirAddr;
 	socklen_t addrLen;
@@ -270,35 +273,60 @@ std::unique_ptr<Socket> NativeAcceptorSocket::acceptSocket(float maxWaitInSecond
 
 		// socket is set to O_NONBLOCK in listen() so -1 can mean
 		// errno was set to EWOULDBLOCK and no actual error occurred.
-		while ((newFD = ::accept(internalListener, (sockaddr *) &theirAddr, &addrLen)) == -1) {
-			if (errno == NativeSocketUtil::APGWOULDBLOCK) {
-				auto timeNow = std::chrono::high_resolution_clock::now();
-				const float deltaTime =
-				        std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count() / 1000.0f;
+		while (true) {
+			if (timeFor4) {
+				newFD = ::accept(internalListener4, (sockaddr *) &theirAddr, &addrLen);
+			} else {
+				newFD = ::accept(internalListener6, (sockaddr *) &theirAddr, &addrLen);
+			}
 
-				startTime = timeNow;
+			timeFor4 = !timeFor4;
 
-				waitTime += deltaTime;
+			if (newFD == -1) {
+				if (errno == NativeSocketUtil::APGWOULDBLOCK) {
+					auto timeNow = std::chrono::high_resolution_clock::now();
+					const float deltaTime =
+					        std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count()
+					                / 1000.0f;
 
-				if (waitTime > maxWaitInSeconds) {
+					startTime = timeNow;
+
+					waitTime += deltaTime;
+
+					if (waitTime > maxWaitInSeconds) {
+						return nullptr;
+					}
+				} else {
+					el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v",
+					        NativeSocketUtil::getErrorMessage(errno));
+					setError();
 					return nullptr;
 				}
 			} else {
-				el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v",
-				        NativeSocketUtil::getErrorMessage(errno));
-				setError();
-				return nullptr;
+				break;
 			}
 		}
 	} else {
-		while ((newFD = ::accept(internalListener, (sockaddr *) &theirAddr, &addrLen)) == -1) {
-			if (errno == NativeSocketUtil::APGWOULDBLOCK) {
-				continue;
+		while (true) {
+			if (timeFor4) {
+				newFD = ::accept(internalListener4, (sockaddr *) &theirAddr, &addrLen);
 			} else {
-				el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v",
-				        NativeSocketUtil::getErrorMessage(errno));
-				setError();
-				return nullptr;
+				newFD = ::accept(internalListener6, (sockaddr *) &theirAddr, &addrLen);
+			}
+
+			timeFor4 = !timeFor4;
+
+			if (newFD == -1) {
+				if (errno == NativeSocketUtil::APGWOULDBLOCK) {
+					continue;
+				} else {
+					el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v",
+					        NativeSocketUtil::getErrorMessage(errno));
+					setError();
+					return nullptr;
+				}
+			} else {
+				break;
 			}
 		}
 	}
@@ -306,13 +334,19 @@ std::unique_ptr<Socket> NativeAcceptorSocket::acceptSocket(float maxWaitInSecond
 	return NativeSocket::fromRawFileDescriptor(newFD, theirAddr);
 }
 
-std::unique_ptr<Socket> NativeAcceptorSocket::acceptSocketOnce() {
+std::unique_ptr<Socket> NativeDualAcceptorSocket::acceptSocketOnce() {
+	static bool four = false;
+
 	int newFD;
 	sockaddr_storage theirAddr;
 	socklen_t addrLen;
 
-	if ((newFD = ::accept(internalListener, (sockaddr *) &theirAddr, &addrLen)) == -1) {
-		// We almost expect that it would have blocked, but certainly it's not an error.
+	newFD = ::accept(four ? internalListener4 : internalListener6, (sockaddr *) &theirAddr, &addrLen);
+
+	four = !four;
+
+	if (newFD == -1) {
+		// We almost expect that it would have blocked, but certainly it's not an error if it would've.
 		if (errno != NativeSocketUtil::APGWOULDBLOCK) {
 			el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v", NativeSocketUtil::getErrorMessage(errno));
 			setError();
@@ -324,12 +358,12 @@ std::unique_ptr<Socket> NativeAcceptorSocket::acceptSocketOnce() {
 	return NativeSocket::fromRawFileDescriptor(newFD, theirAddr);
 }
 
-void NativeAcceptorSocket::listen() {
+void NativeDualAcceptorSocket::listen() {
 	const auto logger = el::Loggers::getLogger("APG");
 	disconnect();
 
-	// TODO: IPv6 here?
-	addrinfo hints { };
+	addrinfo hints;
+	std::memset(&hints, 0, sizeof (hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_socktype = SOCK_STREAM;
@@ -342,30 +376,87 @@ void NativeAcceptorSocket::listen() {
 	auto retHolder = NativeSocketUtil::make_addrinfo_ptr(retInfoTemp_);
 
 	if (addrRet != 0) {
-		logger->error("Couldn't listen on port %v in NativeAcceptorSocket: %v", port, ::gai_strerror(addrRet));
+		logger->error("Couldn't listen on port %v in NativeDualAcceptorSocket: %v", port, ::gai_strerror(addrRet));
 		setError();
 		return;
 	}
 
-	internalListener = NativeSocketUtil::findValidSocket(retHolder, nullptr, true);
+	auto supportedProtocols = NativeSocketUtil::findValidDualSockets(internalListener4, internalListener6, retHolder);
 
-	if (internalListener == -1) {
-		logger->error("Couldn't find a valid socket to listen on: %v", NativeSocketUtil::getErrorMessage(errno));
-		setError();
-		return;
+	switch (supportedProtocols) {
+	case NativeSocketUtil::DualSocketReturn::IPV4_ONLY: {
+		logger->info("Listening only for IPv4.");
+		internalListener6 = internalListener4;
+
+		supportsIP4 = true;
+		supportsIP6 = false;
+
+		break;
 	}
 
-	if (NativeSocketUtil::setNonBlocking(internalListener) != 0) {
-		logger->error("Couldn't set non-blocking state on listening socket: %v",
-		        NativeSocketUtil::getErrorMessage(errno));
-		setError();
-		return;
+	case NativeSocketUtil::DualSocketReturn::IPV6_ONLY: {
+		logger->info("Listening only for IPv6.");
+		internalListener4 = internalListener6;
+
+		supportsIP4 = false;
+		supportsIP6 = true;
+
+		break;
 	}
 
-	if (::listen(internalListener, NativeAcceptorSocket::CONNECTION_BACKLOG_SIZE) == -1) {
-		logger->error("Couldn't complete ::listen: %v", NativeSocketUtil::getErrorMessage(errno));
+	case NativeSocketUtil::DualSocketReturn::BOTH: {
+		logger->info("Listening for both IPv4 and IPv6!");
+
+		supportsIP4 = supportsIP6 = true;
+
+		break;
+	}
+
+	case NativeSocketUtil::DualSocketReturn::NEITHER: {
+		internalListener4 = internalListener6 = -1;
+		supportsIP4 = supportsIP6 = false;
+
+		logger->error("Dual native listener socket doesn't support either protocol.");
 		setError();
 		return;
+
+		break;
+	}
+
+	default: {
+		logger->fatal("Unsupported NativeSocketUtil::DualSocketReturn value");
+		break;
+	}
+	}
+
+	if (hasIP4Support()) {
+		if (NativeSocketUtil::setNonBlocking(internalListener4) != 0) {
+			logger->error("Couldn't set non-blocking state on listening socket (IP4): %v",
+			        NativeSocketUtil::getErrorMessage(errno));
+			setError();
+			return;
+		}
+
+		if (::listen(internalListener4, NativeDualAcceptorSocket::CONNECTION_BACKLOG_SIZE) == -1) {
+			logger->error("Couldn't complete ::listen for IPv4 socket: %v", NativeSocketUtil::getErrorMessage(errno));
+			setError();
+			return;
+		}
+	}
+
+	if (hasIP6Support()) {
+		if (NativeSocketUtil::setNonBlocking(internalListener6) != 0) {
+			logger->error("Couldn't set non-blocking state on listening socket (IP6): %v",
+			        NativeSocketUtil::getErrorMessage(errno));
+			setError();
+			return;
+		}
+
+		if (::listen(internalListener6, NativeDualAcceptorSocket::CONNECTION_BACKLOG_SIZE) == -1) {
+			logger->error("Couldn't complete ::listen for IPv6 socket: %v", NativeSocketUtil::getErrorMessage(errno));
+			setError();
+			return;
+		}
 	}
 
 	setConnected();
@@ -375,7 +466,7 @@ NativeSocketUtil::addrinfo_ptr NativeSocketUtil::make_addrinfo_ptr(addrinfo * ai
 	return NativeSocketUtil::addrinfo_ptr(ainfo, freeaddrinfo);
 }
 
-int NativeSocketUtil::findValidSocket(const addrinfo_ptr &ptr, addrinfo **targetStruct, bool shouldBind) {
+int NativeSocketUtil::findValidSocket(const addrinfo_ptr &ptr, bool shouldBind, addrinfo **targetStruct) {
 	auto logger = el::Loggers::getLogger("APG");
 
 	int socketFD = -1;
@@ -418,6 +509,99 @@ int NativeSocketUtil::findValidSocket(const addrinfo_ptr &ptr, addrinfo **target
 	}
 
 	return socketFD;
+}
+
+NativeSocketUtil::DualSocketReturn NativeSocketUtil::findValidDualSockets(int &ip4Socket, int &ip6Socket,
+        const addrinfo_ptr &ptr, addrinfo **targetStruct4, addrinfo **targetStruct6) {
+	auto logger = el::Loggers::getLogger("APG");
+
+	int tempSocketFD = -1;
+
+	bool ip4Done = false;
+	bool ip6Done = false;
+
+	addrinfo *p;
+
+	for (p = ptr.get(); p != nullptr; p = p->ai_next) {
+		if (ip4Done && ip6Done) {
+			break;
+		} else if (p->ai_family == AF_INET) {
+			if (ip4Done) {
+				// already bound our IP4 address so move to next
+				continue;
+			}
+		} else if (p->ai_family == AF_INET6) {
+			if (ip6Done) {
+				// already bound IP6 so move to next
+				continue;
+			}
+		} else {
+			logger->verbose(9, "Unsupported ai_family found: %v", p->ai_family);
+			continue;
+		}
+
+		tempSocketFD = ::socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+
+		const std::string inetString = (p->ai_family == AF_INET ? "IPv4" : "IPv6");
+
+		if (tempSocketFD == -1) {
+			logger->verbose(9, "Couldn't establish socket connection for addrinfo struct for %v.", inetString);
+			continue;
+		}
+
+		if (p->ai_family == AF_INET6) {
+			int opt = 1;
+
+			if (::setsockopt(tempSocketFD, IPPROTO_IPV6, IPV6_V6ONLY, &opt, sizeof(opt)) < 0) {
+				logger->error("Couldn't set IPV6_V6ONLY for IPv6 socket: %v", NativeSocketUtil::getErrorMessage(errno));
+				NativeSocketUtil::closeSocket(tempSocketFD);
+				continue;
+			}
+		}
+
+		if (::bind(tempSocketFD, p->ai_addr, p->ai_addrlen) == -1) {
+			NativeSocketUtil::closeSocket(tempSocketFD);
+			logger->warn("Couldn't bind socket for %v. This could indicate connectivity problems for this IP version.",
+			        inetString);
+			continue;
+		}
+
+		logger->verbose(9, "Connected/bound socket with ai_family %v.", inetString);
+
+		if (p->ai_family == AF_INET) {
+			ip4Socket = tempSocketFD;
+			tempSocketFD = -1;
+			ip4Done = true;
+
+			if (targetStruct4 != nullptr) {
+				targetStruct4 = &p;
+			}
+		} else if (p->ai_family == AF_INET6) {
+			ip6Socket = tempSocketFD;
+			tempSocketFD = -1;
+			ip6Done = true;
+
+			if (targetStruct6 != nullptr) {
+				targetStruct6 = &p;
+			}
+		}
+	}
+
+	if (ip4Done && ip6Done) {
+		return DualSocketReturn::BOTH;
+	} else if (ip4Done) {
+		// should be -1 anyway but make sure
+		ip6Socket = -1;
+
+		return DualSocketReturn::IPV4_ONLY;
+	} else if (ip6Done) {
+		// should be -1 anyway but make sure
+		ip4Socket = -1;
+
+		return DualSocketReturn::IPV6_ONLY;
+	}
+
+	return DualSocketReturn::NEITHER;
 }
 
 int NativeSocketUtil::closeSocket(int socketFD) {

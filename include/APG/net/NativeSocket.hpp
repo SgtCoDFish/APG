@@ -65,15 +65,38 @@ class NativeSocketUtil {
 public:
 	using addrinfo_ptr = std::unique_ptr<addrinfo, void(*)(addrinfo*)>;
 
+	enum class DualSocketReturn {
+		IPV4_ONLY,
+		IPV6_ONLY,
+		BOTH,
+		NEITHER
+	};
+
 	/**
 	 * Traverses a linked list returned by getaddrinfo and calls socket() on each
 	 * trying to get a socket descriptor. If it succeeds, returns the descriptor and places
 	 * the valid addrinfo into targetStruct.
 	 *
+	 * Only useful for servers which want to listen on only IP4, only IP6 or IP6-with-mapped-IP4.
+	 *
 	 * If bind is true, ::bind() will be called on a valid descriptor. If false, ::connect() is called.
 	 * @return a valid socket descriptor if a valid addrinfo was found, or -1 on failure.
 	 */
-	static int findValidSocket(const addrinfo_ptr &ptr, addrinfo ** targetStruct, bool bind = false);
+	static int findValidSocket(const addrinfo_ptr &ptr, bool bind = false, addrinfo ** targetStruct = nullptr);
+
+	/**
+	 * Attempts to fill ip4Socket and ip6Socket with sockets bind()ed sockets
+	 * which support both IPv4 and IPv6. Both will listen to the same port.
+	 *
+	 * Using this function, you should setsockopt for IPV6_V6ONLY or enable this in your OS settings.
+	 *
+	 * If ip4 or ip6 fails, the corresponding ip4Socket or ip6Socket will be set to mimic the other socket that succeeded,
+	 * although there will only be one real socket and it will obviously only support one protocol.
+	 *
+	 * @return a DualSocketReturn describing what the outcome of the function was.
+	 */
+	static DualSocketReturn findValidDualSockets(int &ip4Socket, int &ip6Socket, const addrinfo_ptr &ptr,
+	        addrinfo **targetStruct4 = nullptr, addrinfo **targetStruct6 = nullptr);
 
 	/**
 	 * Close the given socket FD; implemented here to handle differences between Windows and other
@@ -148,15 +171,29 @@ private:
 	fd_set socketSet;
 };
 
-class NativeAcceptorSocket : public AcceptorSocket {
+/**
+ * Uses the native socket API (posix sockets, winsock2) on the platform to listen for incoming connections.
+ *
+ * Will attempt to create 2 sockets listening on the same port; one for IPv4, one for IPv6.
+ * If one of those is not available, it can be queried using hasIPXSupport for X = {4, 6}.
+ */
+class NativeDualAcceptorSocket : public AcceptorSocket {
 public:
-	explicit NativeAcceptorSocket(uint16_t port_, bool autoListen = false, uint32_t bufferSize = BB_DEFAULT_SIZE);
-	virtual ~NativeAcceptorSocket();
+	explicit NativeDualAcceptorSocket(uint16_t port_, bool autoListen = false, uint32_t bufferSize = BB_DEFAULT_SIZE);
+	virtual ~NativeDualAcceptorSocket();
 
 	virtual std::unique_ptr<Socket> acceptSocket(float maxWaitInSeconds = -1.0f) override final;
 	virtual std::unique_ptr<Socket> acceptSocketOnce() override final;
 
 	virtual void disconnect() override final;
+
+	bool hasIP4Support() const {
+		return supportsIP4;
+	}
+
+	bool hasIP6Support() const {
+		return supportsIP6;
+	}
 
 protected:
 	virtual void listen() override final;
@@ -166,7 +203,11 @@ private:
 
 	const std::string portString;
 
-	int internalListener = -1;
+	int internalListener4 = -1;
+	int internalListener6 = -1;
+
+	bool supportsIP4 = false;
+	bool supportsIP6 = false;
 };
 
 }
