@@ -54,6 +54,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <netinet/tcp.h>
 #endif
 
 #include "Socket.hpp"
@@ -109,6 +110,8 @@ public:
 	 * between Windows and other platforms.
 	 */
 	static int setNonBlocking(int socketFD);
+
+	static int setTCPNodelay(int socketFD);
 
 	static addrinfo_ptr make_addrinfo_ptr(addrinfo *ainfo);
 

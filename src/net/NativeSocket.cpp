@@ -221,6 +221,12 @@ void NativeSocket::connect() {
 		return;
 	}
 
+	if(NativeSocketUtil::setTCPNodelay(internalSocket) != 0) {
+		logger->error("Couldn't set TCP_NODELAY (Nagle's algorithm).");
+		setError();
+		return;
+	}
+
 	setConnected();
 	addToSet();
 }
@@ -621,6 +627,12 @@ int NativeSocketUtil::setNonBlocking(int socketFD) {
 #else
 	return ::fcntl(socketFD, F_SETFL, O_NONBLOCK);
 #endif
+}
+
+int NativeSocketUtil::setTCPNodelay(int socketFD) {
+	char yes = 1;
+
+	return ::setsockopt(socketFD, IPPROTO_TCP, TCP_NODELAY, &yes, sizeof(yes));
 }
 
 void NativeSocket::nativeSocketInit() {
