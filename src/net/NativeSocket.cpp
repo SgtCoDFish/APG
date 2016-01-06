@@ -192,7 +192,7 @@ void NativeSocket::connect() {
 	addrinfo hints;
 	std::memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
 
 	addrinfo * tempAI;
 
@@ -221,8 +221,10 @@ void NativeSocket::connect() {
 		return;
 	}
 
-	if(NativeSocketUtil::setTCPNodelay(internalSocket) != 0) {
-		logger->error("Couldn't set TCP_NODELAY (Nagle's algorithm).");
+	if (NativeSocketUtil::setTCPNodelay(internalSocket) != 0) {
+		el::Loggers::getLogger("APG")->error("Couldn't set nodelay on new socket: %v",
+		        NativeSocketUtil::getErrorMessage(errno));
+		NativeSocketUtil::closeSocket(internalSocket);
 		setError();
 		return;
 	}
@@ -339,6 +341,14 @@ std::unique_ptr<Socket> NativeDualAcceptorSocket::acceptSocket(float maxWaitInSe
 		}
 	}
 
+	if (NativeSocketUtil::setTCPNodelay(newFD) != 0) {
+		el::Loggers::getLogger("APG")->error("Couldn't set nodelay on new socket: %v",
+		        NativeSocketUtil::getErrorMessage(errno));
+		NativeSocketUtil::closeSocket(newFD);
+
+		return nullptr;
+	}
+
 	return NativeSocket::fromRawFileDescriptor(newFD, theirAddr);
 }
 
@@ -359,6 +369,14 @@ std::unique_ptr<Socket> NativeDualAcceptorSocket::acceptSocketOnce() {
 			el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v", NativeSocketUtil::getErrorMessage(errno));
 			setError();
 		}
+
+		return nullptr;
+	}
+
+	if (NativeSocketUtil::setTCPNodelay(newFD) != 0) {
+		el::Loggers::getLogger("APG")->error("Couldn't set nodelay on new socket: %v",
+		        NativeSocketUtil::getErrorMessage(errno));
+		NativeSocketUtil::closeSocket(newFD);
 
 		return nullptr;
 	}
@@ -558,7 +576,11 @@ NativeSocketUtil::DualSocketReturn NativeSocketUtil::findValidDualSockets(int &i
 		}
 
 		if (p->ai_family == AF_INET6) {
+#ifdef _WIN32
 			const char opt = 1;
+#else
+			const int opt = 1;
+#endif
 
 			if (::setsockopt(tempSocketFD, IPPROTO_IPV6, IPV6_V6ONLY, &opt, sizeof(opt)) < 0) {
 				logger->error("Couldn't set IPV6_V6ONLY for IPv6 socket: %v", NativeSocketUtil::getErrorMessage(errno));
@@ -630,7 +652,11 @@ int NativeSocketUtil::setNonBlocking(int socketFD) {
 }
 
 int NativeSocketUtil::setTCPNodelay(int socketFD) {
-	char yes = 1;
+#ifdef _WIN32
+	const char yes = 1;
+#else
+	const int yes = 1;
+#endif
 
 	return ::setsockopt(socketFD, IPPROTO_TCP, TCP_NODELAY, &yes, sizeof(yes));
 }
