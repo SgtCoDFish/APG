@@ -119,7 +119,7 @@ int NativeSocket::send() {
 		}
 	}
 
-#ifdef APG_SOCKET_AUTO_CLEAR
+#ifndef APG_SOCKET_NO_AUTO_CLEAR
 	clear();
 #endif
 
@@ -127,18 +127,18 @@ int NativeSocket::send() {
 }
 
 int NativeSocket::recv(uint32_t length) {
-	REQUIRE(length <= recvBuffer.size(), "Cannot recv() on a buffer size smaller than the max");
+	REQUIRE(length <= APG_RECV_BUFFER_SIZE, "Cannot recv() on a buffer size smaller than the max");
 
 	if (hasError()) {
 		el::Loggers::getLogger("APG")->warn("recv() called on SDL socket in error state.");
 		return 0;
 	}
 
-#ifdef APG_SOCKET_AUTO_CLEAR
+#ifndef APG_SOCKET_NO_AUTO_CLEAR
 	clear();
 #endif
 
-	auto bytesReceived = ::recv(internalSocket, reinterpret_cast<char *>(recvBuffer.data()), recvBuffer.size(), 0);
+	auto bytesReceived = ::recv(internalSocket, reinterpret_cast<char *>(recvBuffer.get()), length, 0);
 
 	if (bytesReceived <= 0) {
 		if (bytesReceived == 0 || errno == EAGAIN || errno == NativeSocketUtil::APGWOULDBLOCK) {
@@ -151,7 +151,7 @@ int NativeSocket::recv(uint32_t length) {
 		}
 	}
 
-	putBytes(recvBuffer.data(), bytesReceived);
+	putBytes(recvBuffer.get(), bytesReceived);
 
 	return bytesReceived;
 }

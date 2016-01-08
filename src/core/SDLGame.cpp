@@ -209,7 +209,7 @@ void SDLGame::logSDLVersions() {
 
 void SDLGame::debugSDLVersion(el::Logger * const logger, const char *libraryName, const SDL_version &compiledVersion,
         const SDL_version &linkedVersion) {
-	logger->verbose(9, "%v compiled with version %v.%v.%v, linked with version %v.%v.%v", libraryName,
+	logger->verbose(8, "%v compiled with version %v.%v.%v, linked with version %v.%v.%v", libraryName,
 	        (uint32_t) compiledVersion.major, (uint32_t) compiledVersion.minor, (uint32_t) compiledVersion.patch,
 	        (uint32_t) linkedVersion.major, (uint32_t) linkedVersion.minor, (uint32_t) linkedVersion.patch);
 }

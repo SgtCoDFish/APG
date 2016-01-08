@@ -54,7 +54,8 @@ void SocketCommon::clearError() {
 Socket::Socket(const std::string &remoteHost_, uint16_t port_, uint32_t bufferSize_) :
 		        SocketCommon(bufferSize_),
 		        port { port_ },
-		        remoteHost { remoteHost_ } {
+		        remoteHost { remoteHost_ },
+		        recvBuffer { std::make_unique<uint8_t[]>(APG_RECV_BUFFER_SIZE) } {
 }
 
 AcceptorSocket::AcceptorSocket(uint16_t port_, uint32_t bufferSize_) :

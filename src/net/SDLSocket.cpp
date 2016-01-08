@@ -82,49 +82,55 @@ int SDLSocket::send() {
 		return 0;
 	}
 
+	printInfo();
+
 	auto &buf = getBuffer();
-	unsigned int totalSent = 0;
 
-	while (totalSent < buf.size()) {
-		auto sent = SDLNet_TCP_Send(internalSocket, buf.data(), buf.size());
+	const auto sent = SDLNet_TCP_Send(internalSocket, buf.data(), size());
 
-		if (sent <= 0) {
-			el::Loggers::getLogger("APG")->error("Send error: %v", SDLNet_GetError());
-			setError();
-			return 0;
-		}
+	el::Loggers::getLogger("APG")->info("Sent %v bytes.", sent);
 
-		totalSent += sent;
+	if (sent < static_cast<int32_t>(size())) {
+		el::Loggers::getLogger("APG")->error("Send error: %v", SDLNet_GetError());
+		setError();
+		return 0;
 	}
 
-#ifdef APG_SOCKET_AUTO_CLEAR
+#ifndef APG_SOCKET_NO_AUTO_CLEAR
 	clear();
+	printInfo();
 #endif
 
-	return totalSent;
+	return sent;
 }
 
 int SDLSocket::recv(uint32_t length) {
-	REQUIRE(length <= recvBuffer.size(), "Cannot recv() on a buffer size smaller than the max");
+	REQUIRE(length <= APG_RECV_BUFFER_SIZE, "Cannot recv() on a buffer size smaller than the max");
 
 	if (hasError()) {
 		el::Loggers::getLogger("APG")->warn("recv() called on SDL socket in error state.");
 		return 0;
 	}
 
-#ifdef APG_SOCKET_AUTO_CLEAR
+	printInfo();
+
+#ifndef APG_SOCKET_NO_AUTO_CLEAR
 	clear();
 #endif
 
-	auto received = SDLNet_TCP_Recv(internalSocket, recvBuffer.data(), recvBuffer.size());
+	auto received = SDLNet_TCP_Recv(internalSocket, recvBuffer.get(), length);
 
-	if (received < 0) {
+	if (received <= 0) {
 		el::Loggers::getLogger("APG")->error("Couldn't read data: %v", SDLNet_GetError());
 		setError();
 		return 0;
 	}
 
-	putBytes(recvBuffer.data(), received);
+	el::Loggers::getLogger("APG")->info("Received %v bytes.", received);
+
+	putBytes(recvBuffer.get(), received);
+
+	printInfo();
 
 	return received;
 }

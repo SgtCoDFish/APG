@@ -36,13 +36,10 @@
 
 #include "ByteBuffer.hpp"
 
-#ifndef APG_SOCKET_AUTO_CLEAR
-
-// if APG_SOCKET_AUTO_CLEAR is defined, sockets will empty their buffers
-// after send()ing data or before recv()ing data.
-#define APG_SOCKET_AUTO_CLEAR 1
-
-#endif
+// if APG_SOCKET_NO_AUTO_CLEAR is defined, sockets will not empty their buffers
+// after send()ing data or before recv()ing data, which puts the burden on the
+// programmer
+// #define APG_SOCKET_NO_AUTO_CLEAR
 
 #ifndef APG_RECV_BUFFER_SIZE
 
@@ -129,7 +126,7 @@ public:
 	virtual void disconnect() = 0;
 
 protected:
-	std::array<uint8_t, APG_RECV_BUFFER_SIZE> recvBuffer;
+	std::unique_ptr<uint8_t[]> recvBuffer;
 };
 
 /**
