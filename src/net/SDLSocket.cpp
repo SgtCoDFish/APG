@@ -35,6 +35,9 @@
 #include <chrono>
 #include <array>
 
+#include "APG/internal/Assert.hpp"
+#include "APG/net/Socket.hpp"
+
 namespace APG {
 
 SDLSocket::SDLSocket(const std::string &remoteHost_, uint16_t port_, bool autoConnect, uint32_t bufferSize_) :
@@ -82,10 +85,10 @@ int SDLSocket::send() {
 	auto &buf = getBuffer();
 	unsigned int totalSent = 0;
 
-	while(totalSent < buf.size()) {
+	while (totalSent < buf.size()) {
 		auto sent = SDLNet_TCP_Send(internalSocket, buf.data(), buf.size());
 
-		if(sent <= 0) {
+		if (sent <= 0) {
 			el::Loggers::getLogger("APG")->error("Send error: %v", SDLNet_GetError());
 			setError();
 			return 0;
@@ -94,30 +97,26 @@ int SDLSocket::send() {
 		totalSent += sent;
 	}
 
-//	auto sent = ;
-//	el::Loggers::getLogger("SENTSENT")->warn("Sent %v bytes", sent);
-
-//	if (sent < (int32_t) buf.size()) {
-//		if (sent > 0) {
-//			el::Loggers::getLogger("APG")->warn("Warning: %v bytes sent of %v bytes total.", sent, buf.size());
-//		} else {
-//			el::Loggers::getLogger("APG")->error("Send error: %v", SDLNet_GetError());
-//			setError();
-//			return 0;
-//		}
-//	}
+#ifdef APG_SOCKET_AUTO_CLEAR
+	clear();
+#endif
 
 	return totalSent;
 }
 
 int SDLSocket::recv(uint32_t length) {
+	REQUIRE(length <= recvBuffer.size(), "Cannot recv() on a buffer size smaller than the max");
+
 	if (hasError()) {
 		el::Loggers::getLogger("APG")->warn("recv() called on SDL socket in error state.");
 		return 0;
 	}
 
-	auto tempSendBuffer = std::make_unique<uint8_t[]>(length);
-	auto received = SDLNet_TCP_Recv(internalSocket, tempSendBuffer.get(), length);
+#ifdef APG_SOCKET_AUTO_CLEAR
+	clear();
+#endif
+
+	auto received = SDLNet_TCP_Recv(internalSocket, recvBuffer.data(), recvBuffer.size());
 
 	if (received < 0) {
 		el::Loggers::getLogger("APG")->error("Couldn't read data: %v", SDLNet_GetError());
@@ -125,7 +124,7 @@ int SDLSocket::recv(uint32_t length) {
 		return 0;
 	}
 
-	putBytes(tempSendBuffer.get(), received);
+	putBytes(recvBuffer.data(), received);
 
 	return received;
 }
@@ -133,9 +132,9 @@ int SDLSocket::recv(uint32_t length) {
 bool SDLSocket::hasActivity() {
 	const auto active = SDLNet_CheckSockets(socketSet.get(), 0);
 
-	if(active == -1) {
+	if (active == -1) {
 		el::Loggers::getLogger("APG")->error("SDLNet_CheckSockets returned an error code in waitForActivity: %v",
-				        SDLNet_GetError());
+		        SDLNet_GetError());
 		setError();
 		return false;
 	}

@@ -44,6 +44,7 @@
 
 #include "APG/net/NativeSocket.hpp"
 #include "APG/core/APGeasylogging.hpp"
+#include "APG/internal/Assert.hpp"
 
 namespace APG {
 
@@ -100,19 +101,17 @@ int NativeSocket::send() {
 		return 0;
 	}
 
-	auto &buf = getBuffer();
-
-	const int total = buf.size();
+	const int total = size();
 	int sent = 0;
 
 	while (sent < total) {
-		sent += ::send(internalSocket, reinterpret_cast<const char *>(buf.data()) + sent * sizeof(uint8_t),
-		        buf.size() - sent, 0);
+		sent += ::send(internalSocket, reinterpret_cast<const char *>(getBuffer().data()) + sent * sizeof(uint8_t),
+		        size() - sent, 0);
 	}
 
-	if (sent < (int32_t) buf.size()) {
+	if (sent < (int32_t) size()) {
 		if (sent >= 0) {
-			el::Loggers::getLogger("APG")->warn("Warning: %v bytes sent of %v bytes total.", sent, buf.size());
+			el::Loggers::getLogger("APG")->verbose(1, "Warning: %v bytes sent of %v bytes total.", sent, size());
 		} else {
 			el::Loggers::getLogger("APG")->error("Send error: %v", NativeSocketUtil::getErrorMessage(errno));
 			setError();
@@ -120,17 +119,26 @@ int NativeSocket::send() {
 		}
 	}
 
+#ifdef APG_SOCKET_AUTO_CLEAR
+	clear();
+#endif
+
 	return sent;
 }
 
 int NativeSocket::recv(uint32_t length) {
+	REQUIRE(length <= recvBuffer.size(), "Cannot recv() on a buffer size smaller than the max");
+
 	if (hasError()) {
 		el::Loggers::getLogger("APG")->warn("recv() called on SDL socket in error state.");
 		return 0;
 	}
 
-	auto tempBuffer = std::make_unique<uint8_t[]>(length);
-	auto bytesReceived = ::recv(internalSocket, reinterpret_cast<char *>(tempBuffer.get()), length, 0);
+#ifdef APG_SOCKET_AUTO_CLEAR
+	clear();
+#endif
+
+	auto bytesReceived = ::recv(internalSocket, reinterpret_cast<char *>(recvBuffer.data()), recvBuffer.size(), 0);
 
 	if (bytesReceived <= 0) {
 		if (bytesReceived == 0 || errno == EAGAIN || errno == NativeSocketUtil::APGWOULDBLOCK) {
@@ -143,7 +151,7 @@ int NativeSocket::recv(uint32_t length) {
 		}
 	}
 
-	putBytes(tempBuffer.get(), bytesReceived);
+	putBytes(recvBuffer.data(), bytesReceived);
 
 	return bytesReceived;
 }

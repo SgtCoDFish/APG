@@ -36,6 +36,22 @@
 
 #include "ByteBuffer.hpp"
 
+#ifndef APG_SOCKET_AUTO_CLEAR
+
+// if APG_SOCKET_AUTO_CLEAR is defined, sockets will empty their buffers
+// after send()ing data or before recv()ing data.
+#define APG_SOCKET_AUTO_CLEAR 1
+
+#endif
+
+#ifndef APG_RECV_BUFFER_SIZE
+
+// the size of the buffer used to recv() on this socket, to prevent having to
+// create a new buffer every recv()
+#define APG_RECV_BUFFER_SIZE 2048
+
+#endif
+
 namespace APG {
 /**
  * This is a class for implementing shared functionality between Socket and AcceptorSocket;
@@ -111,6 +127,9 @@ public:
 
 	virtual void connect() = 0;
 	virtual void disconnect() = 0;
+
+protected:
+	std::array<uint8_t, APG_RECV_BUFFER_SIZE> recvBuffer;
 };
 
 /**
