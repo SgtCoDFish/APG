@@ -82,13 +82,11 @@ int SDLSocket::send() {
 		return 0;
 	}
 
-	printInfo();
-
 	auto &buf = getBuffer();
 
 	const auto sent = SDLNet_TCP_Send(internalSocket, buf.data(), size());
 
-	el::Loggers::getLogger("APG")->info("Sent %v bytes.", sent);
+//	el::Loggers::getLogger("APG")->info("Sent %v bytes.", sent);
 
 	if (sent < static_cast<int32_t>(size())) {
 		el::Loggers::getLogger("APG")->error("Send error: %v", SDLNet_GetError());
@@ -98,7 +96,6 @@ int SDLSocket::send() {
 
 #ifndef APG_SOCKET_NO_AUTO_CLEAR
 	clear();
-	printInfo();
 #endif
 
 	return sent;
@@ -112,8 +109,6 @@ int SDLSocket::recv(uint32_t length) {
 		return 0;
 	}
 
-	printInfo();
-
 #ifndef APG_SOCKET_NO_AUTO_CLEAR
 	clear();
 #endif
@@ -126,11 +121,9 @@ int SDLSocket::recv(uint32_t length) {
 		return 0;
 	}
 
-	el::Loggers::getLogger("APG")->info("Received %v bytes.", received);
+//	el::Loggers::getLogger("APG")->info("Received %v bytes.", received);
 
 	putBytes(recvBuffer.get(), received);
-
-	printInfo();
 
 	return received;
 }
