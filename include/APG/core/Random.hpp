@@ -28,6 +28,8 @@
 #ifndef INCLUDE_APG_CORE_RANDOM_HPP_
 #define INCLUDE_APG_CORE_RANDOM_HPP_
 
+#include <type_traits>
+
 #include <random>
 
 namespace APG {
@@ -35,23 +37,28 @@ namespace APG {
 /**
  * Returns random numbers as a "dice roll" from a mersenne twister.
  */
-class Random final {
+template<typename DiceType = uint_fast32_t> class Random final {
 public:
-	/* Must be an integer type */
-	using dice_type_t = uint_fast32_t;
+	static_assert(std::is_integral<DiceType>::value, "DiceType must be integral");
 
-	explicit Random(std::mt19937_64 &mt, dice_type_t defaultMin = 0u, dice_type_t defaultMax = 99u);
+	explicit Random(std::mt19937_64 &mt_, DiceType defaultMin_ = 0u, DiceType defaultMax_ = 99u) :
+			        mt { mt_ },
+			        diceDist { defaultMin_, defaultMax_ } {
+	}
+
 	~Random() = default;
 
 	/**
 	 * Return an integer roll in the given range (inclusive).
 	 */
-	dice_type_t getDiceRoll();
+	DiceType getDiceRoll() {
+		return diceDist(mt);
+	}
 
 private:
 	std::mt19937_64 &mt;
 
-	std::uniform_int_distribution<dice_type_t> diceDist;
+	std::uniform_int_distribution<DiceType> diceDist;
 };
 
 }
