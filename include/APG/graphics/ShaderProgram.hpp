@@ -72,16 +72,16 @@ public:
 
 	void setUniformf(const char * const uniformName, std::initializer_list<float> vals);
 	void setUniformf(const char * const uniformName, float val);
-	void setUniformf(const char * const uniformName, glm::vec2 vals);
-	void setUniformf(const char * const uniformName, glm::vec3 vals);
-	void setUniformf(const char * const uniformName, glm::vec4 vals);
-	void setUniformf(const char * const uniformName, glm::mat4 mat);
+	void setUniformf(const char * const uniformName, const glm::vec2 &vals);
+	void setUniformf(const char * const uniformName, const glm::vec3 &vals);
+	void setUniformf(const char * const uniformName, const glm::vec4 &vals);
+	void setUniformf(const char * const uniformName, const glm::mat4 &mat);
 
 	void setUniformi(const char * const uniformName, std::initializer_list<int32_t> vals);
 	void setUniformi(const char * const uniformName, int32_t val);
-	void setUniformi(const char * const uniformName, glm::ivec2 vals);
-	void setUniformi(const char * const uniformName, glm::ivec3 vals);
-	void setUniformi(const char * const uniformName, glm::ivec4 vals);
+	void setUniformi(const char * const uniformName, const glm::ivec2 &vals);
+	void setUniformi(const char * const uniformName, const glm::ivec3 &vals);
+	void setUniformi(const char * const uniformName, const glm::ivec4 &vals);
 
 	uint32_t getProgramID() const {
 		return shaderProgram;

@@ -150,7 +150,7 @@ else ()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_RELEASE_FLAGS}")
 endif ()
 
-add_library(${APG_LIB_NAME} ${APG_SOURCES})
+add_library(${APG_LIB_NAME} ${APG_SOURCES} ${APG_HEADERS})
 
 if ( NOT EXCLUDE_AUDIO_TEST )
     if ( NOT EXISTS ${PROJECT_SOURCE_DIR}/assets/test_music.ogg )

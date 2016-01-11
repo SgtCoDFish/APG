@@ -148,22 +148,22 @@ void APG::ShaderProgram::setUniformf(const char * const uniformName, float val) 
 	glUniform1f(uniLoc, val);
 }
 
-void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::vec2 vals) {
+void APG::ShaderProgram::setUniformf(const char * const uniformName, const glm::vec2 &vals) {
 	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
 	glUniform2f(uniLoc, vals.x, vals.y);
 }
 
-void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::vec3 vals) {
+void APG::ShaderProgram::setUniformf(const char * const uniformName, const glm::vec3 &vals) {
 	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
 	glUniform3f(uniLoc, vals.x, vals.y, vals.z);
 }
 
-void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::vec4 vals) {
+void APG::ShaderProgram::setUniformf(const char * const uniformName, const glm::vec4 &vals) {
 	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
 	glUniform4f(uniLoc, vals.x, vals.y, vals.z, vals.w);
 }
 
-void APG::ShaderProgram::setUniformf(const char * const uniformName, glm::mat4 mat) {
+void APG::ShaderProgram::setUniformf(const char * const uniformName, const glm::mat4 &mat) {
 	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
 	glUniformMatrix4fv(uniLoc, 1, GL_FALSE, glm::value_ptr(mat));
 }
@@ -205,17 +205,17 @@ void APG::ShaderProgram::setUniformi(const char * const uniformName, int32_t val
 	glUniform1i(uniLoc, val);
 }
 
-void APG::ShaderProgram::setUniformi(const char * const uniformName, glm::ivec2 vals) {
+void APG::ShaderProgram::setUniformi(const char * const uniformName, const glm::ivec2 &vals) {
 	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
 	glUniform2i(uniLoc, vals.x, vals.y);
 }
 
-void APG::ShaderProgram::setUniformi(const char * const uniformName, glm::ivec3 vals) {
+void APG::ShaderProgram::setUniformi(const char * const uniformName, const glm::ivec3 &vals) {
 	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
 	glUniform3i(uniLoc, vals.x, vals.y, vals.z);
 }
 
-void APG::ShaderProgram::setUniformi(const char * const uniformName, glm::ivec4 vals) {
+void APG::ShaderProgram::setUniformi(const char * const uniformName, const glm::ivec4 &vals) {
 	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
 	glUniform4i(uniLoc, vals.x, vals.y, vals.z, vals.w);
 }
