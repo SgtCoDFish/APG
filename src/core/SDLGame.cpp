@@ -38,8 +38,14 @@
 #include <SDL2/SDL_net.h>
 
 #include <GL/glew.h>
+
+#if defined(__APPLE__)
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else
 #include <GL/gl.h>
 #include <GL/glu.h>
+#endif
 
 #include "APG/core/APGeasylogging.hpp"
 #include "APG/core/SDLGame.hpp"
@@ -48,7 +54,13 @@
 
 uint32_t APG::SDLGame::SDL_INIT_FLAGS = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS;
 uint32_t APG::SDLGame::SDL_IMAGE_INIT_FLAGS = IMG_INIT_PNG;
+
+#if defined (__APPLE__)
+uint32_t APG::SDLGame::SDL_MIXER_INIT_FLAGS = 0;
+#else
 uint32_t APG::SDLGame::SDL_MIXER_INIT_FLAGS = MIX_INIT_OGG;
+#endif
+
 uint32_t APG::SDLGame::SDL_WINDOW_FLAGS = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
 namespace APG {

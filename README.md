@@ -1,28 +1,40 @@
 APG
 ===
 
-A simple framework for getting started writing an RPG using Modern C++ (C++14), SDL2 and
-[tmxparser](https://github.com/andrewrk/tmxparser/) to load maps made in [Tiled](http://www.mapeditor.org/).
+A simple framework for writing primarily 2D game using Modern C++ (C++14), OpenGL SDL2 and
+[Tiled](http://www.mapeditor.org/) maps.
 
 The design is heavily inspired by [LibGDX](https://github.com/libgdx/libgdx/).
-
-The name comes from saying the letters "RPG" out loud; "*A*rr *P*ee *G*ee".
 
 What's Included
 ---------------
 
 - An easy entry-point with clearly defined functions to override and implement to make your own cross platform game.
-- SXXDL: C++14 `unique_ptr` wrappers around common SDL2 structs (e.g. `SDL_Surface`, `SDL_Window`, `SDL_Renderer`) which let you
-stop having to worry about cleanup.
 - A SpriteBatch class similar to the one in [LibGDX](https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/graphics/g2d/SpriteBatch.java) which aims to minimise draw calls for 2D sprites.
 - Two renderers for TMX maps; one using pure SDL2 `SDL_Renderer` functions, one using pure modern OpenGL (core context).
 - An SDL2 input manager for the keyboard supporting "isPressed" and "isJustPressed" as required.
-- An SDL2_mixer audio manager for playing a channel of music and multiple channels of sound effects.
-- SDL2_net/Native Socket wrappers for networking including a modified version of [ByteBufferCpp](https://github.com/SgtCoDFish/ByteBufferCpp) for handling data.
+- An SDL2\_mixer audio manager for playing a channel of music and multiple channels of sound effects.
+- SDL2\_net/Native Socket wrappers for networking including a modified version of [ByteBufferCpp](https://github.com/SgtCoDFish/ByteBufferCpp) for handling data.
 - The ability to compile without SDL/GL at all, allowing you to use the rest of the library freely and reduce dependencies/library size if you don't need some components (ideal for, for example, servers which share some data structures with the client).
+- SXXDL: C++14 `unique_ptr` wrappers around common SDL2 structs (e.g. `SDL_Surface`, `SDL_Window`, `SDL_Renderer`) which let you
+stop having to worry about cleanup.
 
 How To Use
 ----------
+
+## Dependencies for Build
+### Linux
+Can all be done through a package manager; details coming soon.
+
+### macOS
+You'll need Homebrew installed.
+
+```bash
+brew install sdl2 sdl2_gfx sdl2_image sdl2_mixer sdl2_net sdl2_ttf glew glm rapidjson tinyxml2
+```
+
+### Windows
+Coming soon!
 
 Clone the repository and navigate to the folder, then:
 

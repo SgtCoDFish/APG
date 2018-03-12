@@ -37,7 +37,12 @@
 #include <SDL2/SDL_image.h>
 
 #include <GL/glew.h>
+
+#if defined(__APPLE__)
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 
 #include <tmxparser/Tmx.h>
 

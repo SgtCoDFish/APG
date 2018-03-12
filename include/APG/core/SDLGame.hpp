@@ -39,8 +39,14 @@
 #include <SDL2/SDL_net.h>
 
 #include <GL/glew.h>
+
+#if defined(__APPLE__)
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else
 #include <GL/gl.h>
 #include <GL/glu.h>
+#endif
 
 #include "APG/SXXDL.hpp"
 #include "APG/core/Game.hpp"
