@@ -277,6 +277,10 @@ if ( NOT EXCLUDE_AUDIO_TEST )
 	set (AUDIOTEST_SOURCES test/APGAudioTest.cpp)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${AUDIOTEST_FLAGS}")
 
+	if ( EMSCRIPTEN )
+		set (CMAKE_EXE_LINKER_FLAGS "${BASE_LINKER_FLAGS} --embed-file assets/test_music.ogg --embed-file assets/test_sound.wav -O2")
+	endif ()
+
 	add_executable(AudioTest ${AUDIOTEST_SOURCES} ${EXTRA_SOURCES})
 	target_link_libraries(AudioTest ${APG_LIB_NAME} ${EXAMPLE_LIBS})
 endif ( NOT EXCLUDE_AUDIO_TEST )

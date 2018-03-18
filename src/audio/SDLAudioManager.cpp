@@ -32,7 +32,7 @@
 #include "easylogging++.h"
 
 APG::SDLAudioManager::SDLAudioManager(int frequency, uint16_t format, int channelCount) :
-		        APG::AudioManager() {
+		APG::AudioManager() {
 	const auto logger = el::Loggers::getLogger("APG");
 
 	if (Mix_OpenAudio(frequency, format, 2, 1024) == -1) {
