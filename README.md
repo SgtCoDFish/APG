@@ -51,7 +51,7 @@ You should be able to install the dependencies you need through your package man
 ```bash
 sudo apt install git cmake  # basic build dependencies; you'll also need a compiler (something like build-essential)
 # Now install library dependencies which are not vendored
-sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-net-dev libsdl2-ttf-dev libglew-dev
+sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-net-dev libsdl2-ttf-dev libglew-dev zlib1g-dev
 ```
 
 #### Windows
