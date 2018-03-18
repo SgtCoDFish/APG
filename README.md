@@ -22,12 +22,15 @@ Most of APG's dependencies are vendored using git submodules, so just cloning th
 # Clone APG as usual, and cd into the directory
 g submodule update --init --recursive  # this will fetch all the dependencies at the correct commit
 ```
+
 ### Dependencies for Build
+Generally, you'll need OpenGL and the SDL2 libraries (SDL2, SDL2\_image, SDL2\_mixer, SDL2\_net, SDL2\_ttf) installed and nothing else.
+
 #### macOS
-You'll need Homebrew installed.
+You'll need Homebrew installed along with git (likely through the XCode command line tools).
 
 ```bash
-brew install sdl2 sdl2_gfx sdl2_image sdl2_mixer sdl2_net sdl2_ttf glew glm rapidjson tinyxml2
+brew install cmake sdl2 sdl2_gfx sdl2_image sdl2_mixer sdl2_net sdl2_ttf glew
 ```
 
 #### Linux Deb-based (Debian, Ubuntu, etc.)
