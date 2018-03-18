@@ -6,6 +6,7 @@ A simple framework for writing primarily 2D game using Modern C++ (C++14), OpenG
 The design is heavily inspired by [LibGDX](https://github.com/libgdx/libgdx/).
 
 ## What's Included
+- COMING SOON: emscripten support (WASM)
 - An easy entry-point with clearly defined functions to implement to make your own cross platform game.
 - A SpriteBatch class similar to the one in [LibGDX](https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/graphics/g2d/SpriteBatch.java) which aims to minimise draw calls for 2D sprites.
 - An SDL2 input manager for the keyboard supporting "isPressed" and "isJustPressed" as required.
@@ -24,7 +25,18 @@ g submodule update --init --recursive  # this will fetch all the dependencies at
 ```
 
 ### Dependencies for Build
-Generally, you'll need OpenGL and the SDL2 libraries (SDL2, SDL2\_image, SDL2\_mixer, SDL2\_net, SDL2\_ttf) installed and nothing else.
+Generally, you'll need a C++ compiler, zlib, OpenGL and the SDL2 libraries (SDL2, SDL2\_image, SDL2\_mixer, SDL2\_net, SDL2\_ttf) installed and nothing else.
+
+#### WASM
+Install [emscripten](https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html) as shown in the Wiki.
+
+Activate emscripten (`source ./emsdk_env.sh`) then run:
+```bash
+python $EMSCRIPTEN/embuilder.py build ALL
+```
+to build SDL2 and OpenGL.
+
+Don't forget to use `emcmake cmake ..` instead of the regular cmake command.
 
 #### macOS
 You'll need Homebrew installed along with git (likely through the XCode command line tools).

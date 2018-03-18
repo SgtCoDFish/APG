@@ -32,28 +32,16 @@
 
 #include <cstdint>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
-#include <SDL2/SDL_net.h>
-
-#include <GL/glew.h>
-
-#if defined(__APPLE__)
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
+#include "APG/SDL.hpp"
+#include "APG/GL.hpp"
 
 #include "APG/SXXDL.hpp"
 #include "APG/core/Game.hpp"
-#include "APG/core/APGeasylogging.hpp"
 #include "APG/input/SDLInputManager.hpp"
 #include "APG/audio/SDLAudioManager.hpp"
 #include "APG/font/SDLFontManager.hpp"
+
+#include "easylogging++.h"
 
 namespace APG {
 

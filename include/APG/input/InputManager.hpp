@@ -30,7 +30,7 @@
 
 #ifndef APG_NO_SDL
 
-#include <SDL2/SDL.h>
+#include "APG/SDL.hpp"
 
 namespace APG {
 

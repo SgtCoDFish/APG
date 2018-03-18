@@ -27,11 +27,7 @@
 
 #ifndef APG_NO_SDL
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
-#include <SDL2/SDL_net.h>
-
+#include "APG/SDL.hpp"
 #include "APG/SXXDL.hpp"
 
 SXXDL::window_ptr SXXDL::make_window_ptr(SDL_Window *window) {

@@ -31,26 +31,14 @@
 
 #include <string>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
-#include <SDL2/SDL_net.h>
+#include "APG/SDL.hpp"
+#include "APG/GL.hpp"
 
-#include <GL/glew.h>
-
-#if defined(__APPLE__)
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
-
-#include "APG/core/APGeasylogging.hpp"
 #include "APG/core/SDLGame.hpp"
 #include "APG/input/SDLInputManager.hpp"
 #include "APG/tiled/TmxRenderer.hpp"
+
+#include "easylogging++.h"
 
 uint32_t APG::SDLGame::SDL_INIT_FLAGS = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS;
 uint32_t APG::SDLGame::SDL_IMAGE_INIT_FLAGS = IMG_INIT_PNG;
@@ -211,8 +199,10 @@ void SDLGame::logSDLVersions() {
 	SDLGame::debugSDLVersion(logger, "SDL2_ttf", compiledVersion, *ttfVersion);
 
 	SDL_MIXER_VERSION(&compiledVersion);
+#if !defined (__EMSCRIPTEN__)
 	const auto mixVersion = Mix_Linked_Version();
 	SDLGame::debugSDLVersion(logger, "SDL2_mixer", compiledVersion, *mixVersion);
+#endif
 
 	SDL_NET_VERSION(&compiledVersion);
 	const auto netVersion = SDLNet_Linked_Version();

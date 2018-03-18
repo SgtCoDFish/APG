@@ -31,16 +31,16 @@
 
 #include <string>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include "APG/SDL.hpp"
 
 #include "APG/SXXDL.hpp"
-#include "APG/core/APGeasylogging.hpp"
 #include "APG/font/SDLFontManager.hpp"
 #include "APG/graphics/SpriteBase.hpp"
 #include "APG/graphics/Texture.hpp"
 #include "APG/graphics/Sprite.hpp"
 #include "APG/internal/Assert.hpp"
+
+#include "easylogging++.h"
 
 const int APG::SDLFontManager::MAX_OWNED_TEXTURES;
 const int APG::SDLFontManager::MAX_OWNED_SPRITES;

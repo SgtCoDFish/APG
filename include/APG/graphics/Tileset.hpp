@@ -38,8 +38,9 @@
 
 #include "Tmx.h"
 
-#include "APG/core/APGeasylogging.hpp"
 #include "APG/graphics/Texture.hpp"
+
+#include "easylogging++.h"
 
 namespace APG {
 

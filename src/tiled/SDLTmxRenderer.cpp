@@ -32,8 +32,7 @@
 
 #include "Tmx.h"
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include "APG/SDL.hpp"
 
 #include "APG/SXXDL.hpp"
 #include "APG/tiled/TmxRenderer.hpp"

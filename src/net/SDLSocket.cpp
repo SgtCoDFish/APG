@@ -27,16 +27,17 @@
 
 #ifndef APG_NO_SDL
 
-#include "APG/net/SDLSocket.hpp"
-#include "APG/core/APGeasylogging.hpp"
-
 #include <memory>
 #include <utility>
 #include <chrono>
 #include <array>
 
+#include "APG/net/SDLSocket.hpp"
+
 #include "APG/internal/Assert.hpp"
 #include "APG/net/Socket.hpp"
+
+#include "easylogging++.h"
 
 namespace APG {
 

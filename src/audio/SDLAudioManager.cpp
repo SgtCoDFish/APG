@@ -28,8 +28,8 @@
 #ifndef APG_NO_SDL
 
 #include "APG/internal/Assert.hpp"
-#include "APG/core/APGeasylogging.hpp"
 #include "APG/audio/SDLAudioManager.hpp"
+#include "easylogging++.h"
 
 APG::SDLAudioManager::SDLAudioManager(int frequency, uint16_t format, int channelCount) :
 		        APG::AudioManager() {

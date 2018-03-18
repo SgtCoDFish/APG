@@ -33,26 +33,19 @@
 #include <numeric>
 #include <utility>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-
-#include <GL/glew.h>
-
-#if defined(__APPLE__)
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
+#include "APG/SDL.hpp"
+#include "APG/GL.hpp"
 
 #include "Tmx.h"
 
 #include "APG/SXXDL.hpp"
-#include "APG/core/APGeasylogging.hpp"
-INITIALIZE_EASYLOGGINGPP
 #include "APG/core/Game.hpp"
 #include "APG/tiled/SDLTmxRenderer.hpp"
 
 #include "test/APGSDLRenderTest.hpp"
+
+#include "easylogging++.h"
+INITIALIZE_EASYLOGGINGPP
 
 const std::string ASSET_PREFIX = "assets/";
 

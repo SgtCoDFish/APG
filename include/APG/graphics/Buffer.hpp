@@ -36,15 +36,9 @@
 #include <vector>
 #include <array>
 
-#include <GL/glew.h>
+#include "APG/GL.hpp"
 
-#if defined(__APPLE__)
-#include <OpenGL/glu.h>
-#else
-#include <GL/glu.h>
-#endif
-
-#include "APG/core/APGeasylogging.hpp"
+#include "easylogging++.h"
 
 namespace APG {
 

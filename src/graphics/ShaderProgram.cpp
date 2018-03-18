@@ -36,15 +36,7 @@
 #include <new>
 #include <memory>
 
-#include <GL/glew.h>
-
-#if defined(__APPLE__)
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
+#include "APG/GL.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -53,7 +45,8 @@
 #include "APG/graphics/VertexAttribute.hpp"
 #include "APG/graphics/VertexAttributeList.hpp"
 #include "APG/internal/Assert.hpp"
-#include "APG/core/APGeasylogging.hpp"
+
+#include "easylogging++.h"
 
 APG::ShaderProgram::ShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource) {
 	loadShader(vertexShaderSource, GL_VERTEX_SHADER);

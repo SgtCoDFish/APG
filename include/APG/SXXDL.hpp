@@ -30,10 +30,7 @@
 
 #include <memory>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
-#include <SDL2/SDL_net.h>
+#include "APG/SDL.hpp"
 
 namespace SXXDL {
 

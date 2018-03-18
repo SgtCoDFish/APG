@@ -39,12 +39,13 @@
 #include "Tmx.h"
 
 #include "APG/SXXDL.hpp"
-#include "APG/core/APGeasylogging.hpp"
 #include "APG/core/APGCommon.hpp"
 #include "APG/graphics/Tileset.hpp"
 #include "APG/graphics/AnimatedSprite.hpp"
 #include "APG/tiled/TmxRenderer.hpp"
 #include "APG/internal/Assert.hpp"
+
+#include "easylogging++.h"
 
 std::unordered_map<std::string, std::shared_ptr<APG::Tileset>> APG::TmxRenderer::tmxTilesets;
 

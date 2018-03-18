@@ -32,7 +32,7 @@
 
 #include <unordered_map>
 
-#include <SDL2/SDL_mixer.h>
+#include "APG/SDL.hpp"
 
 #include "APG/SXXDL.hpp"
 #include "APG/audio/Audio.hpp"

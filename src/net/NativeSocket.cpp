@@ -43,8 +43,9 @@
 #include <chrono>
 
 #include "APG/net/NativeSocket.hpp"
-#include "APG/core/APGeasylogging.hpp"
 #include "APG/internal/Assert.hpp"
+
+#include "easylogging++.h"
 
 namespace APG {
 

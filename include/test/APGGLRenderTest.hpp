@@ -32,7 +32,7 @@
 #include <memory>
 #include <utility>
 
-#include <SDL2/SDL.h>
+#include "APG/SDL.hpp"
 
 #include "Tmx.h"
 

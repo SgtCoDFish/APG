@@ -27,7 +27,7 @@
 #include <cstdint>
 
 #include "APG/net/NetUtil.hpp"
-#include "APG/core/APGeasylogging.hpp"
+#include "easylogging++.h"
 
 namespace APG {
 

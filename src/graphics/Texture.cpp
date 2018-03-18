@@ -33,26 +33,19 @@
 #include <atomic>
 #include <string>
 
-#include <GL/glew.h>
-#if defined(__APPLE__)
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
+#include "APG/GL.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include "APG/SDL.hpp"
 
 #include "APG/SXXDL.hpp"
-#include "APG/core/APGeasylogging.hpp"
 #include "APG/graphics/Texture.hpp"
 #include "APG/graphics/ShaderProgram.hpp"
 #include "APG/internal/Assert.hpp"
+
+#include "easylogging++.h"
 
 std::atomic<uint32_t> APG::Texture::availableTextureUnit(0);
 uint32_t APG::Texture::TEXTURE_TARGETS[] = { GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2, GL_TEXTURE3,
@@ -162,7 +155,7 @@ void APG::Texture::loadTexture(SDL_Surface * const surface) {
 	logger->info("Loaded texture \"%v\" at unit GL_TEXTURE%v", fileName, textureUnitInt);
 
 	if (preserveSurface) {
-		preservedSurface = std::move(SXXDL::make_surface_ptr(surface));
+		preservedSurface = SXXDL::make_surface_ptr(surface);
 	}
 }
 

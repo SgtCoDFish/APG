@@ -45,16 +45,35 @@ endif()
 message ("Finding dependencies for APG.")
 
 if ( NOT APG_NO_SDL )
-	find_package(SDL2 REQUIRED)
-	find_package(SDL2_image REQUIRED)
-	find_package(SDL2_mixer REQUIRED)
-	find_package(SDL2_ttf REQUIRED)
-	find_package(SDL2_net REQUIRED)
+	if(EMSCRIPTEN)
+		set(CMAKE_CXX_FLAGS_BASE "${CMAKE_CXX_FLAGS_BASE} -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='[\"png\"]' -s USE_SDL_NET=2 -s USE_SDL_TTF=2")
+		set(${SDL2_LIBRARY} "-s USE_SDL=2")
+		set(${SDL2_TTF_LIBRARIES} "-s USE_SDL_TTF=2")
+		set(${SDL2_IMAGE_LIBRARY} "-s USE_SDL_IMAGE=2")
+		# set(${SDL2_MIXER_LIBRARY} "-s USE_SDL_MIXER=2")
+		set(${SDL2_MIXER_LIBRARY} "")
+		set(${SDL2_NET_LIBRARY} "-s USE_SDL_NET=1")
+		set(${SDL2_INCLUDE_DIR} "")
+		set(${SDL2_TTF_INCLUDE_DIR} "")
+		set(${SDL2_IMAGE_INCLUDE_DIR} "")
+		set(${SDL2_MIXER_INCLUDE_DIR} "")
+		set(${SDL2_NET_INCLUDE_DIR} "")
+	else()
+		find_package(SDL2 REQUIRED)
+		find_package(SDL2_image REQUIRED)
+		find_package(SDL2_mixer REQUIRED)
+		find_package(SDL2_ttf REQUIRED)
+		find_package(SDL2_net REQUIRED)
+	endif()
 endif ()
 
 if ( NOT APG_NO_GL )
-	find_package(OpenGL REQUIRED)
-	find_package(GLEW REQUIRED)
+	if(EMSCRIPTEN)
+		message("Skipping finding OpenGL for emscripten")
+	else()
+		find_package(OpenGL REQUIRED)
+		find_package(GLEW REQUIRED)
+	endif()
 endif ()
 
 #find_package(GLM REQUIRED)
@@ -62,7 +81,14 @@ endif ()
 
 #find_package(TmxParser REQUIRED)
 #find_package(TinyXML2 REQUIRED)
-#find_package(ZLIB REQUIRED)
+
+if ( EMSCRIPTEN )
+	set(CMAKE_CXX_FLAGS_BASE "${CMAKE_CXX_FLAGS_BASE} -s USE_ZLIB=1")
+	set(ZLIB_LIBRARIES "-s USE_ZLIB=1")
+	set(ZLIB_INCLUDE_DIRS "")
+else ()
+	find_package(ZLIB REQUIRED)
+endif ()
 
 set(VENDOR_TINYXML2_FILES ${PROJECT_SOURCE_DIR}/vendor/tinyxml2/tinyxml2.cpp ${PROJECT_SOURCE_DIR}/vendor/tinyxml2/tinyxml2.h)
 set(VENDOR_TINYXML2_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/tinyxml2)
@@ -73,42 +99,27 @@ file(GLOB_RECURSE VENDOR_TMXPARSER_HEADERS ${PROJECT_SOURCE_DIR}/vendor/tmxparse
 set(VENDOR_TMXPARSER_FILES ${VENDOR_TMXPARSER_SOURCES} ${VENDOR_TMXPARSER_HEADERS})
 set(VENDOR_TMXPARSER_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/tmxparser/src)
 
-set(ZLIB_PC ${PROJECT_BINARY_DIR}/zlib.pc)
-configure_file(${PROJECT_SOURCE_DIR}/vendor/zlib/zlib.pc.cmakein ${ZLIB_PC} @ONLY)
-configure_file(${PROJECT_SOURCE_DIR}/vendor/zlib/zconf.h.cmakein ${PROJECT_BINARY_DIR}/zconf.h @ONLY)
-set(VENDOR_ZLIB_FILES
-	${PROJECT_SOURCE_DIR}/vendor/zlib/adler32.c
-	${PROJECT_SOURCE_DIR}/vendor/zlib/compress.c
-	${PROJECT_SOURCE_DIR}/vendor/zlib/crc32.c
-	${PROJECT_SOURCE_DIR}/vendor/zlib/deflate.c
-	${PROJECT_SOURCE_DIR}/vendor/zlib/gzclose.c
-	${PROJECT_SOURCE_DIR}/vendor/zlib/gzlib.c
-	${PROJECT_SOURCE_DIR}/vendor/zlib/gzread.c
-	${PROJECT_SOURCE_DIR}/vendor/zlib/gzwrite.c
-	${PROJECT_SOURCE_DIR}/vendor/zlib/inflate.c
-	${PROJECT_SOURCE_DIR}/vendor/zlib/infback.c
-	${PROJECT_SOURCE_DIR}/vendor/zlib/inftrees.c
-	${PROJECT_SOURCE_DIR}/vendor/zlib/inffast.c
-	${PROJECT_SOURCE_DIR}/vendor/zlib/trees.c
-	${PROJECT_SOURCE_DIR}/vendor/zlib/uncompr.c
-	${PROJECT_SOURCE_DIR}/vendor/zlib/zutil.c
-)
-set(VENDOR_ZLIB_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/zlib)
-
 set(VENDOR_GLM_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/glm)
+
 set(VENDOR_RAPIDJSON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/rapidjson/include)
+
+set(VENDOR_EASYLOGGINGPP_FILES
+	"${PROJECT_SOURCE_DIR}/vendor/easyloggingpp/src/easylogging++.cc"
+	"${PROJECT_SOURCE_DIR}/vendor/easyloggingpp/src/easylogging++.h"
+)
+set(VENDOR_EASYLOGGINGPP_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/easyloggingpp/src)
 
 set(VENDOR_FILES
 	${VENDOR_TINYXML2_FILES}
 	${VENDOR_TMXPARSER_FILES}
-	${VENDOR_ZLIB_FILES}
+	${VENDOR_EASYLOGGINGPP_FILES}
 )
 set(VENDOR_INCLUDE_DIRS
 	${VENDOR_TINYXML2_INCLUDE_DIRS}
 	${VENDOR_TMXPARSER_INCLUDE_DIRS}
-	${VENDOR_ZLIB_INCLUDE_DIRS}
 	${VENDOR_GLM_INCLUDE_DIRS}
 	${VENDOR_RAPIDJSON_INCLUDE_DIRS}
+	${VENDOR_EASYLOGGINGPP_INCLUDE_DIRS}
 )
 
 file(GLOB_RECURSE APG_SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
@@ -136,6 +147,12 @@ if( DEFINED WIN32 )
 		set (OS_FLAGS "-mwindows")
 		set (OS_LIBS Version Imm32 winmm vorbisfile ogg vorbis winsock32 mingw32)
 	endif ()
+elseif ( DEFINED EMSCRIPTEN )
+	set (OS_FLAGS "-s WASM=1")
+	set (OS_LIBS "")
+	add_definitions(-DELPP_NO_LOG_TO_FILE)
+	add_definitions(-DELPP_NO_DEFAULT_LOG_FILE)
+	add_definitions(-DELPP_OS_UNIX)
 else ()
 	set (OS_FLAGS "-fPIC")
 	set (OS_LIBS "")
@@ -163,12 +180,13 @@ if ( APG_NO_NATIVE)
 endif()
 
 set(CMAKE_CXX_FLAGS_BASE "${CMAKE_CXX_FLAGS_BASE} ${COMPILER_FLAGS}")
-message(${CMAKE_CXX_FLAGS_BASE})
+message("${CMAKE_CXX_FLAGS_BASE}")
 
 include_directories(
 	"include"
 	${PROJECT_BINARY_DIR}
 	${VENDOR_INCLUDE_DIRS}
+	${ZLIB_INCLUDE_DIRS}
 )
 
 if ( NOT APG_NO_SDL )
@@ -216,7 +234,13 @@ if ( (NOT EXCLUDE_SDL_TEST) OR (NOT EXCLUDE_GL_TEST) OR (NOT EXCLUDE_AUDIO_TEST)
 		${OPENGL_LIBRARIES}
 		${TINYXML2_LIBRARIES}
 		${OS_LIBS}
-		${TMXPARSER_LIBRARY})
+		${TMXPARSER_LIBRARY}
+		${ZLIB_LIBRARIES}
+	)
+
+	if ( EMSCRIPTEN )
+		set (CMAKE_EXECUTABLE_SUFFIX ".html")
+	endif ()
 endif ( )
 
 if ( NOT EXCLUDE_SDL_TEST)

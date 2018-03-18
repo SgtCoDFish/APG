@@ -44,7 +44,7 @@
 #include <rapidjson/writer.h>
 #endif
 
-#include "APG/core/APGeasylogging.hpp"
+#include "easylogging++.h"
 
 namespace APG {
 class JSONCommon {

@@ -35,7 +35,7 @@
 #include <string>
 #include <memory>
 
-#include <SDL2/SDL_net.h>
+#include "APG/SDL.hpp"
 
 #include "APG/SXXDL.hpp"
 

@@ -27,10 +27,11 @@
 
 #include <chrono>
 
-#include "APG/core/APGeasylogging.hpp"
-INITIALIZE_EASYLOGGINGPP
 #include "APG/core/SDLGame.hpp"
 #include "test/APGAudioTest.hpp"
+
+#include "easylogging++.h"
+INITIALIZE_EASYLOGGINGPP
 
 bool APG::APGAudioTest::init() {
 	soundHandle = audioManager->loadSoundFile("assets/test_sound.wav");

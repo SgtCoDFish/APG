@@ -29,10 +29,11 @@
 
 #include <cstdint>
 
-#include <SDL2/SDL.h>
+#include "APG/SDL.hpp"
 
-#include "APG/core/APGeasylogging.hpp"
 #include "APG/input/SDLInputManager.hpp"
+
+#include "easylogging++.h"
 
 APG::SDLInputManager::SDLInputManager() {
 	keyState = SDL_GetKeyboardState(nullptr);

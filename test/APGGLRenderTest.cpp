@@ -34,26 +34,19 @@
 #include <vector>
 #include <numeric>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-
-#include <GL/glew.h>
-
-#if defined(__APPLE__)
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
+#include "APG/GL.hpp"
+#include "APG/SDL.hpp"
 
 #include "APG/SXXDL.hpp"
-#include "APG/core/APGeasylogging.hpp"
-INITIALIZE_EASYLOGGINGPP
 #include "APG/core/Game.hpp"
 #include "APG/core/SDLGame.hpp"
 #include "APG/core/APGCommon.hpp"
 #include "APG/graphics/Buffer.hpp"
 #include "APG/graphics/Texture.hpp"
 #include "APG/graphics/Camera.hpp"
+
+#include "easylogging++.h"
+INITIALIZE_EASYLOGGINGPP
 
 #include "test/APGGLRenderTest.hpp"
 

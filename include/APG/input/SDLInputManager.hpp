@@ -34,7 +34,7 @@
 
 #include <array>
 
-#include <SDL2/SDL.h>
+#include "APG/SDL.hpp"
 
 #include "APG/input/InputManager.hpp"
 

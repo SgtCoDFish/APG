@@ -1,6 +1,3 @@
-[submodule "vendor/--force"]
-	path = vendor/--force
-	url = https://github.com/sainteos/tmxparser
 [submodule "vendor/tmxparser"]
 	path = vendor/tmxparser
 	url = https://github.com/sainteos/tmxparser
@@ -10,9 +7,6 @@
 [submodule "vendor/rapidjson"]
 	path = vendor/rapidjson
 	url = https://github.com/Tencent/rapidjson
-[submodule "vendor/zlib"]
-	path = vendor/zlib
-	url = https://github.com/madler/zlib
 [submodule "vendor/glm"]
 	path = vendor/glm
 	url = https://github.com/g-truc/glm

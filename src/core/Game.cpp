@@ -27,8 +27,9 @@
 
 #include <cstdint>
 
-#include "APG/core/APGeasylogging.hpp"
 #include "APG/core/Game.hpp"
+
+#include "easylogging++.h"
 
 uint32_t APG::Game::screenWidth = 1280;
 uint32_t APG::Game::screenHeight = 720;
