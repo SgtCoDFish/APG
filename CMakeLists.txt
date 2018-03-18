@@ -252,7 +252,7 @@ if ( NOT EXCLUDE_SDL_TEST)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SDLRENDERTEST_FLAGS}")
 
 	if ( EMSCRIPTEN )
-		set (CMAKE_EXE_LINKER_FLAGS "${BASE_LINKER_FLAGS} --embed-file assets/world1.tmx --embed-file assets/sample_indoor.tmx --embed-file assets/world1tileset.png --embed-file assets/npctileset.png --embed-file assets/roguelike_sheet.png")
+		set (CMAKE_EXE_LINKER_FLAGS "${BASE_LINKER_FLAGS} --embed-file assets/world1.tmx --embed-file assets/sample_indoor.tmx --embed-file assets/world1tileset.png --embed-file assets/npctileset.png --embed-file assets/roguelike_sheet.png -O2")
 	endif ()
 
 	add_executable(SDLRenderTest ${SDLRENDERTEST_SOURCES} ${EXTRA_SOURCES})
@@ -265,7 +265,7 @@ if ( NOT EXCLUDE_GL_TEST )
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GLRENDERTEST_FLAGS}")
 
 	if ( EMSCRIPTEN )
-		set (CMAKE_EXE_LINKER_FLAGS "${BASE_LINKER_FLAGS} --embed-file assets/world1.tmx --embed-file assets/sample_indoor.tmx --embed-file assets/world1tileset.png --embed-file assets/npctileset.png --embed-file assets/roguelike_sheet.png --embed-file assets/pass_vertex-es3.glslv --embed-file assets/red_frag-es3.glslf --embed-file assets/player.png  --embed-file assets/player16.png --embed-file assets/test_font.ttf -s USE_WEBGL2=1")
+		set (CMAKE_EXE_LINKER_FLAGS "${BASE_LINKER_FLAGS} --embed-file assets/world1.tmx --embed-file assets/sample_indoor.tmx --embed-file assets/world1tileset.png --embed-file assets/npctileset.png --embed-file assets/roguelike_sheet.png --embed-file assets/pass_vertex-es3.glslv --embed-file assets/red_frag-es3.glslf --embed-file assets/player.png  --embed-file assets/player16.png --embed-file assets/test_font.ttf -s USE_WEBGL2=1 -O2")
 	endif ()
 
 	add_executable(GLRenderTest ${GLRENDERTEST_SOURCES} ${EXTRA_SOURCES})

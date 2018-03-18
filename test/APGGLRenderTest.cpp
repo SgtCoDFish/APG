@@ -103,7 +103,7 @@ bool APG::APGGLRenderTest::init() {
 
 	logger->info("Estimated font size: (w, h) = (%v, %v).", renderedFontSize.x, renderedFontSize.y);
 
-	fontSprite = fontManager->renderText(font, "Hello, world!", true, FontRenderMethod::NICE);
+	//fontSprite = fontManager->renderText(font, "Hello, world!", true, FontRenderMethod::NICE);
 
 	auto glError = glGetError();
 	if (glError != GL_NO_ERROR) {
@@ -177,7 +177,7 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	spriteBatch->draw(currentPlayer->getTexture(), playerX, playerY, currentPlayer->getWidth() * 2,
 			currentPlayer->getHeight() * 2, 0.0f, 0.0f, currentPlayer->getWidth() * 0.5f,
 			currentPlayer->getHeight() * 0.5f);
-	spriteBatch->draw(fontSprite, textPos.x, textPos.y);
+	//spriteBatch->draw(fontSprite, textPos.x, textPos.y);
 	spriteBatch->end();
 
 	SDL_GL_SwapWindow(window.get());
