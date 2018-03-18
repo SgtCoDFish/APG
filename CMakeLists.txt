@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 set(CMAKE_LEGACY_CYGWIN32 0)
 
 project(APG)
@@ -57,25 +57,76 @@ if ( NOT APG_NO_GL )
 	find_package(GLEW REQUIRED)
 endif ()
 
-find_package(GLM REQUIRED)
-find_package(rapidjson REQUIRED)
+#find_package(GLM REQUIRED)
+#find_package(rapidjson REQUIRED)
 
-find_package(TmxParser REQUIRED)
-find_package(TinyXML2 REQUIRED)
-find_package(ZLIB REQUIRED)
+#find_package(TmxParser REQUIRED)
+#find_package(TinyXML2 REQUIRED)
+#find_package(ZLIB REQUIRED)
+
+set(VENDOR_TINYXML2_FILES ${PROJECT_SOURCE_DIR}/vendor/tinyxml2/tinyxml2.cpp ${PROJECT_SOURCE_DIR}/vendor/tinyxml2/tinyxml2.h)
+set(VENDOR_TINYXML2_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/tinyxml2)
+
+configure_file(${PROJECT_SOURCE_DIR}/vendor/tmxparser/src/Tmx.h.in ${PROJECT_BINARY_DIR}/Tmx.h)
+file(GLOB_RECURSE VENDOR_TMXPARSER_SOURCES ${PROJECT_SOURCE_DIR}/vendor/tmxparser/src/*.cpp)
+file(GLOB_RECURSE VENDOR_TMXPARSER_HEADERS ${PROJECT_SOURCE_DIR}/vendor/tmxparser/src/*.h ${PROJECT_BINARY_DIR}/Tmx.h)
+set(VENDOR_TMXPARSER_FILES ${VENDOR_TMXPARSER_SOURCES} ${VENDOR_TMXPARSER_HEADERS})
+set(VENDOR_TMXPARSER_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/tmxparser/src)
+
+set(ZLIB_PC ${PROJECT_BINARY_DIR}/zlib.pc)
+configure_file(${PROJECT_SOURCE_DIR}/vendor/zlib/zlib.pc.cmakein ${ZLIB_PC} @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/vendor/zlib/zconf.h.cmakein ${PROJECT_BINARY_DIR}/zconf.h @ONLY)
+set(VENDOR_ZLIB_FILES
+	${PROJECT_SOURCE_DIR}/vendor/zlib/adler32.c
+	${PROJECT_SOURCE_DIR}/vendor/zlib/compress.c
+	${PROJECT_SOURCE_DIR}/vendor/zlib/crc32.c
+	${PROJECT_SOURCE_DIR}/vendor/zlib/deflate.c
+	${PROJECT_SOURCE_DIR}/vendor/zlib/gzclose.c
+	${PROJECT_SOURCE_DIR}/vendor/zlib/gzlib.c
+	${PROJECT_SOURCE_DIR}/vendor/zlib/gzread.c
+	${PROJECT_SOURCE_DIR}/vendor/zlib/gzwrite.c
+	${PROJECT_SOURCE_DIR}/vendor/zlib/inflate.c
+	${PROJECT_SOURCE_DIR}/vendor/zlib/infback.c
+	${PROJECT_SOURCE_DIR}/vendor/zlib/inftrees.c
+	${PROJECT_SOURCE_DIR}/vendor/zlib/inffast.c
+	${PROJECT_SOURCE_DIR}/vendor/zlib/trees.c
+	${PROJECT_SOURCE_DIR}/vendor/zlib/uncompr.c
+	${PROJECT_SOURCE_DIR}/vendor/zlib/zutil.c
+)
+set(VENDOR_ZLIB_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/zlib)
+
+set(VENDOR_GLM_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/glm/glm)
+set(VENDOR_RAPIDJSON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/rapidjson/include)
+
+set(VENDOR_FILES
+	${VENDOR_TINYXML2_FILES}
+	${VENDOR_TMXPARSER_FILES}
+	${VENDOR_ZLIB_FILES}
+)
+set(VENDOR_INCLUDE_DIRS
+	${VENDOR_TINYXML2_INCLUDE_DIRS}
+	${VENDOR_TMXPARSER_INCLUDE_DIRS}
+	${VENDOR_ZLIB_INCLUDE_DIRS}
+	${VENDOR_GLM_INCLUDE_DIRS}
+	${VENDOR_RAPIDJSON_INCLUDE_DIRS}
+)
 
 file(GLOB_RECURSE APG_SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 file(GLOB_RECURSE APG_HEADERS ${PROJECT_SOURCE_DIR}/include/*.hpp)
 file(GLOB_RECURSE APG_TEST_ASSETS ${PROJECT_SOURCE_DIR}/assets/*)
 
+set(FULL_SOURCES ${APG_SOURCES} ${VENDOR_FILES})
+
+set(CMAKE_CXX_STANDARD 14)
+
 if( DEFINED WIN32 )
 	if( MSVC )
-		set (OS_FLAGS "")
-		set (COMPILER_FLAGS "/GR /EHsc")
-		set (OS_LIBS "")
+		set(OS_FLAGS "")
+		set(COMPILER_FLAGS "/GR /EHsc")
+		set(OS_LIBS "")
 
 		# VS 2015 has a linker issue when using the official SDL2 libs, this should fix it
-		if( MSVC_VERSION GREATER 1800)
+		if(MSVC_VERSION GREATER 1800)
 			message ("Using legacy STDIO fix for MSVC 15.")
 			set(OS_LIBS ${OS_LIBS} legacy_stdio_definitions)
 			set(EXTRA_SOURCES ${PROJECT_SOURCE_DIR}/MSVC/vs2015_io_fix.cpp)
@@ -91,7 +142,6 @@ else ()
 endif ()
 
 if ( NOT MSVC )
-	set(CMAKE_CXX_COMPILER_ARG1 "-std=c++1y")
 	set(COMPILER_FLAGS "-Wall -Wextra -Wno-unused-parameter ${OS_FLAGS}")
 	set(APG_DEBUG_FLAGS "-g3 -O0")
 	set(APG_RELEASE_FLAGS "-g0 -O3")
@@ -104,10 +154,6 @@ set(APG_SOURCES ${APG_SOURCES} ${EXTRA_SOURCES})
 
 add_definitions(-DGLM_FORCE_RADIANS)
 
-if ( APG_NO_SDL )
-	add_definitions(-DAPG_NO_SDL)
-endif ()
-
 if ( APG_NO_GL )
 	add_definitions(-DAPG_NO_GL)
 endif()
@@ -119,20 +165,20 @@ endif()
 set(CMAKE_CXX_FLAGS_BASE "${CMAKE_CXX_FLAGS_BASE} ${COMPILER_FLAGS}")
 message(${CMAKE_CXX_FLAGS_BASE})
 
-include_directories("include"
+include_directories(
+	"include"
 	${GLM_INCLUDE_DIRS}
-	${TMXPARSER_INCLUDE_DIR}
-	${TINYXML2_INCLUDE_DIR}
-	${ZLIB_INCLUDE_DIRS}
-	)
+	${VENDOR_INCLUDE_DIRS}
+)
 
 if ( NOT APG_NO_SDL )
-	include_directories(${SDL2_INCLUDE_DIR}
+	include_directories(
+		${SDL2_INCLUDE_DIR}
 		${SDL2_TTF_INCLUDE_DIR}
 		${SDL2_IMAGE_INCLUDE_DIR}
 		${SDL2_MIXER_INCLUDE_DIR}
 		${SDL2_NET_INCLUDE_DIR}
-		)
+	)
 endif ()
 
 if ( NOT APG_NO_GL )
@@ -150,7 +196,7 @@ else ()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_RELEASE_FLAGS}")
 endif ()
 
-add_library(${APG_LIB_NAME} ${APG_SOURCES} ${APG_HEADERS})
+add_library(${APG_LIB_NAME} ${FULL_SOURCES} ${APG_HEADERS})
 
 if ( NOT EXCLUDE_AUDIO_TEST )
 	if ( NOT EXISTS ${PROJECT_SOURCE_DIR}/assets/test_music.ogg )
@@ -169,7 +215,6 @@ if ( (NOT EXCLUDE_SDL_TEST) OR (NOT EXCLUDE_GL_TEST) OR (NOT EXCLUDE_AUDIO_TEST)
 		${GLEW_LIBRARIES}
 		${OPENGL_LIBRARIES}
 		${TINYXML2_LIBRARIES}
-		${ZLIB_LIBRARIES}
 		${OS_LIBS}
 		${TMXPARSER_LIBRARY})
 endif ( )
