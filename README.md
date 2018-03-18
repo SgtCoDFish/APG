@@ -16,6 +16,12 @@ The design is heavily inspired by [LibGDX](https://github.com/libgdx/libgdx/).
 stop having to worry about cleanup.
 
 ## How To Use
+## Cloning
+Most of APG's dependencies are vendored using git submodules, so just cloning the repository won't be enough to get all the code. You can do something like the following:
+```bash
+# Clone APG as usual, and cd into the directory
+g submodule update --init --recursive  # this will fetch all the dependencies at the correct commit
+```
 ### Dependencies for Build
 #### macOS
 You'll need Homebrew installed.
@@ -23,8 +29,15 @@ You'll need Homebrew installed.
 ```bash
 brew install sdl2 sdl2_gfx sdl2_image sdl2_mixer sdl2_net sdl2_ttf glew glm rapidjson tinyxml2
 ```
-#### Linux
-Can all be done through a package manager; details coming soon.
+
+#### Linux Deb-based (Debian, Ubuntu, etc.)
+You should be able to install the dependencies you need through your package manager.
+
+```bash
+sudo apt install git cmake  # basic build dependencies; you'll also need a compiler (something like build-essential)
+# Now install library dependencies which are not vendored
+sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-net-dev libsdl2-ttf-dev libglew-dev
+```
 
 #### Windows
 Coming soon!

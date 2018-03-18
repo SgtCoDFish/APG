@@ -30,7 +30,7 @@
 
 #include <glm/vec2.hpp>
 
-#include "tmxparser/Tmx.h"
+#include "Tmx.h"
 
 #include "APG/graphics/Sprite.hpp"
 #include "APG/tiled/GLTmxRenderer.hpp"

@@ -44,7 +44,7 @@
 #include <GL/gl.h>
 #endif
 
-#include <tmxparser/Tmx.h>
+#include "Tmx.h"
 
 #include "APG/SXXDL.hpp"
 #include "APG/core/APGeasylogging.hpp"

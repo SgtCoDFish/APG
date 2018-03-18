@@ -30,7 +30,7 @@
 #include <string>
 #include <sstream>
 
-#include "tmxparser/Tmx.h"
+#include "Tmx.h"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>

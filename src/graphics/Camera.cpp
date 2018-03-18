@@ -30,10 +30,11 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "APG/graphics/Camera.hpp"
 
-const glm::mat4 APG::Camera::IDENTITY;
+const glm::mat4 APG::Camera::IDENTITY {};
 
 APG::Camera::Camera(float viewportWidth, float viewportHeight) {
 	setToOrtho(false, viewportWidth, viewportHeight);

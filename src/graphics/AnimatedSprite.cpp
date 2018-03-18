@@ -35,7 +35,7 @@
 #include <utility>
 #include <iostream>
 
-#include "tmxparser/TmxTile.h"
+#include "Tmx.h"
 
 #include "APG/graphics/AnimatedSprite.hpp"
 #include "APG/graphics/Texture.hpp"

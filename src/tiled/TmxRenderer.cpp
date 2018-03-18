@@ -36,14 +36,7 @@
 
 #include <glm/vec2.hpp>
 
-#include "tmxparser/TmxMap.h"
-#include "tmxparser/TmxLayer.h"
-#include "tmxparser/TmxTileset.h"
-#include "tmxparser/TmxImage.h"
-#include "tmxparser/TmxTile.h"
-#include "tmxparser/TmxTileLayer.h"
-#include "tmxparser/TmxObjectGroup.h"
-#include "tmxparser/TmxObject.h"
+#include "Tmx.h"
 
 #include "APG/SXXDL.hpp"
 #include "APG/core/APGeasylogging.hpp"

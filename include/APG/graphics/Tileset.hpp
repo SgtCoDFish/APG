@@ -36,9 +36,7 @@
 #include <string>
 #include <memory>
 
-#include "tmxparser/TmxMap.h"
-#include "tmxparser/TmxTileset.h"
-#include "tmxparser/TmxImage.h"
+#include "Tmx.h"
 
 #include "APG/core/APGeasylogging.hpp"
 #include "APG/graphics/Texture.hpp"

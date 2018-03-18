@@ -34,7 +34,7 @@
 
 #include <SDL2/SDL.h>
 
-#include "tmxparser/TmxMap.h"
+#include "Tmx.h"
 
 #include "APG/SXXDL.hpp"
 #include "APG/core/Game.hpp"
