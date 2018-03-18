@@ -45,6 +45,7 @@
 #include "APG/graphics/VertexAttribute.hpp"
 #include "APG/graphics/VertexAttributeList.hpp"
 #include "APG/internal/Assert.hpp"
+#include "APG/graphics/GLError.hpp"
 
 #include "easylogging++.h"
 
@@ -56,12 +57,12 @@ APG::ShaderProgram::ShaderProgram(const std::string &vertexShaderSource, const s
 }
 
 std::unique_ptr<APG::ShaderProgram> APG::ShaderProgram::fromSource(const std::string &vertexShaderSource,
-        const std::string &fragmentShaderSource) {
+		const std::string &fragmentShaderSource) {
 	return std::make_unique<APG::ShaderProgram>(vertexShaderSource, fragmentShaderSource);
 }
 
 std::unique_ptr<APG::ShaderProgram> APG::ShaderProgram::fromFiles(const std::string &vertexShaderFilename,
-        const std::string &fragmentShaderFilename) {
+		const std::string &fragmentShaderFilename) {
 	const auto vertexSource = ShaderProgram::loadSourceFromFile(vertexShaderFilename);
 	const auto fragmentSource = ShaderProgram::loadSourceFromFile(fragmentShaderFilename);
 
@@ -80,7 +81,7 @@ void APG::ShaderProgram::use() {
 
 void APG::ShaderProgram::setVertexAttribute(const APG::VertexAttribute &vertexAttribute, uint16_t stride) {
 	setFloatAttribute(vertexAttribute.getAlias().c_str(), vertexAttribute.getComponentCount(), stride,
-	        vertexAttribute.getOffset(), false);
+			vertexAttribute.getOffset(), false);
 }
 
 void APG::ShaderProgram::setVertexAttributes(const VertexAttributeList &attributeList) {
@@ -90,7 +91,7 @@ void APG::ShaderProgram::setVertexAttributes(const VertexAttributeList &attribut
 }
 
 void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, uint8_t valueCount,
-        uint32_t strideInElements, uint32_t offsetInElements, bool normalize) {
+		uint32_t strideInElements, uint32_t offsetInElements, bool normalize) {
 	const auto attributeLocation = glGetAttribLocation(shaderProgram, attributeName);
 
 	if (attributeLocation == -1) {
@@ -100,12 +101,12 @@ void APG::ShaderProgram::setFloatAttribute(const char * const attributeName, uin
 
 	glEnableVertexAttribArray(attributeLocation);
 	glVertexAttribPointer(attributeLocation, valueCount, GL_FLOAT, (normalize ? GL_TRUE : GL_FALSE),
-	        strideInElements * sizeof(float), (void *) (sizeof(float) * offsetInElements));
+		strideInElements * sizeof(float), (void *) (sizeof(float) * offsetInElements));
 
 	const auto error = glGetError();
 
 	if (error != GL_NO_ERROR) {
-		el::Loggers::getLogger("APG")->error("Error while setting float attribute: %v.", gluErrorString(error));
+		el::Loggers::getLogger("APG")->error("Error while setting float attribute: %v.", prettyGLError(error));
 		return;
 	}
 }
@@ -124,21 +125,21 @@ void APG::ShaderProgram::setUniformf(const char * const uniformName, std::initia
 	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
 
 	switch (paramCount) {
-	case 1:
-		glUniform1f(uniLoc, vec[0]);
-		break;
+		case 1:
+			glUniform1f(uniLoc, vec[0]);
+			break;
 
-	case 2:
-		glUniform2f(uniLoc, vec[0], vec[1]);
-		break;
+		case 2:
+			glUniform2f(uniLoc, vec[0], vec[1]);
+			break;
 
-	case 3:
-		glUniform3f(uniLoc, vec[0], vec[1], vec[2]);
-		break;
+		case 3:
+			glUniform3f(uniLoc, vec[0], vec[1], vec[2]);
+			break;
 
-	case 4:
-		glUniform4f(uniLoc, vec[0], vec[1], vec[2], vec[3]);
-		break;
+		case 4:
+			glUniform4f(uniLoc, vec[0], vec[1], vec[2], vec[3]);
+			break;
 	}
 }
 
@@ -181,21 +182,21 @@ void APG::ShaderProgram::setUniformi(const char * const uniformName, std::initia
 	const auto uniLoc = glGetUniformLocation(shaderProgram, uniformName);
 
 	switch (paramCount) {
-	case 1:
-		glUniform1i(uniLoc, vec[0]);
-		break;
+		case 1:
+			glUniform1i(uniLoc, vec[0]);
+			break;
 
-	case 2:
-		glUniform2i(uniLoc, vec[0], vec[1]);
-		break;
+		case 2:
+			glUniform2i(uniLoc, vec[0], vec[1]);
+			break;
 
-	case 3:
-		glUniform3i(uniLoc, vec[0], vec[1], vec[2]);
-		break;
+		case 3:
+			glUniform3i(uniLoc, vec[0], vec[1], vec[2]);
+			break;
 
-	case 4:
-		glUniform4i(uniLoc, vec[0], vec[1], vec[2], vec[3]);
-		break;
+		case 4:
+			glUniform4i(uniLoc, vec[0], vec[1], vec[2], vec[3]);
+			break;
 	}
 }
 
@@ -313,7 +314,7 @@ void APG::ShaderProgram::combineProgram() {
 	while ((glerror = glGetError()) != GL_NO_ERROR) {
 		status = GL_FALSE;
 
-		linkStatusStream << "glGetError(): " << gluErrorString(glerror) << "\n";
+		linkStatusStream << "glGetError(): " << prettyGLError(glerror) << "\n";
 	}
 
 	linkInfoLog = linkInfoLog + linkStatusStream.str();
@@ -343,7 +344,7 @@ uint32_t *APG::ShaderProgram::validateTypeAndGet(uint32_t type) {
 	case GL_TESS_CONTROL_SHADER:
 	case GL_TESS_EVALUATION_SHADER:
 		el::Loggers::getLogger("APG")->fatal(
-		        "Geometry/Tesselation Evaluation/Tesselation Control shaders not supported by APG.");
+				"Geometry/Tesselation Evaluation/Tesselation Control shaders not supported by APG.");
 		return nullptr;
 
 	default: {

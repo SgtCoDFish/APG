@@ -72,9 +72,11 @@ SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t 
 		logger->fatal("Couldn't create SDL window: %v", SDL_GetError());
 	}
 
+#if !defined (__EMSCRIPTEN__)
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, glContextMajor);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, glContextMinor);
+#endif
 
 	glContext = SDL_GL_CreateContext(window.get());
 

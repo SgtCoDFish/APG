@@ -44,6 +44,7 @@
 #include "APG/graphics/Buffer.hpp"
 #include "APG/graphics/Texture.hpp"
 #include "APG/graphics/Camera.hpp"
+#include "APG/graphics/GLError.hpp"
 
 #include "easylogging++.h"
 INITIALIZE_EASYLOGGINGPP
@@ -101,7 +102,7 @@ bool APG::APGGLRenderTest::init() {
 	auto glError = glGetError();
 	if (glError != GL_NO_ERROR) {
 		while (glError != GL_NO_ERROR) {
-			logger->fatal("Error in OpenGL while loading: ", gluErrorString(glError));
+			logger->fatal("Error in OpenGL while loading: ", prettyGLError(glError));
 			glError = glGetError();
 		}
 

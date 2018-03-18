@@ -42,6 +42,7 @@
 
 #include "APG/SXXDL.hpp"
 #include "APG/graphics/Texture.hpp"
+#include "APG/graphics/GLError.hpp"
 #include "APG/graphics/ShaderProgram.hpp"
 #include "APG/internal/Assert.hpp"
 
@@ -56,12 +57,12 @@ GL_TEXTURE22, GL_TEXTURE23, GL_TEXTURE24, GL_TEXTURE25, GL_TEXTURE26, GL_TEXTURE
 GL_TEXTURE28, GL_TEXTURE29, GL_TEXTURE30, GL_TEXTURE31 };
 
 APG::Texture::Texture(const std::string &fileName, bool preserveSurface) :
-		        fileName { fileName }, //
-		        preserveSurface { preserveSurface }, //
-		        sWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
-		        tWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
-		        minFilter { APG::TextureFilterType::LINEAR }, //
-		        magFilter { APG::TextureFilterType::LINEAR } {
+		fileName { fileName }, //
+		preserveSurface { preserveSurface }, //
+		sWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
+		tWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
+		minFilter { APG::TextureFilterType::LINEAR }, //
+		magFilter { APG::TextureFilterType::LINEAR } {
 	auto surface = IMG_Load(fileName.c_str());
 
 	if (surface == nullptr) {
@@ -74,12 +75,12 @@ APG::Texture::Texture(const std::string &fileName, bool preserveSurface) :
 }
 
 APG::Texture::Texture(SDL_Surface * const surface, bool preserveSurface) :
-		        fileName { "from SDL_Surface" }, //
-		        preserveSurface { preserveSurface }, //
-		        sWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
-		        tWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
-		        minFilter { APG::TextureFilterType::LINEAR }, //
-		        magFilter { APG::TextureFilterType::LINEAR } {
+		fileName { "from SDL_Surface" }, //
+		preserveSurface { preserveSurface }, //
+		sWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
+		tWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
+		minFilter { APG::TextureFilterType::LINEAR }, //
+		magFilter { APG::TextureFilterType::LINEAR } {
 	REQUIRE(surface != nullptr, "Can't create texture from null surface ptr.");
 
 	generateTextureID();
@@ -121,8 +122,11 @@ void APG::Texture::loadTexture(SDL_Surface * const surface) {
 			glFormat = GL_BGR;
 		}
 	} else {
-		logger->fatal("Invalid bytes per pixel value in %v (%v is invalid, only 4 or 3 supported.)", fileName,
-		        (uint32_t) numberOfColors);
+		logger->fatal(
+			"Invalid bytes per pixel value in %v (%v is invalid, only 4 or 3 supported.)",
+			fileName,
+			(uint32_t) numberOfColors
+		);
 		return;
 	}
 
@@ -138,7 +142,7 @@ void APG::Texture::loadTexture(SDL_Surface * const surface) {
 
 	if (glError != GL_NO_ERROR) {
 		while (glError != GL_NO_ERROR) {
-			logger->fatal("GL error while uploading texture: %v", gluErrorString(glError));
+			logger->fatal("GL error while uploading texture: %v", prettyGLError(glError));
 
 			glError = glGetError();
 		}
@@ -211,11 +215,11 @@ void APG::Texture::setFilter(TextureFilterType minFilter, TextureFilterType magF
 	tempBind();
 
 	REQUIRE(
-	        magFilter != TextureFilterType::LINEAR_MIPMAP_LINEAR
-	                && magFilter != TextureFilterType::NEAREST_MIPMAP_LINEAR
-	                && magFilter != TextureFilterType::LINEAR_MIPMAP_NEAREST
-	                && magFilter != TextureFilterType::NEAREST_MIPMAP_NEAREST,
-	        "Can't set mipmap filter for mag filter.");
+		magFilter != TextureFilterType::LINEAR_MIPMAP_LINEAR &&
+		magFilter != TextureFilterType::NEAREST_MIPMAP_LINEAR &&
+		magFilter != TextureFilterType::LINEAR_MIPMAP_NEAREST &&
+		magFilter != TextureFilterType::NEAREST_MIPMAP_NEAREST,
+		"Can't set mipmap filter for mag filter.");
 
 	this->minFilter = minFilter;
 	this->magFilter = magFilter;

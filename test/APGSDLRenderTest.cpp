@@ -47,6 +47,10 @@
 #include "easylogging++.h"
 INITIALIZE_EASYLOGGINGPP
 
+#if defined (__EMSCRIPTEN__)
+#include <emscripten.h>
+#endif
+
 const std::string ASSET_PREFIX = "assets/";
 
 bool APGSDLRenderTest::init() {
@@ -100,6 +104,35 @@ void APGSDLRenderTest::render(float deltaTime) {
 	SDL_RenderPresent(renderer.get());
 }
 
+struct loop_arg {
+	APGSDLRenderTest *rpg;
+	std::chrono::time_point<std::chrono::high_resolution_clock> timepoint;
+	std::vector<float> timesTaken;
+	el::Logger *logger;
+	bool done;
+};
+
+void loop(void *v_arg) {
+	loop_arg * arg = static_cast<loop_arg *>(v_arg);
+
+	auto timeNow = std::chrono::high_resolution_clock::now();
+	float deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - arg->timepoint).count() / 1000.0f;
+
+	arg->timepoint = timeNow;
+	arg->timesTaken.push_back(deltaTime);
+
+	arg->done = arg->rpg->update(deltaTime);
+
+	if (arg->timesTaken.size() >= 1000) {
+		const float sum = std::accumulate(arg->timesTaken.begin(), arg->timesTaken.end(), 0.0f);
+		const float fps = 1 / (sum / arg->timesTaken.size());
+
+		arg->logger->info("FPS: ", fps);
+
+		arg->timesTaken.clear();
+	}
+}
+
 int main(int argc, char *argv[]) {
 	START_EASYLOGGINGPP(argc, argv);
 
@@ -115,30 +148,19 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	bool done = false;
+	loop_arg arg;
+	arg.rpg = rpg.get();
+	arg.timepoint = std::chrono::high_resolution_clock::now();
+	arg.done = false;
+	arg.logger =  logger;
 
-	auto startTime = std::chrono::high_resolution_clock::now();
-	std::vector<float> timesTaken;
-
-	while (!done) {
-		auto timeNow = std::chrono::high_resolution_clock::now();
-		float deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count() / 1000.0f;
-
-		startTime = timeNow;
-		timesTaken.push_back(deltaTime);
-
-		done = rpg->update(deltaTime);
-
-		if (timesTaken.size() >= 1000) {
-			const float sum = std::accumulate(timesTaken.begin(), timesTaken.end(), 0.0f);
-
-			const float fps = 1 / (sum / timesTaken.size());
-
-			logger->info("FPS: ", fps);
-
-			timesTaken.clear();
-		}
+#if defined(__EMSCRIPTEN__)
+	emscripten_set_main_loop_arg(loop, &arg, 0, 1);
+#else
+	while (!arg.done) {
+		loop(&arg);
 	}
+#endif
 
 	return EXIT_SUCCESS;
 }
