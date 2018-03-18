@@ -244,11 +244,16 @@ if ( (NOT EXCLUDE_SDL_TEST) OR (NOT EXCLUDE_GL_TEST) OR (NOT EXCLUDE_AUDIO_TEST)
 	endif ()
 endif ( )
 
+set(BASE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS})
+
 if ( NOT EXCLUDE_SDL_TEST)
 	set (SDLRENDERTEST_FLAGS "")
 	set (SDLRENDERTEST_SOURCES test/APGSDLRenderTest.cpp)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SDLRENDERTEST_FLAGS}")
-	set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file assets/world1.tmx --embed-file assets/sample_indoor.tmx --embed-file assets/world1tileset.png --embed-file assets/npctileset.png --embed-file assets/roguelike_sheet.png")
+
+	if ( EMSCRIPTEN )
+		set (CMAKE_EXE_LINKER_FLAGS "${BASE_LINKER_FLAGS} --embed-file assets/world1.tmx --embed-file assets/sample_indoor.tmx --embed-file assets/world1tileset.png --embed-file assets/npctileset.png --embed-file assets/roguelike_sheet.png")
+	endif ()
 
 	add_executable(SDLRenderTest ${SDLRENDERTEST_SOURCES} ${EXTRA_SOURCES})
 	target_link_libraries(SDLRenderTest ${APG_LIB_NAME} ${EXAMPLE_LIBS})
@@ -258,6 +263,10 @@ if ( NOT EXCLUDE_GL_TEST )
 	set (GLRENDERTEST_FLAGS "")
 	set (GLRENDERTEST_SOURCES test/APGGLRenderTest.cpp)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GLRENDERTEST_FLAGS}")
+
+	if ( EMSCRIPTEN )
+		set (CMAKE_EXE_LINKER_FLAGS "${BASE_LINKER_FLAGS} --embed-file assets/world1.tmx --embed-file assets/sample_indoor.tmx --embed-file assets/world1tileset.png --embed-file assets/npctileset.png --embed-file assets/roguelike_sheet.png --embed-file assets/pass_vertex-es3.glslv --embed-file assets/red_frag-es3.glslf --embed-file assets/player.png  --embed-file assets/player16.png --embed-file assets/test_font.ttf -s USE_WEBGL2=1")
+	endif ()
 
 	add_executable(GLRenderTest ${GLRENDERTEST_SOURCES} ${EXTRA_SOURCES})
 	target_link_libraries(GLRenderTest ${APG_LIB_NAME} ${EXAMPLE_LIBS})

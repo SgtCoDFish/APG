@@ -46,13 +46,19 @@
 #include "APG/graphics/Camera.hpp"
 #include "APG/graphics/GLError.hpp"
 
+#include "test/APGGLRenderTest.hpp"
+
 #include "easylogging++.h"
 INITIALIZE_EASYLOGGINGPP
 
-#include "test/APGGLRenderTest.hpp"
-
+#if defined (__EMSCRIPTEN__)
+#include <emscripten.h>
+const char * APG::APGGLRenderTest::vertexShaderFilename = "assets/pass_vertex-es3.glslv";
+const char * APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag-es3.glslf";
+#else
 const char * APG::APGGLRenderTest::vertexShaderFilename = "assets/pass_vertex.glslv";
 const char * APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag.glslf";
+#endif
 
 bool APG::APGGLRenderTest::init() {
 	const auto logger = el::Loggers::getLogger("APG");
@@ -169,12 +175,41 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 //	spriteBatch->draw(currentPlayer, playerX, playerY);
 	// draw a weird quarter version of the player to test out extended draw method
 	spriteBatch->draw(currentPlayer->getTexture(), playerX, playerY, currentPlayer->getWidth() * 2,
-	        currentPlayer->getHeight() * 2, 0.0f, 0.0f, currentPlayer->getWidth() * 0.5f,
-	        currentPlayer->getHeight() * 0.5f);
+			currentPlayer->getHeight() * 2, 0.0f, 0.0f, currentPlayer->getWidth() * 0.5f,
+			currentPlayer->getHeight() * 0.5f);
 	spriteBatch->draw(fontSprite, textPos.x, textPos.y);
 	spriteBatch->end();
 
 	SDL_GL_SwapWindow(window.get());
+}
+
+struct loop_arg {
+	APG::APGGLRenderTest *rpg;
+	std::chrono::time_point<std::chrono::high_resolution_clock> timepoint;
+	std::vector<float> timesTaken;
+	el::Logger *logger;
+	bool done;
+};
+
+void loop(void *v_arg) {
+	loop_arg * arg = static_cast<loop_arg *>(v_arg);
+
+	auto timeNow = std::chrono::high_resolution_clock::now();
+	float deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - arg->timepoint).count() / 1000.0f;
+
+	arg->timepoint = timeNow;
+	arg->timesTaken.push_back(deltaTime);
+
+	arg->done = arg->rpg->update(deltaTime);
+
+	if (arg->timesTaken.size() >= 1000) {
+		const float sum = std::accumulate(arg->timesTaken.begin(), arg->timesTaken.end(), 0.0f);
+		const float fps = 1 / (sum / arg->timesTaken.size());
+
+		arg->logger->info("FPS: ", fps);
+
+		arg->timesTaken.clear();
+	}
 }
 
 int main(int argc, char *argv[]) {
@@ -184,36 +219,26 @@ int main(int argc, char *argv[]) {
 	const uint32_t windowWidth = 1280;
 	const uint32_t windowHeight = 720;
 
+	const auto logger = el::Loggers::getLogger("APG");
 	auto game = std::make_unique<APG::APGGLRenderTest>(windowTitle, windowWidth, windowHeight);
 
 	if (!game->init()) {
 		return EXIT_FAILURE;
 	}
 
-	bool done = false;
+	loop_arg arg;
+	arg.rpg = game.get();
+	arg.timepoint = std::chrono::high_resolution_clock::now();
+	arg.done = false;
+	arg.logger =  logger;
 
-	auto startTime = std::chrono::high_resolution_clock::now();
-	std::vector<float> timesTaken;
-
-	while (!done) {
-		const auto timeNow = std::chrono::high_resolution_clock::now();
-		float deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count() / 1000.0f;
-
-		startTime = timeNow;
-		timesTaken.push_back(deltaTime);
-
-		done = game->update(deltaTime);
-
-		if (timesTaken.size() >= 500) {
-			const float sum = std::accumulate(timesTaken.begin(), timesTaken.end(), 0.0f);
-
-			const float fps = 1 / (sum / timesTaken.size());
-
-			el::Loggers::getLogger("APG")->info("FPS: %v", fps);
-
-			timesTaken.clear();
-		}
+#if defined(__EMSCRIPTEN__)
+	emscripten_set_main_loop_arg(loop, &arg, 0, 1);
+#else
+	while (!arg.done) {
+		loop(&arg);
 	}
+#endif
 
 	return EXIT_SUCCESS;
 }

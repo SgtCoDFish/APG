@@ -287,7 +287,7 @@ void APG::ShaderProgram::combineProgram() {
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragmentShader);
 
-	glBindFragDataLocation(shaderProgram, 0, "outColor");
+	//glBindFragDataLocation(shaderProgram, 0, "outColor");
 	glLinkProgram(shaderProgram);
 
 	GLint status;

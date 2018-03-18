@@ -136,7 +136,7 @@ void loop(void *v_arg) {
 int main(int argc, char *argv[]) {
 	START_EASYLOGGINGPP(argc, argv);
 
-	const std::string windowTitle("APG GLTmxRenderer Example");
+	const std::string windowTitle("APG SDLTmxRenderer Example");
 	const uint32_t windowWidth = 1280;
 	const uint32_t windowHeight = 720;
 

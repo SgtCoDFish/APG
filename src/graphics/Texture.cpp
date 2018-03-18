@@ -131,6 +131,7 @@ void APG::Texture::loadTexture(SDL_Surface * const surface) {
 	}
 
 	// loaded successfully, upload to graphics card
+	logger->info("Uploading texture: %vx%v", surface->w, surface->h);
 
 	tempBind();
 
