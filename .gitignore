@@ -1,6 +1,9 @@
 .settings/*
 .settings
 
+.idea/*
+.idea
+
 lib
 lib/*
 
