@@ -1,30 +1,3 @@
-/*
- * Copyright (c) 2014, 2015 See AUTHORS file.
- * All rights reserved.
-
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *    * Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *    * Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution.
- *    * Neither the name of the <organization> nor the
- *      names of its contributors may be used to endorse or promote products
- *      derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 #ifndef APG_NO_SDL
 
 #include <string>
@@ -39,40 +12,42 @@
 #include "APG/tiled/SDLTmxRenderer.hpp"
 #include "APG/internal/Assert.hpp"
 
-APG::SDLTmxRenderer::SDLTmxRenderer(Tmx::Map * const map, const SXXDL::renderer_ptr &renderer) :
-		        SDLTmxRenderer(std::unique_ptr<Tmx::Map>(map), renderer) {
+template<> std::unordered_map<std::string, std::shared_ptr<APG::Tileset>> APG::TmxRenderer<APG::SDLTmxRenderer>::tmxTilesets;
+
+APG::SDLTmxRenderer::SDLTmxRenderer(Tmx::Map *const map, const SXXDL::renderer_ptr &renderer) :
+		SDLTmxRenderer(std::unique_ptr<Tmx::Map>(map), renderer) {
 
 }
 
 APG::SDLTmxRenderer::SDLTmxRenderer(std::unique_ptr<Tmx::Map> &&map, const SXXDL::renderer_ptr &renderer) :
-		        TmxRenderer(std::move(map)),
-		        renderer { renderer } {
+		TmxRenderer(std::move(map)),
+		renderer{renderer} {
 	setupTilesets();
 }
 
 APG::SDLTmxRenderer::SDLTmxRenderer(const std::string &fileName, const SXXDL::renderer_ptr &renderer) :
-		        TmxRenderer(fileName),
-		        renderer { renderer } {
+		TmxRenderer(fileName),
+		renderer{renderer} {
 	setupTilesets();
 }
 
 void APG::SDLTmxRenderer::setupTilesets() {
 	REQUIRE(map->GetOrientation() == Tmx::MapOrientation::TMX_MO_ORTHOGONAL,
-	        "SDLTmxRenderer only supports orthogonal maps.");
+			"SDLTmxRenderer only supports orthogonal maps.");
 
 	for (const auto &tileset : tilesets) {
 		sdlTextures.emplace_back(
-		        SXXDL::make_sdl_texture_ptr(
-		                SDL_CreateTextureFromSurface(renderer.get(), tileset->getPreservedSurface())));
+				SXXDL::make_sdl_texture_ptr(
+						SDL_CreateTextureFromSurface(renderer.get(), tileset->getPreservedSurface())));
 	}
 }
 
-void APG::SDLTmxRenderer::renderLayer(const Tmx::TileLayer * const layer) {
+void APG::SDLTmxRenderer::renderLayerImpl(const Tmx::TileLayer *layer) {
 	const auto tile_width = map->GetTileWidth();
 	const auto tile_height = map->GetTileHeight();
 
-	auto src_rect = SDL_Rect { 0, 0, tile_width, tile_height };
-	auto dst_rect = SDL_Rect { 0, 0, tile_width, tile_height };
+	auto src_rect = SDL_Rect{0, 0, tile_width, tile_height};
+	auto dst_rect = SDL_Rect{0, 0, tile_width, tile_height};
 
 	if (layer->IsVisible()) {
 		for (int y = 0; y < layer->GetHeight(); y++) {
@@ -101,8 +76,8 @@ void APG::SDLTmxRenderer::renderLayer(const Tmx::TileLayer * const layer) {
 
 				if (SDL_RenderCopy(renderer.get(), sdl_tileset.get(), &src_rect, &dst_rect) < 0) {
 					el::Loggers::getLogger("APG")->error(
-					        "Couldn't render in tmx renderer; failed at tile %v, tileset \"%v\"", tile_id,
-					        current_tileset->getFileName());
+							"Couldn't render in tmx renderer; failed at tile %v, tileset \"%v\"", tile_id,
+							current_tileset->getFileName());
 					return;
 				}
 			}
@@ -110,7 +85,7 @@ void APG::SDLTmxRenderer::renderLayer(const Tmx::TileLayer * const layer) {
 	}
 }
 
-void APG::SDLTmxRenderer::renderObjectGroup(const std::vector<TiledObject> &objects) {
+void APG::SDLTmxRenderer::renderObjectGroupImpl(const std::vector<TiledObject> &objects) {
 	el::Loggers::getLogger("APG")->fatal("SDL renderer cannot render object groups yet.");
 }
 

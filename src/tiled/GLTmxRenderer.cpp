@@ -1,30 +1,3 @@
-/*
- * Copyright (c) 2014, 2015 See AUTHORS file.
- * All rights reserved.
-
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *    * Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *    * Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution.
- *    * Neither the name of the <organization> nor the
- *      names of its contributors may be used to endorse or promote products
- *      derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 #ifndef APG_NO_SDL
 #ifndef APG_NO_GL
 
@@ -34,32 +7,36 @@
 
 #include "APG/graphics/Sprite.hpp"
 #include "APG/tiled/GLTmxRenderer.hpp"
+#include "APG/internal/Assert.hpp"
 
-APG::GLTmxRenderer::GLTmxRenderer(Tmx::Map * const map, SpriteBatch * const batch) :
-		        GLTmxRenderer(std::unique_ptr<Tmx::Map>(map), batch) {
+namespace APG {
+template<> std::unordered_map<std::string, std::shared_ptr<APG::Tileset>> TmxRenderer<GLTmxRenderer>::tmxTilesets;
+
+GLTmxRenderer::GLTmxRenderer(Tmx::Map *const map, SpriteBatch *const batch) :
+		GLTmxRenderer(std::unique_ptr<Tmx::Map>(map), batch) {
 }
 
-APG::GLTmxRenderer::GLTmxRenderer(std::unique_ptr<Tmx::Map> &&map, SpriteBatch * const batch) :
-		        TmxRenderer(std::move(map)),
-		        batch { batch } {
+GLTmxRenderer::GLTmxRenderer(std::unique_ptr<Tmx::Map> &&map, SpriteBatch *const batch) :
+		TmxRenderer(std::move(map)),
+		batch{batch} {
 }
 
 
-APG::GLTmxRenderer::GLTmxRenderer(const std::string &fileName, SpriteBatch * const batch) :
-		        TmxRenderer(fileName),
-		        batch { batch } {
+GLTmxRenderer::GLTmxRenderer(const std::string &fileName, SpriteBatch *const batch) :
+		TmxRenderer(fileName),
+		batch{batch} {
 
 }
 
-void APG::GLTmxRenderer::renderAll(float deltaTime) {
+void GLTmxRenderer::renderAll(float deltaTime) {
 	batch->begin();
 
-	TmxRenderer::renderAll(deltaTime);
+	TmxRenderer<GLTmxRenderer>::renderAll(deltaTime);
 
 	batch->end();
 }
 
-void APG::GLTmxRenderer::renderLayer(const Tmx::TileLayer * const layer) {
+void GLTmxRenderer::renderLayerImpl(const Tmx::TileLayer *layer) {
 	const uint32_t tileWidth = map->GetTileWidth();
 	const uint32_t tileHeight = map->GetTileHeight();
 
@@ -82,10 +59,12 @@ void APG::GLTmxRenderer::renderLayer(const Tmx::TileLayer * const layer) {
 	}
 }
 
-void APG::GLTmxRenderer::renderObjectGroup(const std::vector<TiledObject> &objects) {
+void GLTmxRenderer::renderObjectGroupImpl(const std::vector<TiledObject> &objects) {
 	for (const auto &obj : objects) {
 		batch->draw(obj.sprite, obj.position.x, obj.position.y);
 	}
+}
+
 }
 
 #endif
