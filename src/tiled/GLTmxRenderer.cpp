@@ -10,7 +10,8 @@
 #include "APG/internal/Assert.hpp"
 
 namespace APG {
-template<> std::unordered_map<std::string, std::shared_ptr<APG::Tileset>> TmxRenderer<GLTmxRenderer>::tmxTilesets;
+
+std::unordered_map<std::string, std::shared_ptr<Tileset>> GLTmxRenderer::tmxTilesets;
 
 GLTmxRenderer::GLTmxRenderer(Tmx::Map *const map, SpriteBatch *const batch) :
 		GLTmxRenderer(std::unique_ptr<Tmx::Map>(map), batch) {

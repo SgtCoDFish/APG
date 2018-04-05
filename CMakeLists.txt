@@ -160,7 +160,7 @@ else ()
 endif ()
 
 if ( NOT MSVC )
-	set(COMPILER_FLAGS "-Wall -Wextra -Wno-unused-parameter ${OS_FLAGS}")
+	set(COMPILER_FLAGS "-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable ${OS_FLAGS}")
 	set(APG_DEBUG_FLAGS "-g3 -O0")
 	set(APG_RELEASE_FLAGS "-g0 -O3")
 else ()

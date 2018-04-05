@@ -145,9 +145,8 @@ public:
 
 protected:
 	static const uint64_t MAX_SPRITES_PER_UNIT = 1000000;
-	static std::unordered_map<std::string, std::shared_ptr<Tileset>> tmxTilesets;
 
-	static void initialiseStaticTilesets() {
+	void initialiseTilesets(std::unordered_map<std::string, std::shared_ptr<Tileset>> &tmxTilesets) {
 		if (tmxTilesets.empty()) {
 			tmxTilesets.reserve(internal::MAX_SUPPORTED_TEXTURES);
 		}
@@ -165,7 +164,8 @@ protected:
 	glm::vec2 position{0.0f, 0.0f};
 
 	void loadTilesets() {
-		initialiseStaticTilesets();
+		auto &tmxTilesets = getDerivedTmxTilesets();
+		initialiseTilesets(tmxTilesets);
 
 		const auto logger = el::Loggers::getLogger("APG");
 
@@ -252,7 +252,7 @@ protected:
 
 				if (el::Loggers::verboseLevel() >= 1) {
 					for (const auto &property : tile->GetProperties().GetList()) {
-						logger->verbose(1, "Property \"%v\" = \"%v\"", property.first, property.second);
+						logger->verbose(1, R"(Property "%v" = "%v")", property.first, property.second);
 					}
 				}
 
@@ -352,6 +352,10 @@ private:
 		sprites.reserve(tileCount);
 		loadedSprites.reserve(tileCount);
 		loadedAnimatedSprites.reserve(animTileCount);
+	}
+
+	std::unordered_map<std::string, std::shared_ptr<Tileset>> & getDerivedTmxTilesets() {
+		return static_cast<T*>(this)->getTmxTilesets();
 	}
 };
 

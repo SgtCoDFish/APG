@@ -12,26 +12,29 @@
 #include "APG/tiled/SDLTmxRenderer.hpp"
 #include "APG/internal/Assert.hpp"
 
-template<> std::unordered_map<std::string, std::shared_ptr<APG::Tileset>> APG::TmxRenderer<APG::SDLTmxRenderer>::tmxTilesets;
 
-APG::SDLTmxRenderer::SDLTmxRenderer(Tmx::Map *const map, const SXXDL::renderer_ptr &renderer) :
+namespace APG {
+
+std::unordered_map<std::string, std::shared_ptr<Tileset>> SDLTmxRenderer::tmxTilesets;
+
+SDLTmxRenderer::SDLTmxRenderer(Tmx::Map *const map, const SXXDL::renderer_ptr &renderer) :
 		SDLTmxRenderer(std::unique_ptr<Tmx::Map>(map), renderer) {
 
 }
 
-APG::SDLTmxRenderer::SDLTmxRenderer(std::unique_ptr<Tmx::Map> &&map, const SXXDL::renderer_ptr &renderer) :
+SDLTmxRenderer::SDLTmxRenderer(std::unique_ptr<Tmx::Map> &&map, const SXXDL::renderer_ptr &renderer) :
 		TmxRenderer(std::move(map)),
 		renderer{renderer} {
 	setupTilesets();
 }
 
-APG::SDLTmxRenderer::SDLTmxRenderer(const std::string &fileName, const SXXDL::renderer_ptr &renderer) :
+SDLTmxRenderer::SDLTmxRenderer(const std::string &fileName, const SXXDL::renderer_ptr &renderer) :
 		TmxRenderer(fileName),
 		renderer{renderer} {
 	setupTilesets();
 }
 
-void APG::SDLTmxRenderer::setupTilesets() {
+void SDLTmxRenderer::setupTilesets() {
 	REQUIRE(map->GetOrientation() == Tmx::MapOrientation::TMX_MO_ORTHOGONAL,
 			"SDLTmxRenderer only supports orthogonal maps.");
 
@@ -42,7 +45,7 @@ void APG::SDLTmxRenderer::setupTilesets() {
 	}
 }
 
-void APG::SDLTmxRenderer::renderLayerImpl(const Tmx::TileLayer *layer) {
+void SDLTmxRenderer::renderLayerImpl(const Tmx::TileLayer *layer) {
 	const auto tile_width = map->GetTileWidth();
 	const auto tile_height = map->GetTileHeight();
 
@@ -85,8 +88,10 @@ void APG::SDLTmxRenderer::renderLayerImpl(const Tmx::TileLayer *layer) {
 	}
 }
 
-void APG::SDLTmxRenderer::renderObjectGroupImpl(const std::vector<TiledObject> &objects) {
+void SDLTmxRenderer::renderObjectGroupImpl(const std::vector<TiledObject> &objects) {
 	el::Loggers::getLogger("APG")->fatal("SDL renderer cannot render object groups yet.");
+}
+
 }
 
 #endif

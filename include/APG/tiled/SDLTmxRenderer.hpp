@@ -8,6 +8,7 @@
 #include "APG/SXXDL.hpp"
 #include "APG/core/APGCommon.hpp"
 #include "APG/tiled/TmxRenderer.hpp"
+#include "APG/graphics/Tileset.hpp"
 
 #include <glm/vec2.hpp>
 
@@ -32,7 +33,7 @@ public:
 
 	explicit SDLTmxRenderer(const std::string &fileName, const SXXDL::renderer_ptr &renderer);
 
-	virtual ~SDLTmxRenderer() = default;
+	~SDLTmxRenderer() = default;
 
 	// disallow copying because we own resources.
 	SDLTmxRenderer(SDLTmxRenderer &other) = delete;
@@ -42,9 +43,15 @@ public:
 protected:
 	friend class TmxRenderer<SDLTmxRenderer>;
 
+	static std::unordered_map<std::string, std::shared_ptr<Tileset>> tmxTilesets;
+
 	void renderLayerImpl(const Tmx::TileLayer *layer);
 
 	void renderObjectGroupImpl(const std::vector<TiledObject> &objects);
+
+	std::unordered_map<std::string, std::shared_ptr<Tileset>> &getTmxTilesets() {
+		return tmxTilesets;
+	}
 
 private:
 	const SXXDL::renderer_ptr &renderer;
