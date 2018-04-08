@@ -12,4 +12,4 @@
 	url = https://github.com/g-truc/glm
 [submodule "vendor/easyloggingpp"]
 	path = vendor/easyloggingpp
-	url = https://github.com/muflihun/easyloggingpp
+	url = https://github.com/sgtcodfish/easyloggingpp
