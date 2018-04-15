@@ -11,9 +11,9 @@ public:
 	virtual ~SpriteBase() = default;
 	virtual Texture * getTexture() const = 0;
 
-	virtual uint32_t getWidth() const = 0;
+	virtual int32_t getWidth() const = 0;
 
-	virtual uint32_t getHeight() const = 0;
+	virtual int32_t getHeight() const = 0;
 
 	virtual float getU1() const = 0;
 	virtual float getV1() const = 0;

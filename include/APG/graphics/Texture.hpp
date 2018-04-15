@@ -37,33 +37,37 @@ class ShaderProgram;
 
 class Texture {
 public:
-	explicit Texture(const char * const fileName, bool preserveSurface = false) :
-			        Texture(std::string(fileName), preserveSurface) {
+	explicit Texture(const char *const fileName) :
+			Texture(std::string(fileName)) {
 	}
 
-	explicit Texture(const std::string &fileName, bool preserveSurface = false);
-	explicit Texture(SDL_Surface * surface, bool preserveSurface = false);
+	explicit Texture(const std::string &fileName);
+
+	explicit Texture(SDL_Surface *surface);
 
 	virtual ~Texture();
 
 	void bind() const;
 
 	void setWrapType(TextureWrapType sWrap, TextureWrapType tWrap);
+
 	void setColor(glm::vec4 &color);
+
 	void setFilter(TextureFilterType minFilter, TextureFilterType magFilter);
 
 	void generateMipMaps();
 
-	void attachToShader(const char * uniformName, ShaderProgram * program) const;
-	void attachToShader(const std::string &uniformName, ShaderProgram * program) const {
+	void attachToShader(const char *uniformName, ShaderProgram *program) const;
+
+	void attachToShader(const std::string &uniformName, ShaderProgram *program) const {
 		attachToShader(uniformName.c_str(), program);
 	}
 
-	inline uint32_t getWidth() const {
+	inline int getWidth() const {
 		return width;
 	}
 
-	inline uint32_t getHeight() const {
+	inline int getHeight() const {
 		return height;
 	}
 
@@ -76,7 +80,7 @@ public:
 	}
 
 	SDL_Surface *getPreservedSurface() const {
-		return (preserveSurface ? preservedSurface.get() : nullptr);
+		return preservedSurface.get();
 	}
 
 	inline uint32_t getGLTextureUnit() const {
@@ -102,7 +106,8 @@ private:
 	uint32_t textureUnitGL = 0;
 
 	void generateTextureID();
-	void loadTexture(SDL_Surface * surface);
+
+	void loadTexture(SDL_Surface *surface);
 
 	int width = 0;
 	int height = 0;
@@ -110,20 +115,23 @@ private:
 	float invWidth = 0.0f;
 	float invHeight = 0.0f;
 
-	bool preserveSurface = false;
 	SXXDL::surface_ptr preservedSurface = SXXDL::make_surface_ptr(nullptr);
 
 	GLuint tempBindID = 0;
 	GLenum tempUnit = 0;
+
 	void tempBind();
+
 	void rebind();
 
 	TextureWrapType sWrap;
 	TextureWrapType tWrap;
+
 	void uploadWrapType() const;
 
 	TextureFilterType minFilter;
 	TextureFilterType magFilter;
+
 	void uploadFilter() const;
 };
 

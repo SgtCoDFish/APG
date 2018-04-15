@@ -20,14 +20,14 @@ public:
 			Sprite(texture.get()) {
 	}
 
-	explicit Sprite(const std::unique_ptr<Texture> &texture, uint32_t texX, uint32_t texY, uint32_t width,
-					uint32_t height) :
+	explicit Sprite(const std::unique_ptr<Texture> &texture, int32_t texX, int32_t texY, int32_t width,
+					int32_t height) :
 			Sprite(texture.get(), texX, texY, width, height) {
 	}
 
-	explicit Sprite(Texture * texture);
+	explicit Sprite(Texture *texture);
 
-	explicit Sprite(Texture * texture, uint32_t texX, uint32_t texY, uint32_t width, uint32_t height);
+	explicit Sprite(Texture *texture, int32_t texX, int32_t texY, int32_t width, int32_t height);
 
 	~Sprite() override = default;
 
@@ -43,11 +43,11 @@ public:
 		return texture;
 	}
 
-	uint32_t getWidth() const override {
+	int32_t getWidth() const override {
 		return width;
 	}
 
-	uint32_t getHeight() const override {
+	int32_t getHeight() const override {
 		return height;
 	}
 
@@ -70,9 +70,9 @@ public:
 protected:
 	Texture *texture = nullptr;
 
-	uint32_t texX = 0, texY = 0;
+	int32_t texX = 0, texY = 0;
 
-	uint32_t width = 0, height = 0;
+	int32_t width = 0, height = 0;
 
 	float u1 = 0.0f, v1 = 0.0f;
 	float u2 = 0.0f, v2 = 0.0f;

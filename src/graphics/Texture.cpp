@@ -21,8 +21,9 @@
 
 #include "easylogging++.h"
 
-std::atomic<uint32_t> APG::Texture::availableTextureUnit(0);
-uint32_t APG::Texture::TEXTURE_TARGETS[] = {
+namespace APG {
+std::atomic<uint32_t> Texture::availableTextureUnit(0);
+uint32_t Texture::TEXTURE_TARGETS[] = {
 		GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2, GL_TEXTURE3,
 		GL_TEXTURE4, GL_TEXTURE5, GL_TEXTURE6, GL_TEXTURE7, GL_TEXTURE8,
 		GL_TEXTURE9,
@@ -33,11 +34,10 @@ uint32_t APG::Texture::TEXTURE_TARGETS[] = {
 		GL_TEXTURE22, GL_TEXTURE23, GL_TEXTURE24, GL_TEXTURE25, GL_TEXTURE26,
 		GL_TEXTURE27,
 		GL_TEXTURE28, GL_TEXTURE29, GL_TEXTURE30, GL_TEXTURE31
-		};
+};
 
-APG::Texture::Texture(const std::string &fileName, bool preserveSurface) :
+Texture::Texture(const std::string &fileName) :
 		fileName{fileName},
-		preserveSurface{preserveSurface},
 		sWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
 		tWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
 		minFilter{APG::TextureFilterType::LINEAR},
@@ -53,9 +53,8 @@ APG::Texture::Texture(const std::string &fileName, bool preserveSurface) :
 	loadTexture(surface);
 }
 
-APG::Texture::Texture(SDL_Surface *const surface, bool preserveSurface) :
+Texture::Texture(SDL_Surface * surface) :
 		fileName{"from SDL_Surface"},
-		preserveSurface{preserveSurface},
 		sWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
 		tWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
 		minFilter{APG::TextureFilterType::LINEAR},
@@ -67,18 +66,18 @@ APG::Texture::Texture(SDL_Surface *const surface, bool preserveSurface) :
 	loadTexture(surface);
 }
 
-APG::Texture::~Texture() {
+Texture::~Texture() {
 	glDeleteTextures(1, &textureID);
 }
 
-void APG::Texture::generateTextureID() {
+void Texture::generateTextureID() {
 	textureUnitInt = availableTextureUnit++;
 	textureUnitGL = TEXTURE_TARGETS[textureUnitInt];
 
 	glGenTextures(1, &textureID);
 }
 
-void APG::Texture::loadTexture(SDL_Surface *surface) {
+void Texture::loadTexture(SDL_Surface *surface) {
 	const auto logger = el::Loggers::getLogger("APG");
 
 	if (surface == nullptr) {
@@ -139,12 +138,10 @@ void APG::Texture::loadTexture(SDL_Surface *surface) {
 
 	logger->info("Loaded texture \"%v\" at unit GL_TEXTURE%v", fileName, textureUnitInt);
 
-	if (preserveSurface) {
-		preservedSurface = SXXDL::make_surface_ptr(surface);
-	}
+	preservedSurface = SXXDL::make_surface_ptr(surface);
 }
 
-void APG::Texture::tempBind() {
+void Texture::tempBind() {
 	// TODO: consider using the EXT_direct_state_access extension if available
 	// using glTextureParameteri(id, texType, paramName, paramVal)
 	// http://www.opengl.org/registry/specs/EXT/direct_state_access.txt
@@ -155,20 +152,20 @@ void APG::Texture::tempBind() {
 	glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
-void APG::Texture::rebind() {
+void Texture::rebind() {
 	glActiveTexture(tempUnit);
 	glBindTexture(GL_TEXTURE_2D, tempBindID);
 	tempBindID = tempUnit = 0;
 }
 
-void APG::Texture::bind() const {
+void Texture::bind() const {
 	glActiveTexture(textureUnitGL);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	uploadFilter();
 	uploadWrapType();
 }
 
-void APG::Texture::setWrapType(TextureWrapType sWrap, TextureWrapType tWrap) {
+void Texture::setWrapType(TextureWrapType sWrap, TextureWrapType tWrap) {
 	tempBind();
 
 	this->sWrap = sWrap;
@@ -179,12 +176,12 @@ void APG::Texture::setWrapType(TextureWrapType sWrap, TextureWrapType tWrap) {
 	rebind();
 }
 
-void APG::Texture::uploadWrapType() const {
+void Texture::uploadWrapType() const {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sWrap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, tWrap);
 }
 
-void APG::Texture::setColor(glm::vec4 &color) {
+void Texture::setColor(glm::vec4 &color) {
 	tempBind();
 
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(color));
@@ -192,7 +189,7 @@ void APG::Texture::setColor(glm::vec4 &color) {
 	rebind();
 }
 
-void APG::Texture::setFilter(TextureFilterType minFilter, TextureFilterType magFilter) {
+void Texture::setFilter(TextureFilterType minFilter, TextureFilterType magFilter) {
 	tempBind();
 
 	REQUIRE(
@@ -210,12 +207,12 @@ void APG::Texture::setFilter(TextureFilterType minFilter, TextureFilterType magF
 	rebind();
 }
 
-void APG::Texture::uploadFilter() const {
+void Texture::uploadFilter() const {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
 }
 
-void APG::Texture::generateMipMaps() {
+void Texture::generateMipMaps() {
 	tempBind();
 
 	glGenerateMipmap(GL_TEXTURE_2D);
@@ -223,8 +220,10 @@ void APG::Texture::generateMipMaps() {
 	rebind();
 }
 
-void APG::Texture::attachToShader(const char *const uniformName, ShaderProgram *const program) const {
+void Texture::attachToShader(const char *const uniformName, ShaderProgram *const program) const {
 	program->setUniformi(uniformName, textureUnitInt);
+}
+
 }
 
 #endif

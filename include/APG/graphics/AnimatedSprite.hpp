@@ -38,12 +38,12 @@ public:
 	 * @param xSeparation The horizontal separation between two frames, in pixels, defaults to 0.
 	 * @return a list of sprites that can be passed into an AnimatedSprite constructor
 	 */
-	static std::vector<Sprite> splitTexture(Texture * texture, uint32_t tileWidth, uint32_t tileHeight,
-	        uint32_t xStart = 0u, uint32_t yStart = 0u, int32_t frameCount = -1, uint32_t xSeparation = 0u);
+	static std::vector<Sprite> splitTexture(Texture * texture, int32_t tileWidth, int32_t tileHeight,
+	        int32_t xStart = 0, int32_t yStart = 0, int32_t frameCount = -1, int32_t xSeparation = 0);
 
-	static std::vector<Sprite> splitTexture(const std::unique_ptr<Texture> &texture, uint32_t tileWidth,
-	        uint32_t tileHeight, uint32_t xStart = 0u, uint32_t yStart = 0u, int32_t frameCount = -1,
-	        uint32_t xSeparation = 0u) {
+	static std::vector<Sprite> splitTexture(const std::unique_ptr<Texture> &texture, int32_t tileWidth,
+	        int32_t tileHeight, int32_t xStart = 0, int32_t yStart = 0, int32_t frameCount = -1,
+	        int32_t xSeparation = 0) {
 		return splitTexture(texture.get(), tileWidth, tileHeight, xStart, yStart, frameCount, xSeparation);
 	}
 
@@ -56,7 +56,7 @@ public:
 	explicit AnimatedSprite(float frameDuration, std::vector<SpriteBase *> &sprites, AnimationMode animationMode =
 	        AnimationMode::NORMAL);
 
-	~AnimatedSprite() = default;
+	~AnimatedSprite() override = default;
 
 	void update(float deltaTime);
 
@@ -73,11 +73,11 @@ public:
 		return texture;
 	}
 
-	uint32_t getWidth() const override {
+	int32_t getWidth() const override {
 		return width;
 	}
 
-	uint32_t getHeight() const override {
+	int32_t getHeight() const override {
 		return height;
 	}
 
@@ -104,8 +104,8 @@ private:
 	int32_t frameCount = 0;
 
 	float secondsPerFrame = 0.0f;
-	float animTime = 0.0f;
-	int animDir = 1;
+	float animationTime = 0.0f;
+	int animationDirection = 1;
 
 	uint32_t width = 0, height = 0;
 

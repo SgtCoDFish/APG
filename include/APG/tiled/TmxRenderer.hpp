@@ -222,7 +222,7 @@ protected:
 			 * The GIDs start at 1 for the first tileset, and increase by 1 going right.
 			 * When the right edge of the image is reached, we go down and back to the left of the image.
 			 */
-			uint32_t tileID = 0, x = 0, y = 0;
+			int32_t tileID = 0, x = 0, y = 0;
 			while (true) {
 				const auto tileGID = calculateTileGID(tileset, tileID);
 

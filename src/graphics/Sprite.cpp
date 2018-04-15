@@ -15,7 +15,7 @@ APG::Sprite::Sprite(Texture * texture) :
 
 }
 
-APG::Sprite::Sprite(Texture * texture, uint32_t texX, uint32_t texY, uint32_t width, uint32_t height) :
+APG::Sprite::Sprite(Texture * texture, int32_t texX, int32_t texY, int32_t width, int32_t height) :
 		        texture(texture),
 		        texX(texX),
 		        texY(texY),
