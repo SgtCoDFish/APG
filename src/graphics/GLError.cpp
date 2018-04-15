@@ -6,13 +6,13 @@
 #include "APG/graphics/GLError.hpp"
 
 namespace {
-static const std::string NO_GL_ERROR {"No error"};
-static const std::string INVALID_ENUM {"Invalid value for enum"};
-static const std::string INVALID_VALUE {"Invalid numeric value"};
-static const std::string INVALID_OPERATION {"Invalid operation"};
-static const std::string INVALID_FRAMEBUFFER_OPERATION {"Invalid framebuffer operation"};
-static const std::string OUT_OF_MEMORY {"Out of memory"};
-static const std::string UNKNOWN {"Unknown OpenGL Error"};
+constexpr const char *NO_GL_ERROR = "No error";
+constexpr const char *INVALID_ENUM {"Invalid value for enum"};
+constexpr const char *INVALID_VALUE {"Invalid numeric value"};
+constexpr const char *INVALID_OPERATION {"Invalid operation"};
+constexpr const char *INVALID_FRAMEBUFFER_OPERATION {"Invalid framebuffer operation"};
+constexpr const char *OUT_OF_MEMORY {"Out of memory"};
+constexpr const char *UNKNOWN {"Unknown OpenGL Error"};
 }
 
 namespace APG {

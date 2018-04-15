@@ -1,30 +1,3 @@
-/*
- * Copyright (c) 2014, 2015 See AUTHORS file.
- * All rights reserved.
-
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *    * Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *    * Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution.
- *    * Neither the name of the <organization> nor the
- *      names of its contributors may be used to endorse or promote products
- *      derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 #ifndef APG_NO_SDL
 #ifndef APG_NO_GL
 
@@ -49,20 +22,26 @@
 #include "easylogging++.h"
 
 std::atomic<uint32_t> APG::Texture::availableTextureUnit(0);
-uint32_t APG::Texture::TEXTURE_TARGETS[] = { GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2, GL_TEXTURE3,
-GL_TEXTURE4, GL_TEXTURE5, GL_TEXTURE6, GL_TEXTURE7, GL_TEXTURE8, GL_TEXTURE9,
-GL_TEXTURE10, GL_TEXTURE11, GL_TEXTURE12, GL_TEXTURE13, GL_TEXTURE14, GL_TEXTURE15,
-GL_TEXTURE16, GL_TEXTURE17, GL_TEXTURE18, GL_TEXTURE19, GL_TEXTURE20, GL_TEXTURE21,
-GL_TEXTURE22, GL_TEXTURE23, GL_TEXTURE24, GL_TEXTURE25, GL_TEXTURE26, GL_TEXTURE27,
-GL_TEXTURE28, GL_TEXTURE29, GL_TEXTURE30, GL_TEXTURE31 };
+uint32_t APG::Texture::TEXTURE_TARGETS[] = {
+		GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2, GL_TEXTURE3,
+		GL_TEXTURE4, GL_TEXTURE5, GL_TEXTURE6, GL_TEXTURE7, GL_TEXTURE8,
+		GL_TEXTURE9,
+		GL_TEXTURE10, GL_TEXTURE11, GL_TEXTURE12, GL_TEXTURE13, GL_TEXTURE14,
+		GL_TEXTURE15,
+		GL_TEXTURE16, GL_TEXTURE17, GL_TEXTURE18, GL_TEXTURE19, GL_TEXTURE20,
+		GL_TEXTURE21,
+		GL_TEXTURE22, GL_TEXTURE23, GL_TEXTURE24, GL_TEXTURE25, GL_TEXTURE26,
+		GL_TEXTURE27,
+		GL_TEXTURE28, GL_TEXTURE29, GL_TEXTURE30, GL_TEXTURE31
+		};
 
 APG::Texture::Texture(const std::string &fileName, bool preserveSurface) :
-		fileName { fileName }, //
-		preserveSurface { preserveSurface }, //
-		sWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
-		tWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
-		minFilter { APG::TextureFilterType::LINEAR }, //
-		magFilter { APG::TextureFilterType::LINEAR } {
+		fileName{fileName},
+		preserveSurface{preserveSurface},
+		sWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
+		tWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
+		minFilter{APG::TextureFilterType::LINEAR},
+		magFilter{APG::TextureFilterType::LINEAR} {
 	auto surface = IMG_Load(fileName.c_str());
 
 	if (surface == nullptr) {
@@ -74,13 +53,13 @@ APG::Texture::Texture(const std::string &fileName, bool preserveSurface) :
 	loadTexture(surface);
 }
 
-APG::Texture::Texture(SDL_Surface * const surface, bool preserveSurface) :
-		fileName { "from SDL_Surface" }, //
-		preserveSurface { preserveSurface }, //
-		sWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
-		tWrap { APG::TextureWrapType::CLAMP_TO_EDGE }, //
-		minFilter { APG::TextureFilterType::LINEAR }, //
-		magFilter { APG::TextureFilterType::LINEAR } {
+APG::Texture::Texture(SDL_Surface *const surface, bool preserveSurface) :
+		fileName{"from SDL_Surface"},
+		preserveSurface{preserveSurface},
+		sWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
+		tWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
+		minFilter{APG::TextureFilterType::LINEAR},
+		magFilter{APG::TextureFilterType::LINEAR} {
 	REQUIRE(surface != nullptr, "Can't create texture from null surface ptr.");
 
 	generateTextureID();
@@ -99,15 +78,16 @@ void APG::Texture::generateTextureID() {
 	glGenTextures(1, &textureID);
 }
 
-void APG::Texture::loadTexture(SDL_Surface * const surface) {
+void APG::Texture::loadTexture(SDL_Surface *surface) {
 	const auto logger = el::Loggers::getLogger("APG");
 
 	if (surface == nullptr) {
 		logger->fatal("Call to loadTexture with null surface");
+		return;
 	}
 
 	const auto numberOfColors = surface->format->BytesPerPixel;
-	int32_t glFormat = 0;
+	GLenum glFormat = 0;
 
 	if (numberOfColors == 4) {
 		if (surface->format->Rmask == 0x000000ff) {
@@ -123,9 +103,9 @@ void APG::Texture::loadTexture(SDL_Surface * const surface) {
 		}
 	} else {
 		logger->fatal(
-			"Invalid bytes per pixel value in %v (%v is invalid, only 4 or 3 supported.)",
-			fileName,
-			(uint32_t) numberOfColors
+				"Invalid bytes per pixel value in %v (%v is invalid, only 4 or 3 supported.)",
+				fileName,
+				(uint32_t) numberOfColors
 		);
 		return;
 	}
@@ -169,8 +149,8 @@ void APG::Texture::tempBind() {
 	// using glTextureParameteri(id, texType, paramName, paramVal)
 	// http://www.opengl.org/registry/specs/EXT/direct_state_access.txt
 
-	glGetIntegerv(GL_TEXTURE_BINDING_2D, (int32_t *) &tempBindID);
-	glGetIntegerv(GL_ACTIVE_TEXTURE, (int32_t *) &tempUnit);
+	glGetIntegerv(GL_TEXTURE_BINDING_2D, reinterpret_cast<GLint *>(&tempBindID));
+	glGetIntegerv(GL_ACTIVE_TEXTURE, reinterpret_cast<GLint *>(&tempUnit));
 	glActiveTexture(textureUnitGL);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 }
@@ -216,11 +196,11 @@ void APG::Texture::setFilter(TextureFilterType minFilter, TextureFilterType magF
 	tempBind();
 
 	REQUIRE(
-		magFilter != TextureFilterType::LINEAR_MIPMAP_LINEAR &&
-		magFilter != TextureFilterType::NEAREST_MIPMAP_LINEAR &&
-		magFilter != TextureFilterType::LINEAR_MIPMAP_NEAREST &&
-		magFilter != TextureFilterType::NEAREST_MIPMAP_NEAREST,
-		"Can't set mipmap filter for mag filter.");
+			magFilter != TextureFilterType::LINEAR_MIPMAP_LINEAR &&
+			magFilter != TextureFilterType::NEAREST_MIPMAP_LINEAR &&
+			magFilter != TextureFilterType::LINEAR_MIPMAP_NEAREST &&
+			magFilter != TextureFilterType::NEAREST_MIPMAP_NEAREST,
+			"Can't set mipmap filter for mag filter.");
 
 	this->minFilter = minFilter;
 	this->magFilter = magFilter;
@@ -243,7 +223,7 @@ void APG::Texture::generateMipMaps() {
 	rebind();
 }
 
-void APG::Texture::attachToShader(const char * const uniformName, ShaderProgram * const program) const {
+void APG::Texture::attachToShader(const char *const uniformName, ShaderProgram *const program) const {
 	program->setUniformi(uniformName, textureUnitInt);
 }
 

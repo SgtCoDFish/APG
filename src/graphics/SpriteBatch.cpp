@@ -1,30 +1,3 @@
-/*
- * Copyright (c) 2014, 2015 See AUTHORS file.
- * All rights reserved.
-
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *    * Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *    * Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution.
- *    * Neither the name of the <organization> nor the
- *      names of its contributors may be used to endorse or promote products
- *      derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 #ifndef APG_NO_SDL
 #ifndef APG_NO_GL
 
@@ -35,16 +8,14 @@
 #include <memory>
 #include <vector>
 
+#include <glm/glm.hpp>
 #include <glm/vec2.hpp>
+#include <glm/detail/type_mat4x4.hpp>
 
 #include "APG/core/APGCommon.hpp"
 #include "APG/core/Game.hpp"
 #include "APG/graphics/SpriteBatch.hpp"
-#include "APG/graphics/ShaderProgram.hpp"
-#include "APG/graphics/Buffer.hpp"
 #include "APG/graphics/Sprite.hpp"
-#include "APG/graphics/Mesh.hpp"
-#include "APG/graphics/VertexAttribute.hpp"
 #include "APG/internal/Assert.hpp"
 
 const char * const APG::SpriteBatch::POSITION_ATTRIBUTE = "position";
@@ -80,10 +51,10 @@ APG::SpriteBatch::SpriteBatch(ShaderProgram * const program, uint32_t bufferSize
 	uint16_t j = 0;
 	for (unsigned int i = 0; i < indicesLength; i += 6, j += 4) {
 		indices[i + 0] = j;
-		indices[i + 1] = j + 1;
-		indices[i + 2] = j + 2;
-		indices[i + 3] = j + 2;
-		indices[i + 4] = j + 3;
+		indices[i + 1] = j + static_cast<decltype(j)>(1u);
+		indices[i + 2] = j + static_cast<decltype(j)>(2u);
+		indices[i + 3] = j + static_cast<decltype(j)>(2u);
+		indices[i + 4] = j + static_cast<decltype(j)>(3u);
 		indices[i + 5] = j;
 	}
 
@@ -96,7 +67,7 @@ void APG::SpriteBatch::switchTexture(APG::Texture * const newTexture) {
 }
 
 void APG::SpriteBatch::setupMatrices() {
-	combinedMatrix = projectionMatrix * transformMatrix;
+	combinedMatrix = glm::operator*(projectionMatrix, transformMatrix);
 	program->setUniformf("projTrans", combinedMatrix);
 }
 
@@ -163,16 +134,20 @@ void APG::SpriteBatch::draw(APG::Texture * const image, float x, float y, uint32
 	}
 }
 
-void APG::SpriteBatch::draw(APG::SpriteBase * const sprite, float x, float y) {
+void APG::SpriteBatch::draw(APG::SpriteBase * sprite, float x, float y) {
 	REQUIRE(drawing, "Must call begin() before draw().");
 	REQUIRE(sprite != nullptr, "Cannot draw null sprite in SpriteBatch.");
+
+	if(sprite == nullptr) {
+		return;
+	}
 
 	if (sprite->getTexture() != lastTexture) {
 		switchTexture(sprite->getTexture());
 	}
 
-	const auto u1 = sprite->getU();
-	const auto v1 = sprite->getV();
+	const auto u1 = sprite->getU1();
+	const auto v1 = sprite->getV1();
 	const auto u2 = sprite->getU2();
 	const auto v2 = sprite->getV2();
 
@@ -230,11 +205,11 @@ void APG::SpriteBatch::flush() {
 	indexBuffer.bind();
 
 	//TODO: Fix hacky sizeof.
-	const int strideInBytes = (vertexBuffer.getAttributes().getStride() * sizeof(GLfloat));
-	const int spriteCount = idx / strideInBytes;
-	const int indexCount = spriteCount * 6;
+	const auto strideInBytes = (vertexBuffer.getAttributes().getStride() * sizeof(GLfloat));
+	const auto spriteCount = idx / strideInBytes;
+	const auto indexCount = spriteCount * 6;
 
-	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexCount), GL_UNSIGNED_SHORT, nullptr);
 
 	idx = 0;
 }

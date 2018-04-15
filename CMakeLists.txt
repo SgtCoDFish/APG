@@ -206,16 +206,13 @@ if ( NOT APG_NO_GL )
 		)
 endif ()
 
-set(APG_LIB_NAME ${CMAKE_PROJECT_NAME})
-
 if ( APG_DEBUG )
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS}")
-	set(APG_LIB_NAME "${APG_LIB_NAME}-d")
 else ()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_RELEASE_FLAGS}")
 endif ()
 
-add_library(${APG_LIB_NAME} ${FULL_SOURCES} ${APG_HEADERS})
+add_library(APG ${FULL_SOURCES} ${APG_HEADERS})
 
 if ( NOT EXCLUDE_AUDIO_TEST )
 	if ( NOT EXISTS ${PROJECT_SOURCE_DIR}/assets/test_music.ogg )
@@ -256,7 +253,7 @@ if ( NOT EXCLUDE_SDL_TEST)
 	endif ()
 
 	add_executable(SDLRenderTest ${SDLRENDERTEST_SOURCES} ${EXTRA_SOURCES})
-	target_link_libraries(SDLRenderTest ${APG_LIB_NAME} ${EXAMPLE_LIBS})
+	target_link_libraries(SDLRenderTest APG ${EXAMPLE_LIBS})
 endif ( NOT EXCLUDE_SDL_TEST )
 
 if ( NOT EXCLUDE_GL_TEST )
@@ -269,7 +266,7 @@ if ( NOT EXCLUDE_GL_TEST )
 	endif ()
 
 	add_executable(GLRenderTest ${GLRENDERTEST_SOURCES} ${EXTRA_SOURCES})
-	target_link_libraries(GLRenderTest ${APG_LIB_NAME} ${EXAMPLE_LIBS})
+	target_link_libraries(GLRenderTest APG ${EXAMPLE_LIBS})
 endif ( NOT EXCLUDE_GL_TEST )
 
 if ( NOT EXCLUDE_AUDIO_TEST )
@@ -282,8 +279,8 @@ if ( NOT EXCLUDE_AUDIO_TEST )
 	endif ()
 
 	add_executable(AudioTest ${AUDIOTEST_SOURCES} ${EXTRA_SOURCES})
-	target_link_libraries(AudioTest ${APG_LIB_NAME} ${EXAMPLE_LIBS})
+	target_link_libraries(AudioTest APG ${EXAMPLE_LIBS})
 endif ( NOT EXCLUDE_AUDIO_TEST )
 
-install (TARGETS ${APG_LIB_NAME} DESTINATION lib)
+install (TARGETS APG DESTINATION lib)
 install (DIRECTORY ${PROJECT_SOURCE_DIR}/include/APG DESTINATION include)

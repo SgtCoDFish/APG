@@ -1,30 +1,3 @@
-/*
- * Copyright (c) 2014, 2015 See AUTHORS file.
- * All rights reserved.
-
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *    * Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *    * Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution.
- *    * Neither the name of the <organization> nor the
- *      names of its contributors may be used to endorse or promote products
- *      derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 #include <cstdint>
 #include <cstdlib>
 
@@ -49,6 +22,7 @@
 #include "test/APGGLRenderTest.hpp"
 
 #include "easylogging++.h"
+
 INITIALIZE_EASYLOGGINGPP
 
 #if defined (__EMSCRIPTEN__)
@@ -56,8 +30,8 @@ INITIALIZE_EASYLOGGINGPP
 const char * APG::APGGLRenderTest::vertexShaderFilename = "assets/pass_vertex-es3.glslv";
 const char * APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag-es3.glslf";
 #else
-const char * APG::APGGLRenderTest::vertexShaderFilename = "assets/pass_vertex.glslv";
-const char * APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag.glslf";
+const char *APG::APGGLRenderTest::vertexShaderFilename = "assets/pass_vertex.glslv";
+const char *APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag.glslf";
 #endif
 
 bool APG::APGGLRenderTest::init() {
@@ -103,7 +77,7 @@ bool APG::APGGLRenderTest::init() {
 
 	logger->info("Estimated font size: (w, h) = (%v, %v).", renderedFontSize.x, renderedFontSize.y);
 
-	//fontSprite = fontManager->renderText(font, "Hello, world!", true, FontRenderMethod::NICE);
+	fontSprite = fontManager->renderText(font, "Hello, world!", true, FontRenderMethod::NICE);
 
 	auto glError = glGetError();
 	if (glError != GL_NO_ERROR) {
@@ -123,7 +97,7 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	static float playerX = 128.0f, playerY = 128.0f;
-	const glm::vec3 textScreenPosition { 50.0f, screenHeight - 50.0f, 0.0f };
+	const glm::vec3 textScreenPosition{50.0f, screenHeight - 50.0f, 0.0f};
 	static glm::vec3 textPos;
 
 	// will move the player quickly
@@ -172,27 +146,27 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	textPos = camera->unproject(textScreenPosition);
 
 	spriteBatch->begin();
-//	spriteBatch->draw(currentPlayer, playerX, playerY);
+	spriteBatch->draw(currentPlayer, playerX, playerY);
 	// draw a weird quarter version of the player to test out extended draw method
-	spriteBatch->draw(currentPlayer->getTexture(), playerX, playerY, currentPlayer->getWidth() * 2,
-			currentPlayer->getHeight() * 2, 0.0f, 0.0f, currentPlayer->getWidth() * 0.5f,
-			currentPlayer->getHeight() * 0.5f);
-	//spriteBatch->draw(fontSprite, textPos.x, textPos.y);
+	//spriteBatch->draw(currentPlayer->getTexture(), playerX, playerY, currentPlayer->getWidth() * 2,
+	//		currentPlayer->getHeight() * 2, 0.0f, 0.0f, currentPlayer->getWidth() * 0.5f,
+	//		currentPlayer->getHeight() * 0.5f);
+	spriteBatch->draw(fontSprite, textPos.x, textPos.y);
 	spriteBatch->end();
 
 	SDL_GL_SwapWindow(window.get());
 }
 
 struct loop_arg {
-	APG::APGGLRenderTest *rpg;
+	APG::APGGLRenderTest *rpg { nullptr };
+	el::Logger *logger { nullptr };
+	bool done { false };
 	std::chrono::time_point<std::chrono::high_resolution_clock> timepoint;
 	std::vector<float> timesTaken;
-	el::Logger *logger;
-	bool done;
 };
 
 void loop(void *v_arg) {
-	loop_arg * arg = static_cast<loop_arg *>(v_arg);
+	auto arg = static_cast<loop_arg *>(v_arg);
 
 	auto timeNow = std::chrono::high_resolution_clock::now();
 	float deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - arg->timepoint).count() / 1000.0f;
@@ -230,7 +204,7 @@ int main(int argc, char *argv[]) {
 	arg.rpg = game.get();
 	arg.timepoint = std::chrono::high_resolution_clock::now();
 	arg.done = false;
-	arg.logger =  logger;
+	arg.logger = logger;
 
 #if defined(__EMSCRIPTEN__)
 	emscripten_set_main_loop_arg(loop, &arg, 0, 1);

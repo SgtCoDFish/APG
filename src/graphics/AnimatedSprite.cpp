@@ -1,30 +1,3 @@
-/*
- * Copyright (c) 2014, 2015 See AUTHORS file.
- * All rights reserved.
-
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *    * Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *    * Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution.
- *    * Neither the name of the <organization> nor the
- *      names of its contributors may be used to endorse or promote products
- *      derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 #ifndef APG_NO_SDL
 #ifndef APG_NO_GL
 
@@ -69,7 +42,7 @@ APG::AnimatedSprite::AnimatedSprite(float frameDuration, std::initializer_list<S
 
 APG::AnimatedSprite::AnimatedSprite(float frameDuration, std::vector<Sprite> &sprites, AnimationMode animationMode) :
 		        secondsPerFrame { frameDuration } {
-	REQUIRE(sprites.size() > 0, "Can't initialise an animated sprite with an empty sprite list.");
+	REQUIRE(!sprites.empty(), "Can't initialise an animated sprite with an empty sprite list.");
 
 	initializeFromSpriteFrame(&(sprites.front()));
 
@@ -83,7 +56,7 @@ APG::AnimatedSprite::AnimatedSprite(float frameDuration, std::vector<Sprite> &sp
 APG::AnimatedSprite::AnimatedSprite(float frameDuration, std::vector<SpriteBase *> &sprites,
         AnimationMode animationMode) :
 		        secondsPerFrame { frameDuration } {
-	REQUIRE(sprites.size() > 0, "Can't initialise an animated sprite with an empty sprite list.");
+	REQUIRE(!sprites.empty(), "Can't initialise an animated sprite with an empty sprite list.");
 	initializeFromSpriteFrame(sprites.front());
 
 	for (auto sprite : sprites) {
@@ -121,10 +94,6 @@ void APG::AnimatedSprite::update(float deltaTime) {
 
 	case AnimationMode::LOOP_PINGPONG:
 		handleLoopPingPongMode_();
-		break;
-
-	default:
-		REQUIRE(false, "Unsupported animation type in update()");
 		break;
 	}
 }
@@ -216,15 +185,19 @@ void APG::AnimatedSprite::initializeFromSpriteFrame(const SpriteBase * sprite) {
 }
 
 std::vector<APG::Sprite> APG::AnimatedSprite::splitTexture(Texture * texture, uint32_t tileWidth, uint32_t tileHeight,
-        uint32_t xStart, uint32_t yStart, int32_t frameCount, uint32_t xSeparation) {
+        uint32_t xStart, uint32_t yStart, int32_t rawFrameCount, uint32_t xSeparation) {
 	const auto textureWidth = texture->getWidth();
 	const auto textureHeight = texture->getHeight();
 
 	REQUIRE(textureWidth >= (xStart + tileWidth + xSeparation) && textureHeight >= (yStart + tileHeight),
 	        "Texture to split must be bigger than the tiles being extracted and tiles must fit inside the texture..");
 
-	if (frameCount == -1) {
+	size_t frameCount;
+
+	if (rawFrameCount < 0) {
 		frameCount = (texture->getWidth() - xStart) / (tileWidth + xSeparation);
+	} else {
+		frameCount = static_cast<size_t>(rawFrameCount);
 	}
 
 	REQUIRE(frameCount >= 1, "Cannot have 0 frames in a split texture.");

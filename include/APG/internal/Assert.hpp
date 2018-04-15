@@ -49,6 +49,7 @@ namespace internal {
 inline void require_impl(const char *expression, const char *extra, const char *filename, int line) {
 	el::Loggers::getLogger("APG")->fatal("Assertion failure in \"%v\" (line %v): %v (%v)", filename, line, expression,
 	        extra);
+	throw std::runtime_error("assertion failure");
 }
 
 }
