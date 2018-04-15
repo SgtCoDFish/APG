@@ -10,10 +10,13 @@
 #include <string>
 #include <memory>
 
+#include <SDL2/SDL.h>
+
 #include <GL/glew.h>
 #include <glm/vec4.hpp>
 
 #include "APG/SXXDL.hpp"
+#include "APG/graphics/Sprite.hpp"
 
 namespace APG {
 
@@ -63,6 +66,8 @@ public:
 		attachToShader(uniformName.c_str(), program);
 	}
 
+	Sprite makeSprite(const SDL_Rect &rect);
+
 	inline int getWidth() const {
 		return width;
 	}
@@ -91,6 +96,13 @@ public:
 		return fileName;
 	}
 
+protected:
+	/**
+	 * Can be used by derived classes to create a texture without uploading straight away.
+	 */
+	explicit Texture();
+	void loadTexture(SDL_Surface *surface);
+
 private:
 	std::string fileName;
 
@@ -106,8 +118,6 @@ private:
 	uint32_t textureUnitGL = 0;
 
 	void generateTextureID();
-
-	void loadTexture(SDL_Surface *surface);
 
 	int width = 0;
 	int height = 0;

@@ -53,7 +53,7 @@ Texture::Texture(const std::string &fileName) :
 	loadTexture(surface);
 }
 
-Texture::Texture(SDL_Surface * surface) :
+Texture::Texture(SDL_Surface *surface) :
 		fileName{"from SDL_Surface"},
 		sWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
 		tWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
@@ -64,6 +64,15 @@ Texture::Texture(SDL_Surface * surface) :
 	generateTextureID();
 
 	loadTexture(surface);
+}
+
+Texture::Texture() :
+		fileName{"raw derived texture"},
+		sWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
+		tWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
+		minFilter{APG::TextureFilterType::LINEAR},
+		magFilter{APG::TextureFilterType::LINEAR} {
+	generateTextureID();
 }
 
 Texture::~Texture() {
@@ -222,6 +231,10 @@ void Texture::generateMipMaps() {
 
 void Texture::attachToShader(const char *const uniformName, ShaderProgram *const program) const {
 	program->setUniformi(uniformName, textureUnitInt);
+}
+
+Sprite Texture::makeSprite(const SDL_Rect &rect) {
+	return Sprite(this, rect.x, rect.y, rect.w, rect.h);
 }
 
 }

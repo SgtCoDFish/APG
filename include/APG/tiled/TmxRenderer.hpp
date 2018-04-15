@@ -15,6 +15,8 @@
 #include "APG/graphics/AnimatedSprite.hpp"
 #include "APG/internal/Assert.hpp"
 
+#include "APG/tiled/TiledObject.hpp"
+
 namespace Tmx {
 class Map;
 
@@ -22,22 +24,6 @@ class Tile;
 }
 
 namespace APG {
-
-class TiledObject {
-public:
-	explicit TiledObject(const glm::vec2 &pos, SpriteBase *const sprite) :
-			position{pos},
-			sprite{sprite} {
-	}
-
-	explicit TiledObject(float x, float y, SpriteBase *const sprite) :
-			position{x, y},
-			sprite{sprite} {
-	}
-
-	glm::vec2 position;
-	SpriteBase *sprite;
-};
 
 /**
  * Abstracts a renderer for a TMX file that can be loaded using the tmxparser library.
@@ -175,10 +161,6 @@ protected:
 		logger->info("Loading map %v with (tileWidth, tileHeight) = (%vpx, %vpx)", map->GetFilename(), tileWidth,
 					 tileHeight);
 
-#ifdef APG_IGNORE_ANIMATED_TILES
-		logger->info("Note: APG_IGNORE_ANIMATED_TILES is set.");
-#endif
-
 		/*
 		 * We need to reserve space for our sprites or the vectors will be
 		 * dynamically reallocated during loading,
@@ -256,7 +238,6 @@ protected:
 					}
 				}
 
-#ifndef APG_IGNORE_ANIMATED_TILES
 				if (tile->IsAnimated()) {
 					logger->verbose(1, "Animated tile has %v tiles, with total duration %vms.", tile->GetFrameCount(),
 									tile->GetTotalDuration());
@@ -285,7 +266,6 @@ protected:
 					loadedAnimatedSprites.emplace_back(length, framePointers, AnimationMode::LOOP);
 					sprites[tileGID] = &(loadedAnimatedSprites.back());
 				}
-#endif
 			}
 		}
 	}
@@ -354,8 +334,8 @@ private:
 		loadedAnimatedSprites.reserve(animTileCount);
 	}
 
-	std::unordered_map<std::string, std::shared_ptr<Tileset>> & getDerivedTmxTilesets() {
-		return static_cast<T*>(this)->getTmxTilesets();
+	std::unordered_map<std::string, std::shared_ptr<Tileset>> &getDerivedTmxTilesets() {
+		return static_cast<T *>(this)->getTmxTilesets();
 	}
 };
 

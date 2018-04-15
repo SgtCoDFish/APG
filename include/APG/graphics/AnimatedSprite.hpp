@@ -107,7 +107,7 @@ private:
 	float animationTime = 0.0f;
 	int animationDirection = 1;
 
-	uint32_t width = 0, height = 0;
+	int32_t width = 0, height = 0;
 
 	Texture * texture = nullptr;
 
