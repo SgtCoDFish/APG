@@ -2,10 +2,12 @@
 #define APG_TILED_PACKEDTMXRENDERER_HPP
 
 #include <string>
+#include <vector>
 #include <memory>
 
 #include "Tmx.h"
 
+#include "APG/graphics/Sprite.hpp"
 #include "APG/graphics/PackedTexture.hpp"
 
 namespace Tmx {
@@ -22,6 +24,9 @@ public:
 private:
 	std::unique_ptr<Tmx::Map> map;
 	PackedTexture packedTexture;
+
+	std::unordered_map<uint64_t, SpriteBase *> sprites;
+	std::vector<Sprite> loadedSprites;
 };
 
 }

@@ -16,25 +16,51 @@ PackedTmxRenderer::PackedTmxRenderer(const std::string &filename) :
 		logger->error("Failed to load TMX map %v: %v", filename, map->GetErrorText());
 	}
 
-	const auto tileWidth = map->GetTileWidth();
-	const auto tileHeight = map->GetTileHeight();
+	const auto mapTileWidth = map->GetTileWidth();
+	const auto mapTileHeight = map->GetTileHeight();
 
 	for (const auto &mapTileset : map->GetTilesets()) {
-		REQUIRE(mapTileset->GetTileWidth() == tileWidth &&
-				mapTileset->GetTileHeight() == tileHeight,
+		REQUIRE(mapTileset->GetTileWidth() == mapTileWidth &&
+				mapTileset->GetTileHeight() == mapTileHeight,
 				"Only tilesets with tile size equal to map tile size are supported.");
 
 		const auto tilesetName = map->GetFilepath() + mapTileset->GetImage()->GetSource();
-		const auto rect = packedTexture.insertFile(tilesetName);
+		auto possibleRect = packedTexture.insertFile(tilesetName);
 
-		if (!rect) {
+		if (!possibleRect) {
 			logger->error(
 					"Failed to pack tileset %v. Likely the specified size is not enough, or the file couldn't be found.",
 					tilesetName);
 			continue;
 		}
 
-		// TODO: Load tiles as sprites
+		auto rect = *possibleRect;
+
+		const auto spacing = mapTileset->GetSpacing();
+		const auto tilesetTileWidth = mapTileset->GetTileWidth();
+		const auto tilesetTileHeight = mapTileset->GetTileHeight();
+
+		int32_t tileId = 0;
+		int32_t x = rect.x, y = rect.y;
+		while(true) {
+			const auto tileGID = mapTileset->GetFirstGid() + tileId;
+			loadedSprites.emplace_back(&packedTexture, x, y, tilesetTileWidth, tilesetTileHeight);
+			auto &sprite = loadedSprites.back();
+
+			sprites.insert(std::pair<uint64_t, SpriteBase *>(tileGID, &sprite));
+
+			x += tilesetTileWidth + spacing;
+			++tileId;
+
+			if (x >= mapTileset->GetImage()->GetWidth()) {
+				x = rect.x;
+				y += tilesetTileHeight + spacing;
+
+				if (y >= mapTileset->GetImage()->GetHeight()) {
+					break;
+				}
+			}
+		}
 	}
 
 	packedTexture.commitPack();
