@@ -64,6 +64,8 @@ PackedTexture::PackedTexture(int32_t width, int32_t height) :
 		Texture(),
 		workingSurface{SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_RGBA32)},
 		packTree{PackNode::createTree(workingSurface)} {
+	this->setWidth(width);
+	this->setHeight(height);
 }
 
 PackedTexture::~PackedTexture() {

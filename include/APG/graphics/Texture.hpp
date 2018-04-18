@@ -103,6 +103,16 @@ protected:
 	explicit Texture();
 	void loadTexture(SDL_Surface *surface);
 
+	void setWidth(int width) {
+		this->width = width;
+		this->invWidth = 1.0f / width;
+	}
+
+	void setHeight(int height) {
+		this->height = height;
+		this->invHeight = 1.0f / height;
+	}
+
 private:
 	std::string fileName;
 

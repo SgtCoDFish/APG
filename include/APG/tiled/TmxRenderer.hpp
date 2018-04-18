@@ -213,7 +213,7 @@ protected:
 				auto &sprite = loadedSprites.back();
 				sprite.setHash(tileGID);
 
-				sprites.insert(std::pair<uint64_t, SpriteBase *>(sprite.getHash(), &sprite));
+				sprites.insert({std::pair<uint64_t, SpriteBase *>(sprite.getHash(), &sprite)});
 
 				x += tileWidth + spacing;
 				++tileID;

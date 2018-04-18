@@ -21,6 +21,7 @@
 #include "APG/graphics/Sprite.hpp"
 #include "APG/graphics/Camera.hpp"
 #include "APG/tiled/GLTmxRenderer.hpp"
+#include "APG/tiled/PackedTmxRenderer.hpp"
 
 namespace APG {
 
@@ -46,9 +47,9 @@ private:
 	std::unique_ptr<Camera> camera;
 	std::unique_ptr<SpriteBatch> spriteBatch;
 
-	std::unique_ptr<GLTmxRenderer> rendererOne;
-	std::unique_ptr<GLTmxRenderer> rendererTwo;
-	GLTmxRenderer *currentRenderer = nullptr;
+	std::unique_ptr<PackedTmxRenderer> rendererOne;
+	std::unique_ptr<PackedTmxRenderer> rendererTwo;
+	PackedTmxRenderer *currentRenderer = nullptr;
 
 	std::unique_ptr<Texture> playerTexture;
 	std::vector<Sprite> playerFrames;
@@ -58,6 +59,8 @@ private:
 	std::unique_ptr<Sprite> miniPlayer;
 
 	SpriteBase * currentPlayer = nullptr;
+
+	std::unique_ptr<Sprite> bigSprite;
 
 	FontManager::font_handle font = -1;
 
