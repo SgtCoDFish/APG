@@ -34,7 +34,7 @@ APG::Sprite::Sprite(Texture *texture, int32_t texX, int32_t texY, int32_t width,
 				texX, texY, width, height, texture->getWidth(), texture->getHeight()
 		);
 	}
-	el::Loggers::getLogger("APG")->info("Creating sprite (x, y, w, h) = (%v, %v, %v, %v)", texX, texY, width, height);
+	logger->verbose(9, "Creating sprite (x, y, w, h) = (%v, %v, %v, %v)", texX, texY, width, height);
 	calculateUV();
 }
 

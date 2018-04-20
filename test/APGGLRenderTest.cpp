@@ -53,8 +53,8 @@ bool APG::APGGLRenderTest::init() {
 	camera->setToOrtho(false, screenWidth, screenHeight);
 	spriteBatch = std::make_unique<SpriteBatch>(shaderProgram.get());
 
-	rendererOne = std::make_unique<PackedTmxRenderer>("assets/sample_indoor.tmx", spriteBatch.get());
-	rendererTwo = std::make_unique<PackedTmxRenderer>("assets/world1.tmx", spriteBatch.get());
+	rendererOne = std::make_unique<PackedTmxRenderer>("assets/sample_indoor.tmx", spriteBatch.get(), 1024, 1024);
+	rendererTwo = std::make_unique<PackedTmxRenderer>("assets/world1.tmx", spriteBatch.get(), 1024, 1024);
 	currentRenderer = rendererOne.get();
 
 	playerTexture = std::make_unique<Texture>("assets/player.png");
@@ -63,7 +63,6 @@ bool APG::APGGLRenderTest::init() {
 
 	miniTexture = std::make_unique<Texture>("assets/player16.png");
 	miniPlayer = std::make_unique<Sprite>(miniTexture);
-	bigSprite = std::make_unique<Sprite>(rendererOne->getPackedTexture());
 
 	currentPlayer = miniPlayer.get();
 
@@ -147,7 +146,6 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	//		currentPlayer->getHeight() * 2, 0.0f, 0.0f, currentPlayer->getWidth() * 0.5f,
 	//		currentPlayer->getHeight() * 0.5f);
 	spriteBatch->draw(fontSprite, textPos.x, textPos.y);
-//	spriteBatch->draw(bigSprite.get(), 0, 0);
 	spriteBatch->end();
 
 	SDL_GL_SwapWindow(window.get());

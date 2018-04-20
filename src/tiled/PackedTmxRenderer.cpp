@@ -5,9 +5,9 @@
 
 namespace APG {
 
-PackedTmxRenderer::PackedTmxRenderer(const std::string &filename, SpriteBatch *batch) :
+PackedTmxRenderer::PackedTmxRenderer(const std::string &filename, SpriteBatch *batch, int texWidth, int texHeight) :
 		map{std::make_unique<Tmx::Map>()},
-		packedTexture{2048, 2048},
+		packedTexture{texWidth, texHeight},
 		batch{batch} {
 	auto logger = el::Loggers::getLogger("APG");
 	map->ParseFile(filename);
@@ -20,9 +20,9 @@ PackedTmxRenderer::PackedTmxRenderer(const std::string &filename, SpriteBatch *b
 	loadObjects();
 }
 
-PackedTmxRenderer::PackedTmxRenderer(std::unique_ptr<Tmx::Map> &&map, SpriteBatch *batch) :
+PackedTmxRenderer::PackedTmxRenderer(std::unique_ptr<Tmx::Map> &&map, SpriteBatch *batch, int texWidth, int texHeight) :
 		map{std::move(map)},
-		packedTexture{2048, 2048},
+		packedTexture{texWidth, texHeight},
 		batch{batch} {
 	loadTilesets();
 	loadObjects();
@@ -190,8 +190,8 @@ void PackedTmxRenderer::renderLayer(Tmx::TileLayer *layer) {
 		for (int x = 0; x < layer->GetWidth(); x++) {
 			//const uint32_t tileX = position.x + x * tileWidth;
 			//const uint32_t tileY = position.y + y * tileHeight;
-			const auto tileX = 0 + x * tileWidth;
-			const auto tileY = 0 + y * tileHeight;
+			const auto tileX = position.x + x * tileWidth;
+			const auto tileY = position.y + y * tileHeight;
 
 			const auto &tile = layer->GetTile(x, y);
 
@@ -214,12 +214,20 @@ void PackedTmxRenderer::renderLayer(Tmx::TileLayer *layer) {
 
 void PackedTmxRenderer::renderObjectGroup(const std::vector<TiledObject> &objects) {
 	for (const auto &obj : objects) {
-		batch->draw(obj.sprite, obj.position.x, obj.position.y);
+		batch->draw(obj.sprite, position.x + obj.position.x, position.y + obj.position.y);
 	}
 }
 
 PackedTexture *PackedTmxRenderer::getPackedTexture() {
 	return &packedTexture;
+}
+
+const glm::vec2 &PackedTmxRenderer::getPosition() const {
+	return position;
+}
+
+void PackedTmxRenderer::setPosition(glm::vec2 &position) {
+	this->position = position;
 }
 
 }

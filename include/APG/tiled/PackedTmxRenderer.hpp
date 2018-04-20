@@ -16,6 +16,7 @@
 
 namespace Tmx {
 class Tile;
+
 class TileLayer;
 }
 
@@ -23,28 +24,37 @@ namespace APG {
 
 class PackedTmxRenderer final {
 public:
-	explicit PackedTmxRenderer(std::unique_ptr<Tmx::Map> &&map, SpriteBatch * batch);
-	explicit PackedTmxRenderer(const std::string &filename, SpriteBatch * batch);
+	explicit PackedTmxRenderer(std::unique_ptr<Tmx::Map> &&map, SpriteBatch *batch, int texWidth, int texHeight);
+
+	explicit PackedTmxRenderer(const std::string &filename, SpriteBatch *batch, int texWidth, int texHeight);
+
 	~PackedTmxRenderer() = default;
 
 	void update(float deltaTime);
 
 	void renderAll();
+
 	void renderAllAndUpdate(float deltaTime);
 
-	void renderLayer(Tmx::TileLayer * layer);
+	void renderLayer(Tmx::TileLayer *layer);
+
 	void renderObjectGroup(const std::vector<TiledObject> &objects);
 
-	PackedTexture * getPackedTexture();
+	const glm::vec2 &getPosition() const;
+
+	void setPosition(glm::vec2 &position);
+
+	PackedTexture *getPackedTexture();
 
 private:
 	void loadTilesets();
+
 	void loadObjects();
 
 	std::unique_ptr<Tmx::Map> map;
 	PackedTexture packedTexture;
 
-	SpriteBatch * batch;
+	SpriteBatch *batch;
 
 	std::unordered_map<int, SpriteBase *> sprites;
 
@@ -52,6 +62,8 @@ private:
 	std::forward_list<AnimatedSprite> loadedAnimatedSprites;
 
 	std::unordered_map<std::string, std::vector<TiledObject>> objectGroups;
+
+	glm::vec2 position{0, 0};
 };
 
 }
