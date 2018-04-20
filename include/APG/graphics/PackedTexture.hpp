@@ -44,16 +44,22 @@ public:
 
 	~PackedTexture() override;
 
+	/**
+	 * Packs (blits) all pending surfaces into the packed surface, and uploads the resulting texture
+	 * to graphics memory
+	 */
 	void commitPack();
 
 	/**
 	 * Load a file and pack it into this texture (if possible)
+	 * NB: The surface won't actually be packed until commitPack is called
 	 * @returns the rect that can be used to create a sprite after committing
 	 */
 	shim::optional<SDL_Rect> insertFile(const std::string &filename);
 
 	/**
 	 * Inserts an SDL surface into this texture if possible
+	 * NB: The surface won't actually be packed until commitPack is called
 	 * @returns the rect that can be used to create a sprite after committing
 	 */
 	shim::optional<SDL_Rect> insertSurface(SDL_Surface *surface);

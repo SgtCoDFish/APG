@@ -36,7 +36,7 @@ SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t 
 
 	inputManager = std::make_unique<SDLInputManager>();
 	audioManager = std::make_unique<SDLAudioManager>();
-	fontManager = std::make_unique<SDLFontManager>();
+	fontManager = std::make_unique<PackedFontManager>(2048, 2048);
 
 	window = SXXDL::make_window_ptr(
 	        SDL_CreateWindow(windowTitle.c_str(), windowX, windowY, windowWidth, windowHeight, SDL_WINDOW_FLAGS));

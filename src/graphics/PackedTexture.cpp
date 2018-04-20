@@ -77,7 +77,7 @@ PackedTexture::~PackedTexture() {
 }
 
 void PackedTexture::commitPack() {
-	// TODO: packBuffer sorting, blitting + texture uploading goes to here.
+	// TODO: packBuffer sorting?
 	auto logger = el::Loggers::getLogger("APG");
 
 	if (packBuffer.empty()) {

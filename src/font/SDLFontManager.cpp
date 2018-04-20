@@ -17,10 +17,11 @@
 
 namespace APG {
 
-const int APG::SDLFontManager::MAX_OWNED_TEXTURES;
-const int APG::SDLFontManager::MAX_OWNED_SPRITES;
+const int SDLFontManager::MAX_OWNED_TEXTURES;
+const int SDLFontManager::MAX_OWNED_SPRITES;
 
 SDLFontManager::SDLFontManager() {
+	el::Loggers::getLogger("APG")->warn("SDLFontManager actively leaks when rendering, and should be avoided");
 }
 
 FontManager::font_handle SDLFontManager::loadFontFile(const std::string &filename, int pointSize) {
@@ -33,7 +34,7 @@ FontManager::font_handle SDLFontManager::loadFontFile(const std::string &filenam
 	} else {
 		const auto handle = getNextFontHandle();
 
-		loadedFonts.emplace(handle, StoredFont(handle, std::move(sdlFont)));
+		loadedFonts.emplace(handle, StoredSDLFont(handle, std::move(sdlFont)));
 
 		logger->info("Loaded font \"%v\" with handle %v.", filename, handle);
 
@@ -116,7 +117,7 @@ int SDLFontManager::findAvailableSpriteSlot() const {
 	return -1;
 }
 
-SpriteBase *SDLFontManager::renderTextIgnoreWhitespace(const SDLFontManager::StoredFont &font,
+SpriteBase *SDLFontManager::renderTextIgnoreWhitespace(const StoredSDLFont &font,
 													   const std::string &text,
 													   const FontRenderMethod method,
 													   el::Logger *logger) {
@@ -169,7 +170,7 @@ SpriteBase *SDLFontManager::renderTextIgnoreWhitespace(const SDLFontManager::Sto
 	return ownedSprites[ownedSpriteID].get();
 }
 
-SpriteBase *SDLFontManager::renderTextWithWhitespace(const StoredFont &font, const std::string &text,
+SpriteBase *SDLFontManager::renderTextWithWhitespace(const StoredSDLFont &font, const std::string &text,
 													 const FontRenderMethod method,
 													 el::Logger *logger) {
 	static const std::string wsDelimiter = "\n";
@@ -243,7 +244,7 @@ SpriteBase *SDLFontManager::renderTextWithWhitespace(const StoredFont &font, con
 													surfaces.front()->format->Amask);
 
 	if (tempSurface == nullptr) {
-		logger->fatal("Couldn't create master surface for multiline rendering with handle %v. Error: %v", font.handle,
+		logger->fatal("Couldn't create master surface for multi-line rendering with handle %v. Error: %v", font.handle,
 					  SDL_GetError());
 		return nullptr;
 	}
@@ -252,7 +253,8 @@ SpriteBase *SDLFontManager::renderTextWithWhitespace(const StoredFont &font, con
 	for (const auto &surf : surfaces) {
 		auto rect = SDL_Rect{0u, hCounter, 0u, 0u};
 		if (SDL_BlitSurface(surf.get(), nullptr, tempSurface, &rect) != 0) {
-			logger->fatal("Couldn't blit micro surface to multiline master surface, error: %v", SDL_GetError());
+			logger->fatal("Couldn't blit micro surface to multi-line master surface, error: %v", SDL_GetError());
+			SDL_FreeSurface(tempSurface);
 			return nullptr;
 		}
 

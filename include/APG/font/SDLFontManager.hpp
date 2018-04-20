@@ -15,6 +15,7 @@
 #include "APG/graphics/Sprite.hpp"
 #include "APG/graphics/PackedTexture.hpp"
 #include "APG/font/FontManager.hpp"
+#include "APG/font/StoredSDLFont.hpp"
 
 namespace APG {
 class SpriteBase;
@@ -33,24 +34,12 @@ public:
 
 	glm::ivec2 estimateSizeOf(const font_handle &fontHandle, const std::string &text) override;
 
-	SpriteBase *renderText(const font_handle &fontHandle, const std::string &text, bool ignoreWhitespace = true,
-						   FontRenderMethod method = FontRenderMethod::FAST) override;
+	SpriteBase *renderText(const font_handle &fontHandle, const std::string &text, bool ignoreWhitespace,
+						   FontRenderMethod method) override;
 
 private:
 	static constexpr int MAX_OWNED_TEXTURES = 5;
 	static constexpr int MAX_OWNED_SPRITES = 3;
-
-	struct StoredFont {
-		StoredFont(const font_handle &handle, SXXDL::ttf::font_ptr &&ptr) :
-				handle{handle},
-				ptr{std::move(ptr)},
-				color{0, 0, 0, 255} {
-		}
-
-		font_handle handle;
-		SXXDL::ttf::font_ptr ptr;
-		SDL_Color color;
-	};
 
 	struct StoredSDLText {
 		StoredSDLText(std::string text, int spriteID) :
@@ -62,7 +51,7 @@ private:
 		const int spriteID;
 	};
 
-	std::unordered_map<font_handle, StoredFont> loadedFonts;
+	std::unordered_map<font_handle, StoredSDLFont> loadedFonts;
 	std::array<std::unique_ptr<Texture>, MAX_OWNED_TEXTURES> ownedTextures;
 	std::array<std::unique_ptr<Sprite>, MAX_OWNED_SPRITES> ownedSprites;
 
@@ -72,10 +61,10 @@ private:
 
 	SDL_Color glmToSDLColor(const glm::vec4 &glmColor);
 
-	SpriteBase *renderTextIgnoreWhitespace(const StoredFont &font, const std::string &text, FontRenderMethod method,
+	SpriteBase *renderTextIgnoreWhitespace(const StoredSDLFont &font, const std::string &text, FontRenderMethod method,
 										   el::Logger *logger);
 
-	SpriteBase *renderTextWithWhitespace(const StoredFont &font, const std::string &text, FontRenderMethod method,
+	SpriteBase *renderTextWithWhitespace(const StoredSDLFont &font, const std::string &text, FontRenderMethod method,
 										 el::Logger *logger);
 };
 
@@ -83,4 +72,4 @@ private:
 
 #endif
 
-#endif /* INCLUDE_APG_SDLFONTMANAGER_HPP_ */
+#endif

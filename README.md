@@ -66,9 +66,7 @@ cmake ..
 make -jN # where N is the number of cores you have
 ```
 
-If you don't care about the render tests, you can use `cmake -DEXCLUDE_SDL_TEST=ON ..` or `cmake -DEXCLUDE_GL_TEST=ON ..` (or both). By default, both tests are built as well as the libraries.
-
-The audio test is slightly different, and is off by default. You can similarly use `-DEXCLUDE_AUDIO_TEST=OFF` but the option also requires you to place a file, `test_music.ogg` in the base `assets/` directory before running cmake. This is to avoid shipping a test music file.
+If you don't care about the tests you can use `cmake -DEXCLUDE_TESTS=ON`. By default, all tests are built as well as the libraries.
 
 ## Usage Notes - Logging
 The library depends on easylogging++ which is included by source. To use the library, you simply need to: `#include "easylogging++.h"` in your files. *Important:* In your file which contains your main function you must include the line `INITIALIZE_EASYLOGGINGPP` directly after you include the function.
