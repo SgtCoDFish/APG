@@ -139,6 +139,9 @@ set(FULL_SOURCES ${APG_SOURCES} ${VENDOR_FILES})
 
 set(CMAKE_CXX_STANDARD 14)
 
+add_definitions(-DELPP_NO_LOG_TO_FILE)
+add_definitions(-DELPP_NO_DEFAULT_LOG_FILE)
+
 if( DEFINED WIN32 )
 	if( MSVC )
 		set(OS_FLAGS "")
@@ -159,8 +162,6 @@ if( DEFINED WIN32 )
 elseif ( DEFINED EMSCRIPTEN )
 	set (OS_FLAGS "-s WASM=1")
 	set (OS_LIBS "")
-	add_definitions(-DELPP_NO_LOG_TO_FILE)
-	add_definitions(-DELPP_NO_DEFAULT_LOG_FILE)
 	add_definitions(-DELPP_OS_UNIX)
 else ()
 	set (OS_FLAGS "-fPIC")
