@@ -238,4 +238,10 @@ int PackedTmxRenderer::getPixelHeight() const {
 	return map->GetHeight() * map->GetTileHeight();
 }
 
+std::vector<TiledObject> PackedTmxRenderer::getObjectGroup(const std::string &groupName) const {
+	auto it = objectGroups.find(groupName);
+
+	return it == objectGroups.end() ? std::vector<TiledObject>() : it->second;
+}
+
 }

@@ -50,6 +50,8 @@ public:
 
 	int getPixelHeight() const;
 
+	std::vector<TiledObject> getObjectGroup(const std::string &groupName) const;
+
 private:
 	void loadTilesets();
 
