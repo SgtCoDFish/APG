@@ -1,5 +1,3 @@
-#include <cstdint>
-
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -7,14 +5,16 @@
 
 #include "APG/graphics/Camera.hpp"
 
-const glm::mat4 APG::Camera::IDENTITY {};
+const glm::mat4 APG::Camera::IDENTITY{};
 
 APG::Camera::Camera(float viewportWidth, float viewportHeight) {
 	setToOrtho(false, viewportWidth, viewportHeight);
 }
 
 void APG::Camera::update() {
-	projectionMatrix = glm::ortho(0.0f, viewportWidth, viewportHeight, 0.0f, nearPlane, farPlane);
+	projectionMatrix = glm::ortho(-viewportWidth / 2.0f * zoom, viewportWidth / 2.0f * zoom,
+								  viewportHeight / 2.0f * zoom, - viewportHeight / 2.0f * zoom,
+								  nearPlane, farPlane);
 	transformMatrix = glm::lookAt(position, position + direction, up);
 	combinedMatrix = projectionMatrix * transformMatrix;
 }
@@ -24,7 +24,7 @@ void APG::Camera::setToOrtho(bool yDown, float _viewportWidth, float _viewportHe
 	up.y = (yDown ? -1 : 1);
 	direction.z = (yDown ? 1 : -1);
 
-	position = {zoom * viewportWidth / 2.0f, zoom * viewportHeight / 2.0f, 0.0f};
+	position = {viewportWidth / 2.0f * zoom, viewportHeight / 2.0f * zoom, 0.0f};
 	this->viewportWidth = _viewportWidth;
 	this->viewportHeight = _viewportHeight;
 
