@@ -52,6 +52,8 @@ public:
 
 	std::vector<TiledObject> getObjectGroup(const std::string &groupName) const;
 
+	const Tmx::Map *getMap() const;
+
 private:
 	void loadTilesets();
 

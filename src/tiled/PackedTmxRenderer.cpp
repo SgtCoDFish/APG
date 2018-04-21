@@ -244,4 +244,8 @@ std::vector<TiledObject> PackedTmxRenderer::getObjectGroup(const std::string &gr
 	return it == objectGroups.end() ? std::vector<TiledObject>() : it->second;
 }
 
+const Tmx::Map *PackedTmxRenderer::getMap() const {
+	return map.get();
+}
+
 }
