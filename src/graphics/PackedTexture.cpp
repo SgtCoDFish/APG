@@ -70,6 +70,9 @@ PackedTexture::PackedTexture(int32_t width, int32_t height) :
 }
 
 PackedTexture::~PackedTexture() {
+	if(packBuffer.size() > 0) {
+		el::Loggers::getLogger("APG")->warn("Non-empty pack-buffer when destroying PackedTexture");
+	}
 	clearPackBuffer();
 }
 
@@ -89,7 +92,7 @@ void PackedTexture::commitPack() {
 		SDL_BlitSurface(surface, nullptr, preservedSurface.get(), rect);
 	}
 
-	loadTexture(preservedSurface.get());
+	loadTexture(preservedSurface.get(), false);
 	clearPackBuffer();
 }
 

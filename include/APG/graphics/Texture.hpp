@@ -102,7 +102,7 @@ protected:
 	 * Can be used by derived classes to create a texture without uploading straight away.
 	 */
 	explicit Texture();
-	void loadTexture(SDL_Surface *surface);
+	void loadTexture(SDL_Surface *surface, bool andPreserve = true);
 
 	void setWidth(int width) {
 		this->width = width;

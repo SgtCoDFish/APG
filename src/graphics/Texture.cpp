@@ -86,7 +86,7 @@ void Texture::generateTextureID() {
 	glGenTextures(1, &textureID);
 }
 
-void Texture::loadTexture(SDL_Surface *surface) {
+void Texture::loadTexture(SDL_Surface *surface, bool andPreserve) {
 	const auto logger = el::Loggers::getLogger("APG");
 
 	if (surface == nullptr) {
@@ -147,7 +147,9 @@ void Texture::loadTexture(SDL_Surface *surface) {
 
 	logger->info("Loaded texture \"%v\" at unit GL_TEXTURE%v", fileName, textureUnitInt);
 
-	preservedSurface = SXXDL::make_surface_ptr(surface);
+	if (andPreserve) {
+		preservedSurface = SXXDL::make_surface_ptr(surface);
+	}
 }
 
 void Texture::tempBind() {
