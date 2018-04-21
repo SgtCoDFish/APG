@@ -285,7 +285,7 @@ protected:
 					continue;
 				}
 
-				objects.emplace_back(obj->GetX(), obj->GetY() - map->GetTileHeight(), sprites[gid]);
+				objects.emplace_back(obj->GetName(), obj->GetX(), obj->GetY() - map->GetTileHeight(), sprites[gid]);
 			}
 
 			objectGroups.emplace(group->GetName(), objects);
