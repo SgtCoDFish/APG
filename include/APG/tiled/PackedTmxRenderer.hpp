@@ -46,6 +46,10 @@ public:
 
 	PackedTexture *getPackedTexture();
 
+	int getPixelWidth() const;
+
+	int getPixelHeight() const;
+
 private:
 	void loadTilesets();
 

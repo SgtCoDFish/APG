@@ -230,4 +230,12 @@ void PackedTmxRenderer::setPosition(glm::vec2 &position) {
 	this->position = position;
 }
 
+int PackedTmxRenderer::getPixelWidth() const {
+	return map->GetWidth() * map->GetTileWidth();
+}
+
+int PackedTmxRenderer::getPixelHeight() const {
+	return map->GetHeight() * map->GetTileHeight();
+}
+
 }
