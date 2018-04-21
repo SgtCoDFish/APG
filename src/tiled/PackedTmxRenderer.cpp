@@ -7,7 +7,7 @@ namespace APG {
 
 PackedTmxRenderer::PackedTmxRenderer(const std::string &filename, SpriteBatch *batch, int texWidth, int texHeight) :
 		map{std::make_unique<Tmx::Map>()},
-		packedTexture{texWidth, texHeight},
+		packedTexture{std::make_unique<PackedTexture>(texWidth, texHeight)},
 		batch{batch} {
 	auto logger = el::Loggers::getLogger("APG");
 	map->ParseFile(filename);
@@ -22,7 +22,7 @@ PackedTmxRenderer::PackedTmxRenderer(const std::string &filename, SpriteBatch *b
 
 PackedTmxRenderer::PackedTmxRenderer(std::unique_ptr<Tmx::Map> &&map, SpriteBatch *batch, int texWidth, int texHeight) :
 		map{std::move(map)},
-		packedTexture{texWidth, texHeight},
+		packedTexture{std::make_unique<PackedTexture>(texWidth, texHeight)},
 		batch{batch} {
 	loadTilesets();
 	loadObjects();
@@ -41,7 +41,7 @@ void PackedTmxRenderer::loadTilesets() {
 				"Only tilesets with tile size equal to map tile size are supported.");
 
 		const auto tilesetName = map->GetFilepath() + mapTileset->GetImage()->GetSource();
-		auto possibleRect = packedTexture.insertFile(tilesetName);
+		auto possibleRect = packedTexture->insertFile(tilesetName);
 
 		if (!possibleRect) {
 			logger->error(
@@ -63,7 +63,7 @@ void PackedTmxRenderer::loadTilesets() {
 		int32_t x = 0, y = 0;
 		while (true) {
 			const auto tileGID = mapTileset->GetFirstGid() + tileId;
-			loadedSprites.emplace_front(&packedTexture, x + rect.x, y + rect.y, tilesetTileWidth, tilesetTileHeight);
+			loadedSprites.emplace_front(packedTexture.get(), x + rect.x, y + rect.y, tilesetTileWidth, tilesetTileHeight);
 			auto &sprite = loadedSprites.front();
 
 			sprites.insert({std::pair<int, SpriteBase *>(tileGID, &sprite)});
@@ -115,7 +115,7 @@ void PackedTmxRenderer::loadTilesets() {
 		}
 	}
 
-	packedTexture.commitPack();
+	packedTexture->commitPack();
 }
 
 void PackedTmxRenderer::loadObjects() {
@@ -219,15 +219,15 @@ void PackedTmxRenderer::renderObjectGroup(const std::vector<TiledObject> &object
 }
 
 PackedTexture *PackedTmxRenderer::getPackedTexture() {
-	return &packedTexture;
+	return packedTexture.get();
 }
 
 const glm::vec2 &PackedTmxRenderer::getPosition() const {
 	return position;
 }
 
-void PackedTmxRenderer::setPosition(glm::vec2 &position) {
-	this->position = position;
+void PackedTmxRenderer::setPosition(glm::vec2 position) {
+	this->position = std::move(position);
 }
 
 int PackedTmxRenderer::getPixelWidth() const {

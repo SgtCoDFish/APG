@@ -11,6 +11,7 @@
 
 #include "APG/core/Optional.hpp"
 #include "APG/graphics/Texture.hpp"
+#include "APG/SXXDL.hpp"
 
 namespace APG {
 
@@ -67,8 +68,7 @@ public:
 private:
 	using surface_vec_tuple = std::tuple<SDL_Surface *, SDL_Rect *, bool>;
 
-	SDL_Surface *workingSurface{nullptr};
-	PackNode packTree;
+	std::unique_ptr<PackNode> packTree;
 	// the surface to be packed, a rect describing where it should be packed,
 	// and whether we own that surface (i.e. if it needs to be free'd)
 	std::vector<surface_vec_tuple> packBuffer;

@@ -113,6 +113,8 @@ protected:
 		this->invHeight = 1.0f / height;
 	}
 
+	SXXDL::surface_ptr preservedSurface = SXXDL::make_surface_ptr(nullptr);
+
 private:
 	std::string fileName;
 
@@ -134,8 +136,6 @@ private:
 
 	float invWidth = 0.0f;
 	float invHeight = 0.0f;
-
-	SXXDL::surface_ptr preservedSurface = SXXDL::make_surface_ptr(nullptr);
 
 	GLuint tempBindID = 0;
 	GLenum tempUnit = 0;

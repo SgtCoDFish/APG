@@ -42,7 +42,7 @@ public:
 
 	const glm::vec2 &getPosition() const;
 
-	void setPosition(glm::vec2 &position);
+	void setPosition(glm::vec2 position);
 
 	PackedTexture *getPackedTexture();
 
@@ -56,7 +56,7 @@ private:
 	void loadObjects();
 
 	std::unique_ptr<Tmx::Map> map;
-	PackedTexture packedTexture;
+	std::unique_ptr<PackedTexture> packedTexture;
 
 	SpriteBatch *batch;
 
