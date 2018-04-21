@@ -67,6 +67,7 @@ public:
 	}
 
 	Sprite makeSprite(const SDL_Rect &rect);
+	std::unique_ptr<Sprite> makeSpritePtr(const SDL_Rect &rect);
 
 	inline int getWidth() const {
 		return width;

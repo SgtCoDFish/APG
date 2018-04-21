@@ -237,6 +237,10 @@ Sprite Texture::makeSprite(const SDL_Rect &rect) {
 	return Sprite(this, rect.x, rect.y, rect.w, rect.h);
 }
 
+std::unique_ptr<Sprite> Texture::makeSpritePtr(const SDL_Rect &rect) {
+	return std::make_unique<Sprite>(this, rect.x, rect.y, rect.w, rect.h);
+}
+
 }
 
 #endif
