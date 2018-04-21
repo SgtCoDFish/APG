@@ -27,8 +27,8 @@ uint32_t APG::SDLGame::SDL_WINDOW_FLAGS = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 namespace APG {
 
 SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight, uint32_t glContextMajor,
-        uint32_t glContextMinor, uint32_t windowX, uint32_t windowY) :
-		        APG::Game(windowWidth, windowHeight) {
+				 uint32_t glContextMinor, uint32_t windowX, uint32_t windowY) :
+		APG::Game(windowWidth, windowHeight) {
 	const auto logger = el::Loggers::getLogger("APG");
 	logger->info("Initialising APG with OpenGL version %v.%v.", glContextMajor, glContextMinor);
 
@@ -39,7 +39,7 @@ SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t 
 	fontManager = std::make_unique<PackedFontManager>(2048, 2048);
 
 	window = SXXDL::make_window_ptr(
-	        SDL_CreateWindow(windowTitle.c_str(), windowX, windowY, windowWidth, windowHeight, SDL_WINDOW_FLAGS));
+			SDL_CreateWindow(windowTitle.c_str(), windowX, windowY, windowWidth, windowHeight, SDL_WINDOW_FLAGS));
 
 	if (window == nullptr) {
 		logger->fatal("Couldn't create SDL window: %v", SDL_GetError());
@@ -71,7 +71,8 @@ SDLGame::~SDLGame() {
 }
 
 void SDLGame::handleEvent(SDL_Event &event) {
-	if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
+	if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP || event.type == SDL_MOUSEBUTTONUP ||
+		event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEMOTION) {
 		inputManager->handleInputEvent(event);
 	} else if (event.type == SDL_QUIT) {
 		quit();
@@ -98,8 +99,8 @@ void SDLGame::quit() {
 	shouldQuit = true;
 }
 
-void SDLGame::initialiseSDL(el::Logger * logger) {
-	if(logger == nullptr) {
+void SDLGame::initialiseSDL(el::Logger *logger) {
+	if (logger == nullptr) {
 		logger = el::Loggers::getLogger("APG");
 	}
 
@@ -152,7 +153,7 @@ void SDLGame::resetGLErrors() {
 	}
 
 	el::Loggers::getLogger("APG")->verbose(9,
-	        "OpenGL errors have been reset (probably as a workaround for bugs with glew)");
+										   "OpenGL errors have been reset (probably as a workaround for bugs with glew)");
 }
 
 void SDLGame::logSDLVersions() {
@@ -184,11 +185,12 @@ void SDLGame::logSDLVersions() {
 	SDLGame::debugSDLVersion(logger, "SDL2_net", compiledVersion, *netVersion);
 }
 
-void SDLGame::debugSDLVersion(el::Logger * const logger, const char *libraryName, const SDL_version &compiledVersion,
-        const SDL_version &linkedVersion) {
+void SDLGame::debugSDLVersion(el::Logger *const logger, const char *libraryName, const SDL_version &compiledVersion,
+							  const SDL_version &linkedVersion) {
 	logger->verbose(8, "%v compiled with version %v.%v.%v, linked with version %v.%v.%v", libraryName,
-	        (uint32_t) compiledVersion.major, (uint32_t) compiledVersion.minor, (uint32_t) compiledVersion.patch,
-	        (uint32_t) linkedVersion.major, (uint32_t) linkedVersion.minor, (uint32_t) linkedVersion.patch);
+					(uint32_t) compiledVersion.major, (uint32_t) compiledVersion.minor,
+					(uint32_t) compiledVersion.patch,
+					(uint32_t) linkedVersion.major, (uint32_t) linkedVersion.minor, (uint32_t) linkedVersion.patch);
 }
 
 }

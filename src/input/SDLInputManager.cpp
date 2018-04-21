@@ -1,30 +1,3 @@
-/*
- * Copyright (c) 2014, 2015 See AUTHORS file.
- * All rights reserved.
-
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *    * Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *    * Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution.
- *    * Neither the name of the <organization> nor the
- *      names of its contributors may be used to endorse or promote products
- *      derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 #ifndef APG_NO_SDL
 
 #include <cstdint>
@@ -35,7 +8,9 @@
 
 #include "easylogging++.h"
 
-APG::SDLInputManager::SDLInputManager() {
+namespace APG {
+
+SDLInputManager::SDLInputManager() {
 	keyState = SDL_GetKeyboardState(nullptr);
 
 	for (auto &f : canJustPress) {
@@ -43,50 +18,109 @@ APG::SDLInputManager::SDLInputManager() {
 	}
 }
 
-void APG::SDLInputManager::update(float deltaTime) {
+void SDLInputManager::update(float deltaTime) {
 	for (auto &f : justPressed) {
 		f = false;
 	}
 
+	mouseLeftJustPressed = false;
+	mouseRightJustPressed = false;
+
 	mods = SDL_GetModState();
 }
 
-void APG::SDLInputManager::handleInputEvent(SDL_Event &event) {
-	const auto key = event.key.keysym.scancode;
+void SDLInputManager::handleInputEvent(SDL_Event &event) {
+	const auto &key = event.key.keysym.scancode;
+	const auto &mouseMotion = event.motion;
+	const auto &mouseButton = event.button;
+
 	if (event.type == SDL_KEYDOWN && canJustPress[key]) {
 		justPressed[key] = true;
 		canJustPress[key] = false;
 	} else if (event.type == SDL_KEYUP) {
 		canJustPress[key] = true;
+	} else if (event.type == SDL_MOUSEMOTION) {
+		mouseX = mouseMotion.x;
+		mouseY = mouseMotion.y;
+	} else if (event.type == SDL_MOUSEBUTTONDOWN) {
+		if (mouseButton.button == SDL_BUTTON_LEFT) {
+			mouseLeftPressed = true;
+
+			if (mouseLeftCanJustPress) {
+				mouseLeftJustPressed = true;
+			}
+		} else if (mouseButton.button == SDL_BUTTON_RIGHT) {
+			mouseRightPressed = true;
+
+			if (mouseRightCanJustPress) {
+				mouseRightJustPressed = true;
+			}
+		}
+	} else if (event.type == SDL_MOUSEBUTTONUP) {
+		if (mouseButton.button == SDL_BUTTON_LEFT) {
+			mouseLeftPressed = false;
+			mouseLeftJustPressed = false;
+			mouseLeftCanJustPress = true;
+		} else if (mouseButton.button == SDL_BUTTON_RIGHT) {
+			mouseRightPressed = false;
+			mouseRightJustPressed = false;
+			mouseRightCanJustPress = true;
+		}
 	}
 }
 
-bool APG::SDLInputManager::isKeyPressed(const SDL_Scancode &key) const {
+bool SDLInputManager::isKeyPressed(const SDL_Scancode &key) const {
 	return isSDLKeyCodePressed(key);
 }
 
-bool APG::SDLInputManager::isKeyJustPressed(const SDL_Scancode &key) const {
+bool SDLInputManager::isKeyJustPressed(const SDL_Scancode &key) const {
 	return justPressed[key];
 }
 
-bool APG::SDLInputManager::isModPressed(const SDL_Keymod &mod) const {
+bool SDLInputManager::isModPressed(const SDL_Keymod &mod) const {
 	return (mods & mod) == mod;
 }
 
-bool APG::SDLInputManager::isCtrlPressed() const {
+bool SDLInputManager::isCtrlPressed() const {
 	return (mods & KMOD_CTRL) != 0;
 }
 
-bool APG::SDLInputManager::isShiftPressed() const {
+bool SDLInputManager::isShiftPressed() const {
 	return (mods & KMOD_SHIFT) != 0;
 }
 
-bool APG::SDLInputManager::isAltPressed() const {
+bool SDLInputManager::isAltPressed() const {
 	return (mods & KMOD_ALT) != 0;
 }
 
-bool APG::SDLInputManager::isSDLKeyCodePressed(const SDL_Scancode &keysym) const {
+bool SDLInputManager::isLeftMousePressed() const {
+	return mouseLeftPressed;
+}
+
+bool SDLInputManager::isRightMousePressed() const {
+	return mouseRightPressed;
+}
+
+bool SDLInputManager::isLeftMouseJustPressed() const {
+	return mouseLeftJustPressed;
+}
+
+bool SDLInputManager::isRightMouseJustPressed() const {
+	return mouseRightJustPressed;
+}
+
+bool SDLInputManager::isSDLKeyCodePressed(const SDL_Scancode &keysym) const {
 	return keyState[keysym];
+}
+
+int32_t SDLInputManager::getMouseX() const {
+	return mouseX;
+}
+
+int32_t SDLInputManager::getMouseY() const {
+	return mouseY;
+}
+
 }
 
 #endif

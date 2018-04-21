@@ -128,6 +128,13 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 		}
 	}
 
+	if (inputManager->isLeftMouseJustPressed()) {
+		el::Loggers::getLogger("APG")->info("Click: left at (%v, %v)", inputManager->getMouseX(), inputManager->getMouseY());
+	} else if (inputManager->isRightMouseJustPressed()) {
+		el::Loggers::getLogger("APG")->info("Click: right at (%v, %v)", inputManager->getMouseX(), inputManager->getMouseY());
+	}
+
+
 	camera->position.x = playerX - screenWidth / 2.0f;
 	camera->position.y = playerY - screenHeight / 2.0f;
 
