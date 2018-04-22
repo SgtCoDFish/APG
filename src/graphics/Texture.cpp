@@ -83,7 +83,10 @@ void Texture::generateTextureID() {
 	textureUnitInt = availableTextureUnit++;
 	textureUnitGL = TEXTURE_TARGETS[textureUnitInt];
 
+	el::Loggers::getLogger("APG")->info("Generating texture");
+
 	glGenTextures(1, &textureID);
+	el::Loggers::getLogger("APG")->info("Generating texture");
 }
 
 void Texture::loadTexture(SDL_Surface *surface, bool andPreserve) {

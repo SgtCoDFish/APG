@@ -7,7 +7,9 @@ namespace APG {
 
 
 PackedFontManager::PackedFontManager(int packedTextureWidth, int packedTextureHeight) :
-		packedTexture{packedTextureWidth, packedTextureHeight} {
+		packedTextureWidth{packedTextureWidth},
+		packedTextureHeight{packedTextureHeight},
+		packedTexture{nullptr} {
 
 }
 
@@ -88,6 +90,7 @@ SpriteBase *PackedFontManager::renderTextIgnoreWhitespace(const StoredSDLFont &f
 														  const std::string &text,
 														  const FontRenderMethod method,
 														  el::Logger *logger) {
+	ensureTexture();
 	auto tempSurface = SXXDL::make_surface_ptr(nullptr);
 
 	switch (method) {
@@ -114,7 +117,7 @@ SpriteBase *PackedFontManager::renderTextIgnoreWhitespace(const StoredSDLFont &f
 		return nullptr;
 	}
 
-	const auto possibleRect = packedTexture.insertSurface(tempSurface.get());
+	const auto possibleRect = packedTexture->insertSurface(tempSurface.get());
 
 	if (!possibleRect) {
 		// failed to pack in some way
@@ -123,11 +126,11 @@ SpriteBase *PackedFontManager::renderTextIgnoreWhitespace(const StoredSDLFont &f
 		return nullptr;
 	}
 
-	packedTexture.commitPack();
+	packedTexture->commitPack();
 
 	const SDL_Rect rect = *possibleRect;
 
-	ownedSprites.emplace_front(&packedTexture, rect.x, rect.y, rect.w, rect.h);
+	ownedSprites.emplace_front(packedTexture.get(), rect.x, rect.y, rect.w, rect.h);
 
 	auto spritePtr = &(ownedSprites.front());
 	textToSprite[text] = spritePtr;
@@ -138,6 +141,7 @@ SpriteBase *PackedFontManager::renderTextIgnoreWhitespace(const StoredSDLFont &f
 SpriteBase *PackedFontManager::renderTextWithWhitespace(const StoredSDLFont &font, const std::string &text,
 														const FontRenderMethod method,
 														el::Logger *logger) {
+	ensureTexture();
 	static const std::string wsDelimiter = "\n";
 
 	std::vector<std::string> stringVector = util::splitString(text, wsDelimiter);
@@ -218,7 +222,7 @@ SpriteBase *PackedFontManager::renderTextWithWhitespace(const StoredSDLFont &fon
 		hCounter += surf->h;
 	}
 
-	const auto possibleRect = packedTexture.insertSurface(tempSurface.get());
+	const auto possibleRect = packedTexture->insertSurface(tempSurface.get());
 
 	if (!possibleRect) {
 		// failed to pack in some way
@@ -227,16 +231,22 @@ SpriteBase *PackedFontManager::renderTextWithWhitespace(const StoredSDLFont &fon
 		return nullptr;
 	}
 
-	packedTexture.commitPack();
+	packedTexture->commitPack();
 
 	const SDL_Rect rect = *possibleRect;
 
-	ownedSprites.emplace_front(&packedTexture, rect.x, rect.y, rect.w, rect.h);
+	ownedSprites.emplace_front(packedTexture.get(), rect.x, rect.y, rect.w, rect.h);
 
 	auto spritePtr = &(ownedSprites.front());
 	textToSprite[text] = spritePtr;
 
 	return spritePtr;
+}
+
+void PackedFontManager::ensureTexture() {
+	if(packedTexture == nullptr) {
+		packedTexture = std::make_unique<PackedTexture>(packedTextureWidth, packedTextureHeight);
+	}
 }
 
 }

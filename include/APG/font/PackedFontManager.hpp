@@ -31,7 +31,11 @@ public:
 						   FontRenderMethod method) override;
 
 private:
-	PackedTexture packedTexture;
+	int packedTextureWidth;
+	int packedTextureHeight;
+	std::unique_ptr<PackedTexture> packedTexture;
+
+	void ensureTexture();
 
 	std::unordered_map<font_handle, StoredSDLFont> loadedFonts;
 
