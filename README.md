@@ -1,6 +1,5 @@
 # APG
-
-A simple framework for writing primarily 2D game using Modern C++ (C++14), OpenGL, SDL2 and
+A simple framework for writing primarily 2D games using Modern C++ (C++14), OpenGL, SDL2 and
 [Tiled](http://www.mapeditor.org/) maps.
 
 The design is heavily inspired by [LibGDX](https://github.com/libgdx/libgdx/).
