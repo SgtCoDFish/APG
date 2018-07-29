@@ -59,7 +59,8 @@ Texture::Texture(SDL_Surface *surface) :
 		sWrap{TextureWrapType::CLAMP_TO_EDGE},
 		tWrap{TextureWrapType::CLAMP_TO_EDGE},
 		minFilter{TextureFilterType::LINEAR},
-		magFilter{TextureFilterType::LINEAR} {
+		magFilter{TextureFilterType::LINEAR},
+		logger {spdlog::get("APG")} {
 	REQUIRE(surface != nullptr, "Can't create texture from null surface ptr.");
 
 	generateTextureID();
@@ -72,7 +73,8 @@ Texture::Texture() :
 		sWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
 		tWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
 		minFilter{APG::TextureFilterType::LINEAR},
-		magFilter{APG::TextureFilterType::LINEAR} {
+		magFilter{APG::TextureFilterType::LINEAR},
+		logger {spdlog::get("APG")} {
 	generateTextureID();
 }
 

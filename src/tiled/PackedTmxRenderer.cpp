@@ -8,6 +8,8 @@ PackedTmxRenderer::PackedTmxRenderer(const std::string &filename, SpriteBatch *b
 		packedTexture{std::make_unique<PackedTexture>(texWidth, texHeight)},
 		batch{batch},
 		logger{spdlog::get("APG")} {
+	logger->trace("Loading {} in PackedTmxRenderer", filename);
+	logger->flush();
 	map->ParseFile(filename);
 
 	if (map->HasError()) {
@@ -21,7 +23,8 @@ PackedTmxRenderer::PackedTmxRenderer(const std::string &filename, SpriteBatch *b
 PackedTmxRenderer::PackedTmxRenderer(std::unique_ptr<Tmx::Map> &&map, SpriteBatch *batch, int texWidth, int texHeight) :
 		map{std::move(map)},
 		packedTexture{std::make_unique<PackedTexture>(texWidth, texHeight)},
-		batch{batch} {
+		batch{batch},
+		logger{spdlog::get("APG")} {
 	loadTilesets();
 	loadObjects();
 }

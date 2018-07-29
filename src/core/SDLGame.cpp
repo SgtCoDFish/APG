@@ -36,13 +36,18 @@ SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t 
 	logger->info("Initialising APG with OpenGL version {}.{}", glContextMajor, glContextMinor);
 
 	SDLGame::initialiseSDL(logger);
+	
+	logger->info("Initialised SDL.");
 
 	inputManager = std::make_unique<SDLInputManager>();
 	audioManager = std::make_unique<SDLAudioManager>();
 	fontManager = std::make_unique<PackedFontManager>(2048, 2048);
 
+	logger->trace("Input, Audio and Font managers created.");
+
 	window = SXXDL::make_window_ptr(
 			SDL_CreateWindow(windowTitle.c_str(), windowX, windowY, windowWidth, windowHeight, SDL_WINDOW_FLAGS));
+	logger->trace("SDL window created.");
 
 	if (window == nullptr) {
 		logger->critical("Couldn't create SDL window: {}", SDL_GetError());
@@ -59,6 +64,7 @@ SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t 
 
 	glewExperimental = GL_TRUE;
 	glewInit();
+	logger->trace("GL context created and GLEW initialised");
 
 	resetGLErrors();
 }

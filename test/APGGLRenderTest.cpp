@@ -27,6 +27,7 @@ const char *APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag.glsl
 #endif
 
 bool APG::APGGLRenderTest::init() {
+	logger->info("Init1");
 	auto map1 = std::make_unique<Tmx::Map>();
 	map1->ParseFile("assets/sample_indoor.tmx");
 
@@ -34,6 +35,7 @@ bool APG::APGGLRenderTest::init() {
 		logger->critical("Error loading map1: {}", map1->GetErrorText());
 		return false;
 	}
+	logger->info("Init2");
 
 	auto map2 = std::make_unique<Tmx::Map>();
 	map2->ParseFile("assets/world1.tmx");
@@ -42,16 +44,20 @@ bool APG::APGGLRenderTest::init() {
 		logger->critical("Error loading map2: {}", map2->GetErrorText());
 		return false;
 	}
+	logger->info("Init3 - maps loaded");
 
 	shaderProgram = ShaderProgram::fromFiles(vertexShaderFilename, fragmentShaderFilename);
+	logger->info("Init4 - shaders loaded");
 
 	camera = std::make_unique<Camera>(screenWidth, screenHeight);
 	camera->setToOrtho(false, screenWidth, screenHeight);
 	spriteBatch = std::make_unique<SpriteBatch>(shaderProgram.get());
+	logger->info("Init4.5 - camera + spritebatch loaded");
 
 	rendererOne = std::make_unique<PackedTmxRenderer>("assets/sample_indoor.tmx", spriteBatch.get(), 1024, 1024);
 	rendererTwo = std::make_unique<PackedTmxRenderer>("assets/world1.tmx", spriteBatch.get(), 1024, 1024);
 	currentRenderer = rendererOne.get();
+	logger->info("Init5 - renderers loaded");
 
 	playerTexture = std::make_unique<Texture>("assets/player.png");
 	playerFrames = AnimatedSprite::splitTexture(playerTexture, 32, 32, 0, 32, 4);
@@ -61,9 +67,11 @@ bool APG::APGGLRenderTest::init() {
 	miniPlayer = std::make_unique<Sprite>(miniTexture);
 
 	currentPlayer = miniPlayer.get();
+	logger->info("Init6 - player sprites loaded");
 
 	font = fontManager->loadFontFile("assets/test_font.ttf", 12);
 	const auto renderedFontSize = fontManager->estimateSizeOf(font, "Hello, World!");
+	logger->info("Init7 - font loaded");
 
 	logger->info("Estimated font size: (w, h) = ({}, {}).", renderedFontSize.x, renderedFontSize.y);
 
@@ -188,6 +196,7 @@ int main(int argc, char *argv[]) {
 	const uint32_t windowWidth = 1280;
 	const uint32_t windowHeight = 720;
 	auto game = std::make_unique<APG::APGGLRenderTest>(windowTitle, windowWidth, windowHeight);
+	// spdlog::set_level(spdlog::level::trace);
 
 	if (!game->init()) {
 		return EXIT_FAILURE;
