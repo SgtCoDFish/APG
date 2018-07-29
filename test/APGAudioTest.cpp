@@ -3,9 +3,6 @@
 #include "APG/core/SDLGame.hpp"
 #include "test/APGAudioTest.hpp"
 
-#include "easylogging++.h"
-INITIALIZE_EASYLOGGINGPP
-
 bool APG::APGAudioTest::init() {
 	soundHandle = audioManager->loadSoundFile("assets/test_sound.wav");
 
@@ -28,17 +25,12 @@ void APG::APGAudioTest::render(float deltaTime) {
 	for (int i = SDL_SCANCODE_1; i < SDL_SCANCODE_0; ++i) {
 		if (inputManager->isKeyJustPressed((SDL_Scancode) i)) {
 			const float volume = ((float) ((i - SDL_SCANCODE_1) + 1)) / 10.0f;
-			el::Loggers::getLogger("APG")->info("Setting volume to %v", volume);
-
 			audioManager->setGlobalVolume(volume);
-
 			break;
 		}
 	}
 
 	if (inputManager->isKeyJustPressed(SDL_SCANCODE_0)) {
-		el::Loggers::getLogger("APG")->info("Setting volume to max");
-
 		audioManager->setGlobalVolume(1.0f);
 	}
 
@@ -84,14 +76,12 @@ void APG::APGAudioTest::clearToGreen() {
 }
 
 int main(int argc, char **argv) {
-	START_EASYLOGGINGPP(argc, argv);
-
-	const auto logger = el::Loggers::getLogger("APG");
-
 	{
 		const auto game = std::make_unique<APG::APGAudioTest>();
+		auto logger = spdlog::get("APG");
 		if (!game->init()) {
-			logger->fatal("Couldn't init audio test.");
+			logger->critical("Couldn't init audio test.");
+			return EXIT_FAILURE;
 		}
 
 		auto startTime = std::chrono::high_resolution_clock::now();

@@ -7,6 +7,8 @@
 
 #include "Tmx.h"
 
+#include "spdlog/spdlog.h"
+
 #include "APG/graphics/Sprite.hpp"
 #include "APG/graphics/SpriteBatch.hpp"
 #include "APG/graphics/AnimatedSprite.hpp"
@@ -72,6 +74,8 @@ private:
 	std::unordered_map<std::string, std::vector<TiledObject>> objectGroups;
 
 	glm::vec2 position{0, 0};
+
+	std::shared_ptr<spdlog::logger> logger;
 };
 
 }

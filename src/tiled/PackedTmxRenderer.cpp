@@ -1,5 +1,3 @@
-#include <easylogging++.h>
-
 #include "APG/tiled/PackedTmxRenderer.hpp"
 #include "APG/internal/Assert.hpp"
 
@@ -8,12 +6,14 @@ namespace APG {
 PackedTmxRenderer::PackedTmxRenderer(const std::string &filename, SpriteBatch *batch, int texWidth, int texHeight) :
 		map{std::make_unique<Tmx::Map>()},
 		packedTexture{std::make_unique<PackedTexture>(texWidth, texHeight)},
-		batch{batch} {
-	auto logger = el::Loggers::getLogger("APG");
+		batch{batch},
+		logger{spdlog::get("APG")} {
+	logger->trace("Loading {} in PackedTmxRenderer", filename);
+	logger->flush();
 	map->ParseFile(filename);
 
 	if (map->HasError()) {
-		logger->error("Failed to load TMX map %v: %v", filename, map->GetErrorText());
+		logger->error("Failed to load TMX map {}: {}", filename, map->GetErrorText());
 	}
 
 	loadTilesets();
@@ -23,19 +23,18 @@ PackedTmxRenderer::PackedTmxRenderer(const std::string &filename, SpriteBatch *b
 PackedTmxRenderer::PackedTmxRenderer(std::unique_ptr<Tmx::Map> &&map, SpriteBatch *batch, int texWidth, int texHeight) :
 		map{std::move(map)},
 		packedTexture{std::make_unique<PackedTexture>(texWidth, texHeight)},
-		batch{batch} {
+		batch{batch},
+		logger{spdlog::get("APG")} {
 	loadTilesets();
 	loadObjects();
 }
 
 void PackedTmxRenderer::loadTilesets() {
-	auto logger = el::Loggers::getLogger("APG");
-
 	const auto mapTileWidth = map->GetTileWidth();
 	const auto mapTileHeight = map->GetTileHeight();
 
 	for (const auto &mapTileset : map->GetTilesets()) {
-		logger->info("Loading tileset %v with first GID %v", mapTileset->GetName(), mapTileset->GetFirstGid());
+		logger->info("Loading tileset {} with first GID {}", mapTileset->GetName(), mapTileset->GetFirstGid());
 		REQUIRE(mapTileset->GetTileWidth() == mapTileWidth &&
 				mapTileset->GetTileHeight() == mapTileHeight,
 				"Only tilesets with tile size equal to map tile size are supported.");
@@ -45,7 +44,7 @@ void PackedTmxRenderer::loadTilesets() {
 
 		if (!possibleRect) {
 			logger->error(
-					"Failed to pack tileset %v. Likely the specified size is not enough, or the file couldn't be found.",
+					"Failed to pack tileset {}. Likely the specified size is not enough, or the file couldn't be found.",
 					tilesetName);
 			continue;
 		}
@@ -56,7 +55,7 @@ void PackedTmxRenderer::loadTilesets() {
 		const auto tilesetTileWidth = mapTileset->GetTileWidth();
 		const auto tilesetTileHeight = mapTileset->GetTileHeight();
 
-		logger->verbose(7, "%v pack: (x, y, w, h) = (%v, %v, %v, %v)", mapTileset->GetName(), rect.x, rect.y, rect.w,
+		logger->trace("{} pack: (x, y, w, h) = ({}, {}, {}, {})", mapTileset->GetName(), rect.x, rect.y, rect.w,
 						rect.h);
 
 		int32_t tileId = 0;
@@ -68,7 +67,7 @@ void PackedTmxRenderer::loadTilesets() {
 
 			sprites.insert({std::pair<int, SpriteBase *>(tileGID, &sprite)});
 
-			logger->verbose(9, "Loaded sprite %v", tileGID);
+			logger->trace("Loaded sprite {}", tileGID);
 
 			x += tilesetTileWidth + spacing;
 			++tileId;
@@ -86,7 +85,7 @@ void PackedTmxRenderer::loadTilesets() {
 		// iterate over "special tiles" (we mostly care about animated tiles)
 		for (const auto &tile : mapTileset->GetTiles()) {
 			if (tile->IsAnimated()) {
-				logger->info("Loading animated tile with %v frames and total duration of %v",
+				logger->info("Loading animated tile with {} frames and total duration of {}",
 							 tile->GetFrameCount(), tile->GetTotalDuration());
 
 				const auto &frames = tile->GetFrames();
@@ -101,7 +100,7 @@ void PackedTmxRenderer::loadTilesets() {
 					// TODO: Proper frame length handling (AnimSprite refactor)
 
 					if (sprites.find(gid) == sprites.end()) {
-						logger->error("Couldn't find sprite frame %v for animation", gid);
+						logger->error("Couldn't find sprite frame {} for animation", gid);
 						continue;
 					}
 
@@ -119,17 +118,15 @@ void PackedTmxRenderer::loadTilesets() {
 }
 
 void PackedTmxRenderer::loadObjects() {
-	const auto logger = el::Loggers::getLogger("APG");
-
 	for (auto &group : map->GetObjectGroups()) {
-		logger->info("Loading object group \"%v\" with %v objects.", group->GetName(), group->GetNumObjects());
+		logger->info("Loading object group \"{}\" with {} objects.", group->GetName(), group->GetNumObjects());
 		std::vector<TiledObject> objects;
 
 		for (auto &obj : group->GetObjects()) {
 			const auto gid = obj->GetGid();
 
 			if (gid == 0) {
-				logger->verbose(5, "Ignoring non-tile object \"%v\"", obj->GetName());
+				logger->trace("Ignoring non-tile object \"{}\"", obj->GetName());
 				continue;
 			}
 
@@ -166,8 +163,7 @@ void PackedTmxRenderer::renderAll() {
 				}
 
 				default: {
-					el::Loggers::getLogger("APG")->warn("Unsupported layer type for layer \"%v\"",
-														layer->GetName());
+					logger->warn("Unsupported layer type for layer \"{}\"", layer->GetName());
 					break;
 				}
 			}
@@ -204,7 +200,7 @@ void PackedTmxRenderer::renderLayer(Tmx::TileLayer *layer) {
 			const auto ourSprite = sprites.find(tileHash);
 
 			if (ourSprite == sprites.end()) {
-				el::Loggers::getLogger("APG")->error("Couldn't find sprite %v", tileHash);
+				logger->error("Couldn't find sprite {}", tileHash);
 				continue;
 			}
 			batch->draw(ourSprite->second, tileX, tileY);

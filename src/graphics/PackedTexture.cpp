@@ -61,7 +61,8 @@ bool PackNode::isLeaf() const {
 }
 
 PackedTexture::PackedTexture(int32_t width, int32_t height) :
-		Texture() {
+		Texture(),
+		logger{spdlog::get("APG")} {
 	this->preservedSurface = SXXDL::make_surface_ptr(
 			SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_RGBA32));
 	this->packTree = std::make_unique<PackNode>(PackNode::createTree(preservedSurface.get()));
@@ -71,15 +72,13 @@ PackedTexture::PackedTexture(int32_t width, int32_t height) :
 
 PackedTexture::~PackedTexture() {
 	if(packBuffer.size() > 0) {
-		el::Loggers::getLogger("APG")->warn("Non-empty pack-buffer when destroying PackedTexture");
+		logger->warn("Non-empty pack-buffer when destroying PackedTexture");
 	}
 	clearPackBuffer();
 }
 
 void PackedTexture::commitPack() {
 	// TODO: packBuffer sorting?
-	auto logger = el::Loggers::getLogger("APG");
-
 	if (packBuffer.empty()) {
 		logger->info("Not uploading texture as there's nothing to do");
 		return;
@@ -97,23 +96,22 @@ void PackedTexture::commitPack() {
 }
 
 shim::optional<SDL_Rect> PackedTexture::insertFile(const std::string &filename) {
-	auto logger = el::Loggers::getLogger("APG");
 	auto surface = IMG_Load(filename.c_str());
 
 	if (surface == nullptr) {
-		logger->error("Failed to load %v; it won't be packed. Error: %v", filename, IMG_GetError());
+		logger->error("Failed to load {}; it won't be packed. Error: {}", filename, IMG_GetError());
 		return shim::nullopt;
 	}
 
 	auto node = packTree->insert(surface);
 
 	if (node == nullptr) {
-		logger->error("Failed to pack %v into tree; it likely doesn't fit", filename);
+		logger->error("Failed to pack {} into tree; it likely doesn't fit", filename);
 		SDL_FreeSurface(surface);
 		return shim::nullopt;
 	}
 
-	logger->info("Successfully packed %v into PackedTexture", filename);
+	logger->info("Successfully packed {} into PackedTexture", filename);
 
 	packBuffer.emplace_back(std::make_tuple(surface, node->getRegion(), true));
 
@@ -121,15 +119,14 @@ shim::optional<SDL_Rect> PackedTexture::insertFile(const std::string &filename) 
 }
 
 shim::optional<SDL_Rect> PackedTexture::insertSurface(SDL_Surface *surface) {
-	auto logger = el::Loggers::getLogger("APG");
 	auto node = packTree->insert(surface);
 
 	if (node == nullptr) {
-		logger->error("Failed to pack %vx%v surface into tree; it likely doesn't fit", surface->w, surface->h);
+		logger->error("Failed to pack {}x{} surface into tree; it likely doesn't fit", surface->w, surface->h);
 		return shim::nullopt;
 	}
 
-	logger->info("Successfully packed %vx%v surface into PackedTexture", surface->w, surface->h);
+	logger->info("Successfully packed {}x{} surface into PackedTexture", surface->w, surface->h);
 
 	packBuffer.emplace_back(std::make_tuple(surface, node->getRegion(), false));
 	return {*node->getRegion()};

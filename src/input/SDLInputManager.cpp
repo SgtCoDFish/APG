@@ -6,11 +6,9 @@
 
 #include "APG/input/SDLInputManager.hpp"
 
-#include "easylogging++.h"
-
 namespace APG {
 
-SDLInputManager::SDLInputManager() {
+SDLInputManager::SDLInputManager() : logger{spdlog::get("APG")} {
 	keyState = SDL_GetKeyboardState(nullptr);
 
 	for (auto &f : canJustPress) {

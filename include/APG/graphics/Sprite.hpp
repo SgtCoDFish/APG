@@ -7,6 +7,8 @@
 
 #include <memory>
 
+#include "spdlog/spdlog.h"
+
 #include "APG/graphics/Buffer.hpp"
 #include "APG/graphics/SpriteBase.hpp"
 
@@ -78,6 +80,8 @@ protected:
 	float u2 = 0.0f, v2 = 0.0f;
 
 	void calculateUV();
+
+	std::shared_ptr<spdlog::logger> logger;
 };
 
 }

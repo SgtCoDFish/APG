@@ -154,6 +154,8 @@ private:
 	TextureFilterType magFilter;
 
 	void uploadFilter() const;
+
+	std::shared_ptr<spdlog::logger> logger;
 };
 
 using texture_ptr = std::unique_ptr<Texture>;

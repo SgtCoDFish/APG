@@ -1,30 +1,3 @@
-/*
- * Copyright (c) 2014, 2015 See AUTHORS file.
- * All rights reserved.
-
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *    * Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *    * Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution.
- *    * Neither the name of the <organization> nor the
- *      names of its contributors may be used to endorse or promote products
- *      derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 #ifndef INCLUDE_APG_GRAPHICS_BUFFER_HPP_
 #define INCLUDE_APG_GRAPHICS_BUFFER_HPP_
 
@@ -36,11 +9,11 @@
 #include <vector>
 #include <array>
 
+#include "spdlog/spdlog.h"
+
 #include "APG/GL.hpp"
 
 #include "APG/graphics/GLError.hpp"
-
-#include "easylogging++.h"
 
 namespace APG {
 
@@ -65,19 +38,6 @@ enum DrawType {
 };
 
 template<typename T, int glType> class Buffer {
-protected:
-	uint32_t bufferID;
-
-	const BufferType bufferType;
-	const DrawType drawType;
-
-	std::vector<T> bufferData;
-	uint64_t elementCount = 0;
-
-	void generateID() {
-		glGenBuffers(1, &bufferID);
-	}
-
 public:
 	explicit Buffer(BufferType bufferType, DrawType drawType) :
 			        Buffer { bufferType, drawType, nullptr, 0 } {
@@ -85,7 +45,8 @@ public:
 
 	explicit Buffer(BufferType bufferType, DrawType drawType, T * const data, uint64_t elementCount) :
 			        bufferType { bufferType },
-			        drawType { drawType } {
+			        drawType { drawType },
+					logger{spdlog::get("APG")} {
 		generateID();
 		bind();
 
@@ -112,11 +73,11 @@ public:
 		GLenum glError = glGetError();
 		if (glError != GL_NO_ERROR) {
 			if (glError == GL_OUT_OF_MEMORY) {
-				el::Loggers::getLogger("APG")->error(
-				        "Ran out of memory trying to upload buffer data with buffer size = %vB", bufferSize);
+				logger->error(
+				        "Ran out of memory trying to upload buffer data with buffer size = {}B", bufferSize);
 				return;
 			} else {
-				el::Loggers::getLogger("APG")->error("OpenGL error occurred: %v.", prettyGLError(glError));
+				logger->error("OpenGL error occurred: {}.", prettyGLError(glError));
 				return;
 			}
 		}
@@ -184,6 +145,22 @@ public:
 	Buffer(const Buffer &other) = delete;
 	Buffer &operator=(Buffer &other) = delete;
 	Buffer &operator=(const Buffer &other) = delete;
+
+protected:
+	uint32_t bufferID;
+
+	const BufferType bufferType;
+	const DrawType drawType;
+
+	std::vector<T> bufferData;
+	uint64_t elementCount = 0;
+
+	void generateID() {
+		glGenBuffers(1, &bufferID);
+	}
+
+private:
+	std::shared_ptr<spdlog::logger> logger;
 };
 
 using DoubleBuffer = Buffer<double, GL_DOUBLE>;
@@ -197,6 +174,6 @@ using Int8Buffer = Buffer<int8_t, GL_BYTE>;
 
 }
 
-#endif /* APG_NO_GL */
+#endif
 
-#endif /* APG__BUFFER_HPP_ */
+#endif

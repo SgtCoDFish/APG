@@ -14,8 +14,6 @@
 #include "APG/audio/SDLAudioManager.hpp"
 #include "APG/font/PackedFontManager.hpp"
 
-#include "easylogging++.h"
-
 namespace APG {
 
 class SDLGame : public Game {
@@ -78,7 +76,7 @@ public:
 	 * However, if you don't need the whole APG SDLGame framework you can use this method (and SDLGame::shutdownSDL)
 	 * to make your life easier.
 	 */
-	static void initialiseSDL(el::Logger * logger = nullptr);
+	static void initialiseSDL(std::shared_ptr<spdlog::logger> &logger);
 
 	/**
 	 * See the note for SDLGame::initialiseSDL(). Should be called once at most per program run, and after all SDL related activity is completed.
@@ -101,9 +99,11 @@ protected:
 
 	void resetGLErrors();
 
+	std::shared_ptr<spdlog::logger> logger;
+
 private:
-	static void logSDLVersions();
-	static void debugSDLVersion(el::Logger * const logger, const char *libraryName, const SDL_version &compiledVersion,
+	static void logSDLVersions(std::shared_ptr<spdlog::logger> &logger);
+	static void debugSDLVersion(std::shared_ptr<spdlog::logger> &logger, const char *libraryName, const SDL_version &compiledVersion,
 	        const SDL_version &linkedVersion);
 };
 

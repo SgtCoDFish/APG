@@ -11,9 +11,9 @@
 
 #include "Tmx.h"
 
-#include "APG/graphics/Texture.hpp"
+#include "spdlog/spdlog.h"
 
-#include "easylogging++.h"
+#include "APG/graphics/Texture.hpp"
 
 namespace APG {
 
@@ -48,7 +48,8 @@ public:
 			        Texture { fileName },
 			        tileWidth { tileWidth },
 			        tileHeight { tileHeight },
-			        spacing { spacing } {
+			        spacing { spacing },
+					logger {spdlog::get("APG")} {
 		calculateWidthInTiles();
 		calculateHeightInTiles();
 	}
@@ -88,8 +89,7 @@ private:
 		const auto gap = tileWidth + spacing;
 
 		if (getWidth() % gap != 0) {
-			el::Loggers::getLogger("APG")->warn(
-			        "Tileset %v may have an inconsistent spacing in the x direction; this could cause issues.",
+			logger->warn("Tileset {} may have an inconsistent spacing in the x direction; this could cause issues.",
 			        this->getFileName());
 		}
 
@@ -100,13 +100,14 @@ private:
 		const auto gap = tileHeight + spacing;
 
 		if (getHeight() % gap != 0) {
-			el::Loggers::getLogger("APG")->warn(
-			        "Tileset %v may have an inconsistent spacing in the y direction; this could cause issues.",
+			logger->warn("Tileset {} may have an inconsistent spacing in the y direction; this could cause issues.",
 			        this->getFileName());
 		}
 
 		heightInTiles = getHeight() / gap;
 	}
+
+	std::shared_ptr<spdlog::logger> logger;
 };
 
 }
@@ -114,4 +115,4 @@ private:
 #endif
 #endif
 
-#endif /* APGTILESET_HPP_ */
+#endif

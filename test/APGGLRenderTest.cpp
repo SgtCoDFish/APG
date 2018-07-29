@@ -17,8 +17,6 @@
 
 #include "test/APGGLRenderTest.hpp"
 
-INITIALIZE_EASYLOGGINGPP
-
 #if defined (__EMSCRIPTEN__)
 #include <emscripten.h>
 const char * APG::APGGLRenderTest::vertexShaderFilename = "assets/pass_vertex-es3.glslv";
@@ -29,33 +27,37 @@ const char *APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag.glsl
 #endif
 
 bool APG::APGGLRenderTest::init() {
-	const auto logger = el::Loggers::getLogger("APG");
-
+	logger->info("Init1");
 	auto map1 = std::make_unique<Tmx::Map>();
 	map1->ParseFile("assets/sample_indoor.tmx");
 
 	if (map1->HasError()) {
-		logger->fatal("Error loading map1: %v", map1->GetErrorText());
+		logger->critical("Error loading map1: {}", map1->GetErrorText());
 		return false;
 	}
+	logger->info("Init2");
 
 	auto map2 = std::make_unique<Tmx::Map>();
 	map2->ParseFile("assets/world1.tmx");
 
 	if (map2->HasError()) {
-		logger->fatal("Error loading map2: %v", map2->GetErrorText());
+		logger->critical("Error loading map2: {}", map2->GetErrorText());
 		return false;
 	}
+	logger->info("Init3 - maps loaded");
 
 	shaderProgram = ShaderProgram::fromFiles(vertexShaderFilename, fragmentShaderFilename);
+	logger->info("Init4 - shaders loaded");
 
 	camera = std::make_unique<Camera>(screenWidth, screenHeight);
 	camera->setToOrtho(false, screenWidth, screenHeight);
 	spriteBatch = std::make_unique<SpriteBatch>(shaderProgram.get());
+	logger->info("Init4.5 - camera + spritebatch loaded");
 
 	rendererOne = std::make_unique<PackedTmxRenderer>("assets/sample_indoor.tmx", spriteBatch.get(), 1024, 1024);
 	rendererTwo = std::make_unique<PackedTmxRenderer>("assets/world1.tmx", spriteBatch.get(), 1024, 1024);
 	currentRenderer = rendererOne.get();
+	logger->info("Init5 - renderers loaded");
 
 	playerTexture = std::make_unique<Texture>("assets/player.png");
 	playerFrames = AnimatedSprite::splitTexture(playerTexture, 32, 32, 0, 32, 4);
@@ -65,18 +67,20 @@ bool APG::APGGLRenderTest::init() {
 	miniPlayer = std::make_unique<Sprite>(miniTexture);
 
 	currentPlayer = miniPlayer.get();
+	logger->info("Init6 - player sprites loaded");
 
 	font = fontManager->loadFontFile("assets/test_font.ttf", 12);
 	const auto renderedFontSize = fontManager->estimateSizeOf(font, "Hello, World!");
+	logger->info("Init7 - font loaded");
 
-	logger->info("Estimated font size: (w, h) = (%v, %v).", renderedFontSize.x, renderedFontSize.y);
+	logger->info("Estimated font size: (w, h) = ({}, {}).", renderedFontSize.x, renderedFontSize.y);
 
 	fontSprite = fontManager->renderText(font, "Hello, world!", true, FontRenderMethod::NICE);
 
 	auto glError = glGetError();
 	if (glError != GL_NO_ERROR) {
 		while (glError != GL_NO_ERROR) {
-			logger->fatal("Error in OpenGL while loading: ", prettyGLError(glError));
+			logger->critical("Error in OpenGL while loading: {}", prettyGLError(glError));
 			glError = glGetError();
 		}
 
@@ -129,9 +133,9 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	}
 
 	if (inputManager->isLeftMouseJustPressed()) {
-		el::Loggers::getLogger("APG")->info("Click: left at (%v, %v)", inputManager->getMouseX(), inputManager->getMouseY());
+		logger->info("Click: left at ({}, {})", inputManager->getMouseX(), inputManager->getMouseY());
 	} else if (inputManager->isRightMouseJustPressed()) {
-		el::Loggers::getLogger("APG")->info("Click: right at (%v, %v)", inputManager->getMouseX(), inputManager->getMouseY());
+		logger->info("Click: right at ({}, {})", inputManager->getMouseX(), inputManager->getMouseY());
 	}
 
 
@@ -160,7 +164,7 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 
 struct loop_arg {
 	APG::APGGLRenderTest *rpg { nullptr };
-	el::Logger *logger { nullptr };
+	std::shared_ptr<spdlog::logger> logger { nullptr };
 	bool done { false };
 	std::chrono::time_point<std::chrono::high_resolution_clock> timepoint;
 	std::vector<float> timesTaken;
@@ -188,14 +192,11 @@ void loop(void *v_arg) {
 }
 
 int main(int argc, char *argv[]) {
-	START_EASYLOGGINGPP(argc, argv);
-
 	const std::string windowTitle("APG GLTmxRenderer Example");
 	const uint32_t windowWidth = 1280;
 	const uint32_t windowHeight = 720;
-
-	const auto logger = el::Loggers::getLogger("APG");
 	auto game = std::make_unique<APG::APGGLRenderTest>(windowTitle, windowWidth, windowHeight);
+	// spdlog::set_level(spdlog::level::trace);
 
 	if (!game->init()) {
 		return EXIT_FAILURE;
@@ -205,7 +206,7 @@ int main(int argc, char *argv[]) {
 	arg.rpg = game.get();
 	arg.timepoint = std::chrono::high_resolution_clock::now();
 	arg.done = false;
-	arg.logger = logger;
+	arg.logger = spdlog::get("APG");
 
 #if defined(__EMSCRIPTEN__)
 	emscripten_set_main_loop_arg(loop, &arg, 0, 1);
