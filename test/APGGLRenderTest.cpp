@@ -17,8 +17,6 @@
 
 #include "test/APGGLRenderTest.hpp"
 
-INITIALIZE_EASYLOGGINGPP
-
 #if defined (__EMSCRIPTEN__)
 #include <emscripten.h>
 const char * APG::APGGLRenderTest::vertexShaderFilename = "assets/pass_vertex-es3.glslv";
@@ -29,13 +27,11 @@ const char *APG::APGGLRenderTest::fragmentShaderFilename = "assets/red_frag.glsl
 #endif
 
 bool APG::APGGLRenderTest::init() {
-	const auto logger = el::Loggers::getLogger("APG");
-
 	auto map1 = std::make_unique<Tmx::Map>();
 	map1->ParseFile("assets/sample_indoor.tmx");
 
 	if (map1->HasError()) {
-		logger->fatal("Error loading map1: %v", map1->GetErrorText());
+		logger->critical("Error loading map1: {}", map1->GetErrorText());
 		return false;
 	}
 
@@ -43,7 +39,7 @@ bool APG::APGGLRenderTest::init() {
 	map2->ParseFile("assets/world1.tmx");
 
 	if (map2->HasError()) {
-		logger->fatal("Error loading map2: %v", map2->GetErrorText());
+		logger->critical("Error loading map2: {}", map2->GetErrorText());
 		return false;
 	}
 
@@ -69,14 +65,14 @@ bool APG::APGGLRenderTest::init() {
 	font = fontManager->loadFontFile("assets/test_font.ttf", 12);
 	const auto renderedFontSize = fontManager->estimateSizeOf(font, "Hello, World!");
 
-	logger->info("Estimated font size: (w, h) = (%v, %v).", renderedFontSize.x, renderedFontSize.y);
+	logger->info("Estimated font size: (w, h) = ({}, {}).", renderedFontSize.x, renderedFontSize.y);
 
 	fontSprite = fontManager->renderText(font, "Hello, world!", true, FontRenderMethod::NICE);
 
 	auto glError = glGetError();
 	if (glError != GL_NO_ERROR) {
 		while (glError != GL_NO_ERROR) {
-			logger->fatal("Error in OpenGL while loading: ", prettyGLError(glError));
+			logger->critical("Error in OpenGL while loading: {}", prettyGLError(glError));
 			glError = glGetError();
 		}
 
@@ -129,9 +125,9 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 	}
 
 	if (inputManager->isLeftMouseJustPressed()) {
-		el::Loggers::getLogger("APG")->info("Click: left at (%v, %v)", inputManager->getMouseX(), inputManager->getMouseY());
+		logger->info("Click: left at ({}, {})", inputManager->getMouseX(), inputManager->getMouseY());
 	} else if (inputManager->isRightMouseJustPressed()) {
-		el::Loggers::getLogger("APG")->info("Click: right at (%v, %v)", inputManager->getMouseX(), inputManager->getMouseY());
+		logger->info("Click: right at ({}, {})", inputManager->getMouseX(), inputManager->getMouseY());
 	}
 
 
@@ -160,7 +156,7 @@ void APG::APGGLRenderTest::render(float deltaTime) {
 
 struct loop_arg {
 	APG::APGGLRenderTest *rpg { nullptr };
-	el::Logger *logger { nullptr };
+	std::shared_ptr<spdlog::logger> logger { nullptr };
 	bool done { false };
 	std::chrono::time_point<std::chrono::high_resolution_clock> timepoint;
 	std::vector<float> timesTaken;
@@ -188,13 +184,9 @@ void loop(void *v_arg) {
 }
 
 int main(int argc, char *argv[]) {
-	START_EASYLOGGINGPP(argc, argv);
-
 	const std::string windowTitle("APG GLTmxRenderer Example");
 	const uint32_t windowWidth = 1280;
 	const uint32_t windowHeight = 720;
-
-	const auto logger = el::Loggers::getLogger("APG");
 	auto game = std::make_unique<APG::APGGLRenderTest>(windowTitle, windowWidth, windowHeight);
 
 	if (!game->init()) {
@@ -205,7 +197,7 @@ int main(int argc, char *argv[]) {
 	arg.rpg = game.get();
 	arg.timepoint = std::chrono::high_resolution_clock::now();
 	arg.done = false;
-	arg.logger = logger;
+	arg.logger = spdlog::get("APG");
 
 #if defined(__EMSCRIPTEN__)
 	emscripten_set_main_loop_arg(loop, &arg, 0, 1);

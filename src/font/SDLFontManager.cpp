@@ -13,30 +13,27 @@
 #include "APG/graphics/Sprite.hpp"
 #include "APG/internal/Assert.hpp"
 
-#include "easylogging++.h"
-
 namespace APG {
 
 const int SDLFontManager::MAX_OWNED_TEXTURES;
 const int SDLFontManager::MAX_OWNED_SPRITES;
 
-SDLFontManager::SDLFontManager() {
-	el::Loggers::getLogger("APG")->warn("SDLFontManager actively leaks when rendering, and should be avoided");
+SDLFontManager::SDLFontManager() : logger{spdlog::get("APG")} {
+	logger->warn("SDLFontManager actively leaks when rendering, and should be avoided");
 }
 
 FontManager::font_handle SDLFontManager::loadFontFile(const std::string &filename, int pointSize) {
-	auto logger = el::Loggers::getLogger("APG");
 	auto sdlFont = SXXDL::ttf::make_font_ptr(TTF_OpenFont(filename.c_str(), pointSize));
 
 	if (!sdlFont) {
-		logger->fatal("Couldn't load %v, error: %v", filename, TTF_GetError());
+		logger->critical("Couldn't load {}, error: {}", filename, TTF_GetError());
 		return -1;
 	} else {
 		const auto handle = getNextFontHandle();
 
 		loadedFonts.emplace(handle, StoredSDLFont(handle, std::move(sdlFont)));
 
-		logger->info("Loaded font \"%v\" with handle %v.", filename, handle);
+		logger->info("Loaded font \"{}\" with handle {}.", filename, handle);
 
 		return handle;
 	}
@@ -63,7 +60,7 @@ glm::ivec2 SDLFontManager::estimateSizeOf(const font_handle &fontHandle, const s
 	glm::ivec2 ret;
 
 	if (TTF_SizeUTF8((*font).second.ptr.get(), text.c_str(), &ret.x, &ret.y)) {
-		el::Loggers::getLogger("APG")->error("Couldn't get size of text string, error: %v", TTF_GetError());
+		logger->error("Couldn't get size of text string, error: {}", TTF_GetError());
 	}
 
 	return ret;
@@ -71,8 +68,6 @@ glm::ivec2 SDLFontManager::estimateSizeOf(const font_handle &fontHandle, const s
 
 SpriteBase *SDLFontManager::renderText(const font_handle &fontHandle, const std::string &text,
 									   bool ignoreWhitespace, const FontRenderMethod method) {
-	const auto logger = el::Loggers::getLogger("APG");
-
 	const auto &found = loadedFonts.find(fontHandle);
 
 	REQUIRE(found != loadedFonts.end(), "Can't render text with a font that doesn't exist.");
@@ -80,9 +75,9 @@ SpriteBase *SDLFontManager::renderText(const font_handle &fontHandle, const std:
 	auto &font = (*found).second;
 
 	if (ignoreWhitespace) {
-		return renderTextIgnoreWhitespace(font, text, method, logger);
+		return renderTextIgnoreWhitespace(font, text, method);
 	} else {
-		return renderTextWithWhitespace(font, text, method, logger);
+		return renderTextWithWhitespace(font, text, method);
 	}
 }
 
@@ -119,8 +114,7 @@ int SDLFontManager::findAvailableSpriteSlot() const {
 
 SpriteBase *SDLFontManager::renderTextIgnoreWhitespace(const StoredSDLFont &font,
 													   const std::string &text,
-													   const FontRenderMethod method,
-													   el::Logger *logger) {
+													   const FontRenderMethod method) {
 	SDL_Surface *tempSurface = nullptr;
 
 	switch (method) {
@@ -140,7 +134,7 @@ SpriteBase *SDLFontManager::renderTextIgnoreWhitespace(const StoredSDLFont &font
 	}
 
 	if (tempSurface == nullptr) {
-		logger->fatal("Couldn't render text string \"%v\" using font handle %v, error: %v", text, font.handle,
+		logger->critical("Couldn't render text string \"{}\" using font handle {}, error: {}", text, font.handle,
 					  TTF_GetError());
 		return nullptr;
 	}
@@ -148,7 +142,7 @@ SpriteBase *SDLFontManager::renderTextIgnoreWhitespace(const StoredSDLFont &font
 	const auto ownedTextureID = findAvailableOwnedTexture(tempSurface);
 
 	if (ownedTextureID == -1) {
-		logger->fatal("Ran out of space for textures for rendered text (max is %v textures). Time to refactor!",
+		logger->critical("Ran out of space for textures for rendered text (max is {} textures). Time to refactor!",
 					  APG::SDLFontManager::MAX_OWNED_TEXTURES);
 		return nullptr;
 	}
@@ -156,7 +150,7 @@ SpriteBase *SDLFontManager::renderTextIgnoreWhitespace(const StoredSDLFont &font
 	const auto ownedSpriteID = findAvailableSpriteSlot();
 
 	if (ownedSpriteID == -1) {
-		logger->fatal("Ran out of space for sprites for rendered text (max is %v sprites). Time to refactor!",
+		logger->critical("Ran out of space for sprites for rendered text (max is {} sprites). Time to refactor!",
 					  APG::SDLFontManager::MAX_OWNED_SPRITES);
 		return nullptr;
 	}
@@ -171,8 +165,7 @@ SpriteBase *SDLFontManager::renderTextIgnoreWhitespace(const StoredSDLFont &font
 }
 
 SpriteBase *SDLFontManager::renderTextWithWhitespace(const StoredSDLFont &font, const std::string &text,
-													 const FontRenderMethod method,
-													 el::Logger *logger) {
+													 const FontRenderMethod method) {
 	static const std::string wsDelimiter = "\n";
 
 	std::vector<std::string> stringVector;
@@ -188,7 +181,7 @@ SpriteBase *SDLFontManager::renderTextWithWhitespace(const StoredSDLFont &font, 
 	}
 
 	if (stringVector.empty()) {
-		return renderTextIgnoreWhitespace(font, text, method, logger);
+		return renderTextIgnoreWhitespace(font, text, method);
 	}
 
 	switch (method) {
@@ -198,7 +191,7 @@ SpriteBase *SDLFontManager::renderTextWithWhitespace(const StoredSDLFont &font, 
 				auto surface = TTF_RenderUTF8_Blended(font.ptr.get(), s.c_str(), font.color);
 
 				if (surface == nullptr) {
-					logger->fatal("Couldn't render text string \"%v\" (%v of %v) using font handle %v. Error: %v", s,
+					logger->critical("Couldn't render text string \"{}\" ({} of {}) using font handle {}. Error: {}", s,
 								  surfaces.size() + 1, stringVector.size(), font.handle, TTF_GetError());
 					return nullptr;
 				}
@@ -214,7 +207,7 @@ SpriteBase *SDLFontManager::renderTextWithWhitespace(const StoredSDLFont &font, 
 				auto surface = TTF_RenderUTF8_Solid(font.ptr.get(), s.c_str(), font.color);
 
 				if (surface == nullptr) {
-					logger->fatal("Couldn't render text string \"%v\" (%v of %v) using font handle %v. Error: %v", s,
+					logger->critical("Couldn't render text string \"{}\" ({} of {}) using font handle {}. Error: {}", s,
 								  surfaces.size() + 1, stringVector.size(), font.handle, TTF_GetError());
 					return nullptr;
 				}
@@ -244,7 +237,7 @@ SpriteBase *SDLFontManager::renderTextWithWhitespace(const StoredSDLFont &font, 
 													surfaces.front()->format->Amask);
 
 	if (tempSurface == nullptr) {
-		logger->fatal("Couldn't create master surface for multi-line rendering with handle %v. Error: %v", font.handle,
+		logger->critical("Couldn't create master surface for multi-line rendering with handle {}. Error: {}", font.handle,
 					  SDL_GetError());
 		return nullptr;
 	}
@@ -253,7 +246,7 @@ SpriteBase *SDLFontManager::renderTextWithWhitespace(const StoredSDLFont &font, 
 	for (const auto &surf : surfaces) {
 		auto rect = SDL_Rect{0u, hCounter, 0u, 0u};
 		if (SDL_BlitSurface(surf.get(), nullptr, tempSurface, &rect) != 0) {
-			logger->fatal("Couldn't blit micro surface to multi-line master surface, error: %v", SDL_GetError());
+			logger->critical("Couldn't blit micro surface to multi-line master surface, error: {}", SDL_GetError());
 			SDL_FreeSurface(tempSurface);
 			return nullptr;
 		}
@@ -264,7 +257,7 @@ SpriteBase *SDLFontManager::renderTextWithWhitespace(const StoredSDLFont &font, 
 	const auto ownedTextureID = findAvailableOwnedTexture(tempSurface);
 
 	if (ownedTextureID == -1) {
-		logger->fatal("Ran out of space for textures for rendered text (max is %v textures). Time to refactor!",
+		logger->critical("Ran out of space for textures for rendered text (max is {} textures). Time to refactor!",
 					  APG::SDLFontManager::MAX_OWNED_TEXTURES);
 		return nullptr;
 	}
@@ -272,7 +265,7 @@ SpriteBase *SDLFontManager::renderTextWithWhitespace(const StoredSDLFont &font, 
 	const auto ownedSpriteID = findAvailableSpriteSlot();
 
 	if (ownedSpriteID == -1) {
-		logger->fatal("Ran out of space for sprites for rendered text (max is %v sprites). Time to refactor!",
+		logger->critical("Ran out of space for sprites for rendered text (max is {} sprites). Time to refactor!",
 					  APG::SDLFontManager::MAX_OWNED_SPRITES);
 		return nullptr;
 	}

@@ -78,8 +78,8 @@ void SDLTmxRenderer::renderLayerImpl(const Tmx::TileLayer *layer) {
 				dst_rect.y = (int) position.y + y * tile_height;
 
 				if (SDL_RenderCopy(renderer.get(), sdl_tileset.get(), &src_rect, &dst_rect) < 0) {
-					el::Loggers::getLogger("APG")->error(
-							"Couldn't render in tmx renderer; failed at tile %v, tileset \"%v\"", tile_id,
+					logger->error(
+							"Couldn't render in tmx renderer; failed at tile {}, tileset \"{}\"", tile_id,
 							current_tileset->getFileName());
 					return;
 				}
@@ -89,7 +89,8 @@ void SDLTmxRenderer::renderLayerImpl(const Tmx::TileLayer *layer) {
 }
 
 void SDLTmxRenderer::renderObjectGroupImpl(const std::vector<TiledObject> &objects) {
-	el::Loggers::getLogger("APG")->fatal("SDL renderer cannot render object groups yet.");
+	logger->critical("SDL renderer cannot render object groups");
+	throw std::runtime_error("SDL renderer cannot render object groups");
 }
 
 }

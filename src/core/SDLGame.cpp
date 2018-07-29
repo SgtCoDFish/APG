@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include <string>
+#include <stdexcept>
 
 #include "APG/SDL.hpp"
 #include "APG/GL.hpp"
@@ -11,7 +12,7 @@
 #include "APG/input/SDLInputManager.hpp"
 #include "APG/tiled/TmxRenderer.hpp"
 
-#include "easylogging++.h"
+#include "spdlog/spdlog.h"
 
 uint32_t APG::SDLGame::SDL_INIT_FLAGS = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS;
 uint32_t APG::SDLGame::SDL_IMAGE_INIT_FLAGS = IMG_INIT_PNG;
@@ -28,9 +29,11 @@ namespace APG {
 
 SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight, uint32_t glContextMajor,
 				 uint32_t glContextMinor, uint32_t windowX, uint32_t windowY) :
-		APG::Game(windowWidth, windowHeight) {
-	const auto logger = el::Loggers::getLogger("APG");
-	logger->info("Initialising APG with OpenGL version %v.%v.", glContextMajor, glContextMinor);
+		APG::Game(windowWidth, windowHeight),
+		logger {spdlog::stdout_logger_mt("APG")}  {
+	spdlog::set_level(spdlog::level::info);
+	spdlog::set_pattern("%Y-%m-%dT%H:%M:%S.%e%z [%L] [%n] %v");
+	logger->info("Initialising APG with OpenGL version {}.{}", glContextMajor, glContextMinor);
 
 	SDLGame::initialiseSDL(logger);
 
@@ -42,7 +45,8 @@ SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t 
 			SDL_CreateWindow(windowTitle.c_str(), windowX, windowY, windowWidth, windowHeight, SDL_WINDOW_FLAGS));
 
 	if (window == nullptr) {
-		logger->fatal("Couldn't create SDL window: %v", SDL_GetError());
+		logger->critical("Couldn't create SDL window: {}", SDL_GetError());
+		throw std::runtime_error("Failed to create SDL window");
 	}
 
 #if !defined (__EMSCRIPTEN__)
@@ -99,42 +103,43 @@ void SDLGame::quit() {
 	shouldQuit = true;
 }
 
-void SDLGame::initialiseSDL(el::Logger *logger) {
-	if (logger == nullptr) {
-		logger = el::Loggers::getLogger("APG");
-	}
-
+void SDLGame::initialiseSDL(std::shared_ptr<spdlog::logger> &logger) {
 	if (SDL_Init(SDL_INIT_FLAGS) < 0) {
-		logger->fatal("Couldn't initialise SDL2: %v", SDL_GetError());
+		logger->critical("Couldn't initialise SDL2: {}", SDL_GetError());
+		throw std::runtime_error("Failed to initialise SDL2");
 	} else {
-		logger->verbose(1, "Successfully initialised SDL2.");
+		logger->trace("Successfully initialised SDL2.");
 	}
 
 	if ((IMG_Init(SDL_IMAGE_INIT_FLAGS) & SDL_IMAGE_INIT_FLAGS) != SDL_IMAGE_INIT_FLAGS) {
-		logger->fatal("Couldn't initialise SDL2_image: %v", IMG_GetError());
+		logger->critical("Couldn't initialise SDL2_image: {}", IMG_GetError());
+		throw std::runtime_error("Failed to initialise SDL2_image");
 	} else {
-		logger->verbose(1, "Successfully initialised SDL2_image.");
+		logger->trace("Successfully initialised SDL2_image.");
 	}
 
 	if (TTF_Init() == -1) {
-		logger->fatal("Couldn't initialise SDL2_ttf: %v", TTF_GetError());
+		logger->critical("Couldn't initialise SDL2_ttf: {}", TTF_GetError());
+		throw std::runtime_error("Failed to initialise SDL2_ttf");
 	} else {
-		logger->verbose(1, "Successfully initialised SDL2_ttf.");
+		logger->trace("Successfully initialised SDL2_ttf.");
 	}
 
 	if ((Mix_Init(SDL_MIXER_INIT_FLAGS) & SDL_MIXER_INIT_FLAGS) != SDL_MIXER_INIT_FLAGS) {
-		logger->fatal("Couldn't initialise SDL2_mixer: %v", Mix_GetError());
+		logger->critical("Couldn't initialise SDL2_mixer: {}", Mix_GetError());
+		throw std::runtime_error("Failed to initialise SDL2_mixer");
 	} else {
-		logger->verbose(1, "Successfully initialised SDL2_mixer.");
+		logger->trace("Successfully initialised SDL2_mixer.");
 	}
 
 	if (SDLNet_Init() == -1) {
-		logger->fatal("Couldn't initialise SDL2_net: %v", SDLNet_GetError());
+		logger->critical("Couldn't initialise SDL2_net: {}", SDLNet_GetError());
+		throw std::runtime_error("Failed to initialise SDL2_net");
 	} else {
-		logger->verbose(1, "Successfully initialised SDL2_net");
+		logger->trace("Successfully initialised SDL2_net");
 	}
 
-	SDLGame::logSDLVersions();
+	SDLGame::logSDLVersions(logger);
 }
 
 void SDLGame::shutdownSDL() {
@@ -152,13 +157,10 @@ void SDLGame::resetGLErrors() {
 		error = glGetError();
 	}
 
-	el::Loggers::getLogger("APG")->verbose(9,
-										   "OpenGL errors have been reset (probably as a workaround for bugs with glew)");
+	logger->trace("OpenGL errors have been reset (probably as a workaround for bugs with glew)");
 }
 
-void SDLGame::logSDLVersions() {
-	const auto logger = el::Loggers::getLogger("APG");
-
+void SDLGame::logSDLVersions(std::shared_ptr<spdlog::logger> &logger) {
 	SDL_version compiledVersion, sdlLinkedVersion;
 
 	SDL_VERSION(&compiledVersion);
@@ -185,9 +187,9 @@ void SDLGame::logSDLVersions() {
 	SDLGame::debugSDLVersion(logger, "SDL2_net", compiledVersion, *netVersion);
 }
 
-void SDLGame::debugSDLVersion(el::Logger *const logger, const char *libraryName, const SDL_version &compiledVersion,
+void SDLGame::debugSDLVersion(std::shared_ptr<spdlog::logger> &logger, const char *libraryName, const SDL_version &compiledVersion,
 							  const SDL_version &linkedVersion) {
-	logger->verbose(8, "%v compiled with version %v.%v.%v, linked with version %v.%v.%v", libraryName,
+	logger->trace("{} compiled with version {}.{}.{}, linked with version {}.{}.{}", libraryName,
 					(uint32_t) compiledVersion.major, (uint32_t) compiledVersion.minor,
 					(uint32_t) compiledVersion.patch,
 					(uint32_t) linkedVersion.major, (uint32_t) linkedVersion.minor, (uint32_t) linkedVersion.patch);

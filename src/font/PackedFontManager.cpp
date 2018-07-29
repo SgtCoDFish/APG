@@ -9,23 +9,23 @@ namespace APG {
 PackedFontManager::PackedFontManager(int packedTextureWidth, int packedTextureHeight) :
 		packedTextureWidth{packedTextureWidth},
 		packedTextureHeight{packedTextureHeight},
-		packedTexture{nullptr} {
+		packedTexture{nullptr},
+		logger{spdlog::get("APG")} {
 
 }
 
 FontManager::font_handle PackedFontManager::loadFontFile(const std::string &filename, int pointSize) {
-	auto logger = el::Loggers::getLogger("APG");
 	auto sdlFont = SXXDL::ttf::make_font_ptr(TTF_OpenFont(filename.c_str(), pointSize));
 
 	if (!sdlFont) {
-		logger->fatal("Couldn't load %v, error: %v", filename, TTF_GetError());
+		logger->critical("Couldn't load {}, error: {}", filename, TTF_GetError());
 		return -1;
 	} else {
 		const auto handle = getNextFontHandle();
 
 		loadedFonts.emplace(handle, StoredSDLFont(handle, std::move(sdlFont)));
 
-		logger->info("Loaded font \"%v\" with handle %v.", filename, handle);
+		logger->info("Loaded font \"{}\" with handle {}.", filename, handle);
 
 		return handle;
 	}
@@ -52,7 +52,7 @@ glm::ivec2 PackedFontManager::estimateSizeOf(const FontManager::font_handle &fon
 	glm::ivec2 ret{};
 
 	if (TTF_SizeUTF8((*font).second.ptr.get(), text.c_str(), &ret.x, &ret.y)) {
-		el::Loggers::getLogger("APG")->error("Couldn't get size of text string, error: %v", TTF_GetError());
+		logger->error("Couldn't get size of text string, error: {}", TTF_GetError());
 	}
 
 	return ret;
@@ -60,8 +60,6 @@ glm::ivec2 PackedFontManager::estimateSizeOf(const FontManager::font_handle &fon
 
 SpriteBase *PackedFontManager::renderText(const FontManager::font_handle &fontHandle, const std::string &text,
 										  bool ignoreWhitespace, FontRenderMethod method) {
-	const auto logger = el::Loggers::getLogger("APG");
-
 	const auto &found = loadedFonts.find(fontHandle);
 
 	REQUIRE(found != loadedFonts.end(), "Can't render text with a font that doesn't exist.");
@@ -69,9 +67,9 @@ SpriteBase *PackedFontManager::renderText(const FontManager::font_handle &fontHa
 	auto &font = (*found).second;
 
 	if (ignoreWhitespace) {
-		return renderTextIgnoreWhitespace(font, text, method, logger);
+		return renderTextIgnoreWhitespace(font, text, method);
 	} else {
-		return renderTextWithWhitespace(font, text, method, logger);
+		return renderTextWithWhitespace(font, text, method);
 	}
 }
 
@@ -88,8 +86,7 @@ SDL_Color PackedFontManager::glmToSDLColor(const glm::vec4 &glmColor) {
 
 SpriteBase *PackedFontManager::renderTextIgnoreWhitespace(const StoredSDLFont &font,
 														  const std::string &text,
-														  const FontRenderMethod method,
-														  el::Logger *logger) {
+														  const FontRenderMethod method) {
 	ensureTexture();
 	auto tempSurface = SXXDL::make_surface_ptr(nullptr);
 
@@ -112,7 +109,7 @@ SpriteBase *PackedFontManager::renderTextIgnoreWhitespace(const StoredSDLFont &f
 	}
 
 	if (tempSurface == nullptr) {
-		logger->fatal("Couldn't render text string \"%v\" using font handle %v, error: %v", text, font.handle,
+		logger->critical("Couldn't render text string \"{}\" using font handle {}, error: {}", text, font.handle,
 					  TTF_GetError());
 		return nullptr;
 	}
@@ -121,7 +118,7 @@ SpriteBase *PackedFontManager::renderTextIgnoreWhitespace(const StoredSDLFont &f
 
 	if (!possibleRect) {
 		// failed to pack in some way
-		logger->info("Failed to pack %vx%v text into existing packed texture", tempSurface->w,
+		logger->info("Failed to pack {}x{} text into existing packed texture", tempSurface->w,
 					 tempSurface->h);
 		return nullptr;
 	}
@@ -139,8 +136,7 @@ SpriteBase *PackedFontManager::renderTextIgnoreWhitespace(const StoredSDLFont &f
 }
 
 SpriteBase *PackedFontManager::renderTextWithWhitespace(const StoredSDLFont &font, const std::string &text,
-														const FontRenderMethod method,
-														el::Logger *logger) {
+														const FontRenderMethod method) {
 	ensureTexture();
 	static const std::string wsDelimiter = "\n";
 
@@ -149,7 +145,7 @@ SpriteBase *PackedFontManager::renderTextWithWhitespace(const StoredSDLFont &fon
 
 
 	if (stringVector.empty()) {
-		return renderTextIgnoreWhitespace(font, text, method, logger);
+		return renderTextIgnoreWhitespace(font, text, method);
 	}
 
 	switch (method) {
@@ -159,8 +155,9 @@ SpriteBase *PackedFontManager::renderTextWithWhitespace(const StoredSDLFont &fon
 				auto surface = TTF_RenderUTF8_Blended(font.ptr.get(), s.c_str(), font.color);
 
 				if (surface == nullptr) {
-					logger->fatal("Couldn't render text string \"%v\" (%v of %v) using font handle %v. Error: %v", s,
+					logger->critical("Couldn't render text string \"{}\" ({} of {}) using font handle {}. Error: {}", s,
 								  surfaces.size() + 1, stringVector.size(), font.handle, TTF_GetError());
+					throw std::runtime_error("couldn't render string in PackedFontManager");
 					return nullptr;
 				}
 
@@ -175,8 +172,9 @@ SpriteBase *PackedFontManager::renderTextWithWhitespace(const StoredSDLFont &fon
 				auto surface = TTF_RenderUTF8_Solid(font.ptr.get(), s.c_str(), font.color);
 
 				if (surface == nullptr) {
-					logger->fatal("Couldn't render text string \"%v\" (%v of %v) using font handle %v. Error: %v", s,
+					logger->critical("Couldn't render text string \"{}\" ({} of {}) using font handle {}. Error: {}", s,
 								  surfaces.size() + 1, stringVector.size(), font.handle, TTF_GetError());
+					throw std::runtime_error("couldn't render string in PackedFontManager");
 					return nullptr;
 				}
 
@@ -206,8 +204,9 @@ SpriteBase *PackedFontManager::renderTextWithWhitespace(const StoredSDLFont &fon
 								 surfaces.front()->format->Amask));
 
 	if (tempSurface == nullptr) {
-		logger->fatal("Couldn't create master surface for multi-line rendering with handle %v. Error: %v", font.handle,
+		logger->critical("Couldn't create master surface for multi-line rendering with handle {}. Error: {}", font.handle,
 					  SDL_GetError());
+		throw std::runtime_error("couldn't render string in PackedFontManager");
 		return nullptr;
 	}
 
@@ -215,7 +214,8 @@ SpriteBase *PackedFontManager::renderTextWithWhitespace(const StoredSDLFont &fon
 	for (const auto &surf : surfaces) {
 		auto rect = SDL_Rect{0u, hCounter, 0u, 0u};
 		if (SDL_BlitSurface(surf.get(), nullptr, tempSurface.get(), &rect) != 0) {
-			logger->fatal("Couldn't blit micro surface to multi-line master surface, error: %v", SDL_GetError());
+			logger->critical("Couldn't blit micro surface to multi-line master surface, error: {}", SDL_GetError());
+			throw std::runtime_error("couldn't render string in PackedFontManager");
 			return nullptr;
 		}
 
@@ -226,8 +226,9 @@ SpriteBase *PackedFontManager::renderTextWithWhitespace(const StoredSDLFont &fon
 
 	if (!possibleRect) {
 		// failed to pack in some way
-		logger->info("Failed to pack %vx%v multi-line text into existing packed texture", tempSurface->w,
+		logger->critical("Failed to pack {}x{} multi-line text into existing packed texture", tempSurface->w,
 					 tempSurface->h);
+		throw std::runtime_error("couldn't render string in PackedFontManager");
 		return nullptr;
 	}
 

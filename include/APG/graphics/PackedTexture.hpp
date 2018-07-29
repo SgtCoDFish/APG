@@ -7,7 +7,8 @@
 #include <vector>
 #include <utility>
 #include <tuple>
-#include <experimental/optional>
+
+#include "spdlog/spdlog.h"
 
 #include "APG/core/Optional.hpp"
 #include "APG/graphics/Texture.hpp"
@@ -74,6 +75,8 @@ private:
 	std::vector<surface_vec_tuple> packBuffer;
 
 	void clearPackBuffer();
+
+	std::shared_ptr<spdlog::logger> logger;
 };
 
 }

@@ -17,9 +17,6 @@
 
 #include "test/APGSDLRenderTest.hpp"
 
-#include "easylogging++.h"
-INITIALIZE_EASYLOGGINGPP
-
 #if defined (__EMSCRIPTEN__)
 #include <emscripten.h>
 #endif
@@ -27,11 +24,10 @@ INITIALIZE_EASYLOGGINGPP
 const std::string ASSET_PREFIX = "assets/";
 
 bool APGSDLRenderTest::init() {
-	const auto logger = el::Loggers::getLogger("APG");
 	renderer = SXXDL::make_renderer_ptr(SDL_CreateRenderer(window.get(), -1, SDL_RENDERER_ACCELERATED));
 
 	if (renderer == nullptr) {
-		logger->fatal("Couldn't create SDL_Renderer: %v", SDL_GetError());
+		logger->critical("Couldn't create SDL_Renderer: {}", SDL_GetError());
 		return false;
 	}
 
@@ -41,7 +37,7 @@ bool APGSDLRenderTest::init() {
 	mapOne->ParseFile(ASSET_PREFIX + "world1.tmx");
 
 	if (mapOne->HasError()) {
-		logger->fatal("Error loading tmx map: %v", mapOne->GetErrorText());
+		logger->critical("Error loading tmx map: {}", mapOne->GetErrorText());
 		return false;
 	}
 
@@ -49,7 +45,7 @@ bool APGSDLRenderTest::init() {
 	mapTwo->ParseFile(ASSET_PREFIX + "sample_indoor.tmx");
 
 	if (mapTwo->HasError()) {
-		logger->fatal("Error loading tmx map: %v", mapTwo->GetErrorText());
+		logger->critical("Error loading tmx map: {}", mapTwo->GetErrorText());
 		return false;
 	}
 
@@ -81,7 +77,7 @@ struct loop_arg {
 	APGSDLRenderTest *rpg;
 	std::chrono::time_point<std::chrono::high_resolution_clock> timepoint;
 	std::vector<float> timesTaken;
-	el::Logger *logger;
+	std::shared_ptr<spdlog::logger> logger;
 	bool done;
 };
 
@@ -96,24 +92,20 @@ void loop(void *v_arg) {
 
 	arg->done = arg->rpg->update(deltaTime);
 
-	if (arg->timesTaken.size() >= 1000) {
+	if (arg->timesTaken.size() >= 10000) {
 		const float sum = std::accumulate(arg->timesTaken.begin(), arg->timesTaken.end(), 0.0f);
 		const float fps = 1 / (sum / arg->timesTaken.size());
 
-		arg->logger->info("FPS: ", fps);
+		arg->logger->info("FPS: {}", fps);
 
 		arg->timesTaken.clear();
 	}
 }
 
 int main(int argc, char *argv[]) {
-	START_EASYLOGGINGPP(argc, argv);
-
 	const std::string windowTitle("APG SDLTmxRenderer Example");
 	const uint32_t windowWidth = 1280;
 	const uint32_t windowHeight = 720;
-
-	const auto logger = el::Loggers::getLogger("APG");
 
 	auto rpg = std::make_unique<APGSDLRenderTest>(windowTitle, windowWidth, windowHeight);
 
@@ -125,7 +117,7 @@ int main(int argc, char *argv[]) {
 	arg.rpg = rpg.get();
 	arg.timepoint = std::chrono::high_resolution_clock::now();
 	arg.done = false;
-	arg.logger =  logger;
+	arg.logger = spdlog::get("APG");
 
 #if defined(__EMSCRIPTEN__)
 	emscripten_set_main_loop_arg(loop, &arg, 0, 1);

@@ -9,6 +9,8 @@
 
 #include <glm/vec2.hpp>
 
+#include "spdlog/spdlog.h"
+
 #include "APG/SXXDL.hpp"
 #include "APG/core/APGCommon.hpp"
 #include "APG/graphics/Tileset.hpp"
@@ -86,8 +88,7 @@ public:
 					}
 
 					default: {
-						el::Loggers::getLogger("APG")->warn("Unsupported layer type for layer \"%v\"",
-															layer->GetName());
+						logger->warn("Unsupported layer type for layer \"{}\"", layer->GetName());
 						break;
 					}
 				}
@@ -132,6 +133,7 @@ public:
 protected:
 	static const uint64_t MAX_SPRITES_PER_UNIT = 1000000;
 
+
 	void initialiseTilesets(std::unordered_map<std::string, std::shared_ptr<Tileset>> &tmxTilesets) {
 		if (tmxTilesets.empty()) {
 			tmxTilesets.reserve(internal::MAX_SUPPORTED_TEXTURES);
@@ -149,17 +151,16 @@ protected:
 
 	glm::vec2 position{0.0f, 0.0f};
 
+	std::shared_ptr<spdlog::logger> logger;
+
 	void loadTilesets() {
 		auto &tmxTilesets = getDerivedTmxTilesets();
 		initialiseTilesets(tmxTilesets);
 
-		const auto logger = el::Loggers::getLogger("APG");
-
 		const auto tileWidth = map->GetTileWidth();
 		const auto tileHeight = map->GetTileHeight();
 
-		logger->info("Loading map %v with (tileWidth, tileHeight) = (%vpx, %vpx)", map->GetFilename(), tileWidth,
-					 tileHeight);
+		logger->info("Loading map {} with (tileWidth, tileHeight) = ({}px, {}px)", map->GetFilename(), tileWidth, tileHeight);
 
 		/*
 		 * We need to reserve space for our sprites or the vectors will be
@@ -178,11 +179,11 @@ protected:
 			Tileset *loadedTileset = nullptr;
 
 			if (tilesetExists != tmxTilesets.end()) {
-				logger->info("Using previously loaded tileset for \"%v\"", tilesetName);
+				logger->info("Using previously loaded tileset for \"{}\"", tilesetName);
 
 				loadedTileset = tilesetExists->second.get();
 			} else {
-				logger->info("Loading tileset \"%v\" (first GID = %v, has %v special tiles, spacing = %vpx)",
+				logger->info("Loading tileset \"{}\" (first GID = {}, has {} special tiles, spacing = {}px)",
 							 tilesetName,
 							 tileset->GetFirstGid(), tileset->GetTiles().size(), tileset->GetSpacing());
 
@@ -230,16 +231,10 @@ protected:
 			for (const auto &tile : tileset->GetTiles()) {
 				const auto tileGID = calculateTileGID(tileset, tile);
 
-				logger->verbose(1, "Special tile #%v has %v properties.", tileGID, tile->GetProperties().GetSize());
-
-				if (el::Loggers::verboseLevel() >= 1) {
-					for (const auto &property : tile->GetProperties().GetList()) {
-						logger->verbose(1, R"(Property "%v" = "%v")", property.first, property.second);
-					}
-				}
+				logger->trace("Special tile #{} has {} properties.", tileGID, tile->GetProperties().GetSize());
 
 				if (tile->IsAnimated()) {
-					logger->verbose(1, "Animated tile has %v tiles, with total duration %vms.", tile->GetFrameCount(),
+					logger->trace("Animated tile has {} tiles, with total duration {}ms.", tile->GetFrameCount(),
 									tile->GetTotalDuration());
 
 					const auto &frames = tile->GetFrames();
@@ -253,7 +248,7 @@ protected:
 
 					for (const auto &frame : frames) {
 						const auto gid = calculateTileGID(tileset, frame.GetTileID());
-						logger->verbose(2, "Frame #%v: ID %v, GID %v, duration = %vms.", framesLoaded,
+						logger->trace("Frame #{}: ID {}, GID {}, duration = {}ms.", framesLoaded,
 										frame.GetTileID(),
 										gid, frame.GetDuration());
 
@@ -271,17 +266,15 @@ protected:
 	}
 
 	void loadObjects() {
-		const auto logger = el::Loggers::getLogger("APG");
-
 		for (auto &group : map->GetObjectGroups()) {
-			logger->info("Loading object group \"%v\", has %v objects.", group->GetName(), group->GetNumObjects());
+			logger->info("Loading object group \"{}\", has {} objects.", group->GetName(), group->GetNumObjects());
 			std::vector<TiledObject> objects;
 
 			for (auto &obj : group->GetObjects()) {
 				const auto gid = obj->GetGid();
 
 				if (gid == 0) {
-					logger->verbose(5, "Ignoring non-tile object \"%v\"", obj->GetName());
+					logger->trace("Ignoring non-tile object \"{}\"", obj->GetName());
 					continue;
 				}
 
@@ -304,6 +297,7 @@ private:
 	std::unique_ptr<Tmx::Map> ownedMap;
 
 	void init() {
+		logger = spdlog::get("APG");
 		map = ownedMap.get();
 
 		loadTilesets();

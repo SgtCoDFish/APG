@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include <array>
 
+#include "spdlog/spdlog.h"
+
 #include "APG/SDL.hpp"
 
 #include "APG/SXXDL.hpp"
@@ -61,11 +63,11 @@ private:
 
 	SDL_Color glmToSDLColor(const glm::vec4 &glmColor);
 
-	SpriteBase *renderTextIgnoreWhitespace(const StoredSDLFont &font, const std::string &text, FontRenderMethod method,
-										   el::Logger *logger);
+	SpriteBase *renderTextIgnoreWhitespace(const StoredSDLFont &font, const std::string &text, FontRenderMethod method);
 
-	SpriteBase *renderTextWithWhitespace(const StoredSDLFont &font, const std::string &text, FontRenderMethod method,
-										 el::Logger *logger);
+	SpriteBase *renderTextWithWhitespace(const StoredSDLFont &font, const std::string &text, FontRenderMethod method);
+
+	std::shared_ptr<spdlog::logger> logger;
 };
 
 }

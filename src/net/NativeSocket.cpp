@@ -1,31 +1,4 @@
 /*
- * Copyright (c) 2015 See AUTHORS file.
- * All rights reserved.
-
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *    * Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *    * Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution.
- *    * Neither the name of the <organization> nor the
- *      names of its contributors may be used to endorse or promote products
- *      derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
-/*
  * Inspired by SDL2_net.
  * See http://hg.libsdl.org/SDL_net/file/c7fa72f19b14/SDLnet.c
  * And https://msdn.microsoft.com/en-us/library/windows/desktop/ms737629(v=vs.85).aspx for Windows.
@@ -45,13 +18,12 @@
 #include "APG/net/NativeSocket.hpp"
 #include "APG/internal/Assert.hpp"
 
-#include "easylogging++.h"
-
 namespace APG {
 
 NativeSocket::NativeSocket(const std::string &remoteHost, uint16_t port, bool autoConnect, uint32_t bufferSize) :
 		        Socket(remoteHost, port, bufferSize),
-		        portString { std::to_string(port) } {
+		        portString { std::to_string(port) },
+				logger {spdlog::get("APG")} {
 	if (autoConnect) {
 		this->connect();
 	}
@@ -60,7 +32,8 @@ NativeSocket::NativeSocket(const std::string &remoteHost, uint16_t port, bool au
 NativeSocket::NativeSocket(int fd, const std::string &remoteHost, uint16_t port, uint32_t bufferSize) :
 		        Socket(remoteHost, port, bufferSize),
 		        portString { std::to_string(port) },
-		        internalSocket { fd } {
+		        internalSocket { fd },
+				logger {spdlog::get("APG")} {
 	addToSet();
 }
 
@@ -87,8 +60,6 @@ std::unique_ptr<Socket> NativeSocket::fromRawFileDescriptor(int fd, sockaddr_sto
 		}
 	}
 
-//	el::Loggers::getLogger("APG")->info("Got IP: %v, len: %v", ip, std::strlen(ip));
-
 	return std::make_unique<NativeSocket>(fd, std::string(ip, INET6_ADDRSTRLEN), port);
 }
 
@@ -98,7 +69,7 @@ NativeSocket::~NativeSocket() {
 
 int NativeSocket::send() {
 	if (hasError()) {
-		el::Loggers::getLogger("APG")->warn("send() called on SDL socket in error state.");
+		logger->warn("send() called on SDL socket in error state.");
 		return 0;
 	}
 
@@ -112,9 +83,9 @@ int NativeSocket::send() {
 
 	if (sent < (int32_t) size()) {
 		if (sent >= 0) {
-			el::Loggers::getLogger("APG")->verbose(1, "Warning: %v bytes sent of %v bytes total.", sent, size());
+			logger->trace("Warning: {} bytes sent of {} bytes total.", sent, size());
 		} else {
-			el::Loggers::getLogger("APG")->error("Send error: %v", NativeSocketUtil::getErrorMessage(errno));
+			logger->error("Send error: {}", NativeSocketUtil::getErrorMessage(errno));
 			setError();
 			return 0;
 		}
@@ -131,7 +102,7 @@ int NativeSocket::recv(uint32_t length) {
 	REQUIRE(length <= APG_RECV_BUFFER_SIZE, "Cannot recv() on a buffer size smaller than the max");
 
 	if (hasError()) {
-		el::Loggers::getLogger("APG")->warn("recv() called on SDL socket in error state.");
+		logger->warn("recv() called on SDL socket in error state.");
 		return 0;
 	}
 
@@ -146,7 +117,7 @@ int NativeSocket::recv(uint32_t length) {
 			// remote connection closed/nonblock takes effect
 			return 0;
 		} else {
-			el::Loggers::getLogger("APG")->error("Recv error: %v", NativeSocketUtil::getErrorMessage(errno));
+			logger->error("Recv error: {}", NativeSocketUtil::getErrorMessage(errno));
 			setError();
 			return -1;
 		}
@@ -161,7 +132,7 @@ bool NativeSocket::hasActivity() {
 	const auto selRet = ::select(internalSocket + 1, &socketSet, nullptr, nullptr, nullptr);
 
 	if (selRet < 0) {
-		el::Loggers::getLogger("APG")->error("::select entered an error state: %v",
+		logger->error("::select entered an error state: {}",
 		        NativeSocketUtil::getErrorMessage(errno));
 		setError();
 		return false;
@@ -184,8 +155,9 @@ bool NativeSocket::waitForActivity(uint32_t millisecondsToWait) {
 			// timeout
 			return false;
 		} else {
-			el::Loggers::getLogger("APG")->error("::select entered an error state: %v",
-			        NativeSocketUtil::getErrorMessage(errno));
+			logger->error("::select entered an error state: {}",
+			        NativeSocketUtil::getErrorMessage(errno)
+					);
 			setError();
 			return false;
 		}
@@ -195,7 +167,6 @@ bool NativeSocket::waitForActivity(uint32_t millisecondsToWait) {
 }
 
 void NativeSocket::connect() {
-	const auto logger = el::Loggers::getLogger("APG");
 	disconnect();
 
 	addrinfo hints;
@@ -207,7 +178,7 @@ void NativeSocket::connect() {
 
 	const int addrRet = ::getaddrinfo(this->remoteHost.c_str(), this->portString.c_str(), &hints, &tempAI);
 	if (addrRet != 0) {
-		logger->error("Couldn't resolve hosts for \"%v\" in NativeSocket: %v", remoteHost, ::gai_strerror(addrRet));
+		logger->error("Couldn't resolve hosts for \"{}\" in NativeSocket: {}", remoteHost, ::gai_strerror(addrRet));
 		setError();
 		return;
 	}
@@ -218,20 +189,20 @@ void NativeSocket::connect() {
 	internalSocket = NativeSocketUtil::findValidSocket(addrPtr, false);
 
 	if (internalSocket == -1) {
-		logger->error("Couldn't connect to remote host (%v): %v", remoteHost, NativeSocketUtil::getErrorMessage(errno));
+		logger->error("Couldn't connect to remote host ({}): {}", remoteHost, NativeSocketUtil::getErrorMessage(errno));
 		setError();
 		return;
 	}
 
 	if (NativeSocketUtil::setNonBlocking(internalSocket) != 0) {
-		logger->error("Couldn't set non-blocking state for connection with native socket: %v",
+		logger->error("Couldn't set non-blocking state for connection with native socket: {}",
 		        NativeSocketUtil::getErrorMessage(errno));
 		setError();
 		return;
 	}
 
 	if (NativeSocketUtil::setTCPNodelay(internalSocket) != 0) {
-		el::Loggers::getLogger("APG")->error("Couldn't set nodelay on new socket: %v",
+		logger->error("Couldn't set nodelay on new socket: {}",
 		        NativeSocketUtil::getErrorMessage(errno));
 		NativeSocketUtil::closeSocket(internalSocket);
 		setError();
@@ -260,7 +231,8 @@ void NativeSocket::addToSet() {
 
 NativeDualAcceptorSocket::NativeDualAcceptorSocket(uint16_t port_, bool autoListen, uint32_t bufferSize_) :
 		        AcceptorSocket(port_, bufferSize_),
-		        portString { std::to_string(port) } {
+		        portString { std::to_string(port) },
+				logger {spdlog::get("APG")} {
 	if (autoListen) {
 		listen();
 	}
@@ -316,7 +288,7 @@ std::unique_ptr<Socket> NativeDualAcceptorSocket::acceptSocket(float maxWaitInSe
 						return nullptr;
 					}
 				} else {
-					el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v",
+					logger->error("Error in acceptSocket: {}",
 					        NativeSocketUtil::getErrorMessage(errno));
 					setError();
 					return nullptr;
@@ -339,8 +311,7 @@ std::unique_ptr<Socket> NativeDualAcceptorSocket::acceptSocket(float maxWaitInSe
 				if (errno == NativeSocketUtil::APGWOULDBLOCK) {
 					continue;
 				} else {
-					el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v",
-					        NativeSocketUtil::getErrorMessage(errno));
+					logger->error("Error in acceptSocket: {}", NativeSocketUtil::getErrorMessage(errno));
 					setError();
 					return nullptr;
 				}
@@ -351,8 +322,7 @@ std::unique_ptr<Socket> NativeDualAcceptorSocket::acceptSocket(float maxWaitInSe
 	}
 
 	if (NativeSocketUtil::setTCPNodelay(newFD) != 0) {
-		el::Loggers::getLogger("APG")->error("Couldn't set nodelay on new socket: %v",
-		        NativeSocketUtil::getErrorMessage(errno));
+		logger->error("Couldn't set nodelay on new socket: {}", NativeSocketUtil::getErrorMessage(errno));
 		NativeSocketUtil::closeSocket(newFD);
 
 		return nullptr;
@@ -375,7 +345,7 @@ std::unique_ptr<Socket> NativeDualAcceptorSocket::acceptSocketOnce() {
 	if (newFD == -1) {
 		// We almost expect that it would have blocked, but certainly it's not an error if it would've.
 		if (errno != NativeSocketUtil::APGWOULDBLOCK) {
-			el::Loggers::getLogger("APG")->error("Error in acceptSocket: %v", NativeSocketUtil::getErrorMessage(errno));
+			logger->error("Error in acceptSocket: {}", NativeSocketUtil::getErrorMessage(errno));
 			setError();
 		}
 
@@ -383,7 +353,7 @@ std::unique_ptr<Socket> NativeDualAcceptorSocket::acceptSocketOnce() {
 	}
 
 	if (NativeSocketUtil::setTCPNodelay(newFD) != 0) {
-		el::Loggers::getLogger("APG")->error("Couldn't set nodelay on new socket: %v",
+		logger->error("Couldn't set nodelay on new socket: {}",
 		        NativeSocketUtil::getErrorMessage(errno));
 		NativeSocketUtil::closeSocket(newFD);
 
@@ -394,7 +364,6 @@ std::unique_ptr<Socket> NativeDualAcceptorSocket::acceptSocketOnce() {
 }
 
 void NativeDualAcceptorSocket::listen() {
-	const auto logger = el::Loggers::getLogger("APG");
 	disconnect();
 
 	addrinfo hints;
@@ -411,7 +380,7 @@ void NativeDualAcceptorSocket::listen() {
 	auto retHolder = NativeSocketUtil::make_addrinfo_ptr(retInfoTemp_);
 
 	if (addrRet != 0) {
-		logger->error("Couldn't listen on port %v in NativeDualAcceptorSocket: %v", port, ::gai_strerror(addrRet));
+		logger->error("Couldn't listen on port {} in NativeDualAcceptorSocket: {}", port, ::gai_strerror(addrRet));
 		setError();
 		return;
 	}
@@ -459,21 +428,22 @@ void NativeDualAcceptorSocket::listen() {
 	}
 
 	default: {
-		logger->fatal("Unsupported NativeSocketUtil::DualSocketReturn value");
+		logger->critical("Unsupported NativeSocketUtil::DualSocketReturn value");
+		throw std::runtime_error("Unsupported NativeSocketUtil::DualSocketReturn value");
 		break;
 	}
 	}
 
 	if (hasIP4Support()) {
 		if (NativeSocketUtil::setNonBlocking(internalListener4) != 0) {
-			logger->error("Couldn't set non-blocking state on listening socket (IP4): %v",
+			logger->error("Couldn't set non-blocking state on listening socket (IP4): {}",
 			        NativeSocketUtil::getErrorMessage(errno));
 			setError();
 			return;
 		}
 
 		if (::listen(internalListener4, NativeDualAcceptorSocket::CONNECTION_BACKLOG_SIZE) == -1) {
-			logger->error("Couldn't complete ::listen for IPv4 socket: %v", NativeSocketUtil::getErrorMessage(errno));
+			logger->error("Couldn't complete ::listen for IPv4 socket: {}", NativeSocketUtil::getErrorMessage(errno));
 			setError();
 			return;
 		}
@@ -481,14 +451,14 @@ void NativeDualAcceptorSocket::listen() {
 
 	if (hasIP6Support()) {
 		if (NativeSocketUtil::setNonBlocking(internalListener6) != 0) {
-			logger->error("Couldn't set non-blocking state on listening socket (IP6): %v",
+			logger->error("Couldn't set non-blocking state on listening socket (IP6): {}",
 			        NativeSocketUtil::getErrorMessage(errno));
 			setError();
 			return;
 		}
 
 		if (::listen(internalListener6, NativeDualAcceptorSocket::CONNECTION_BACKLOG_SIZE) == -1) {
-			logger->error("Couldn't complete ::listen for IPv6 socket: %v", NativeSocketUtil::getErrorMessage(errno));
+			logger->error("Couldn't complete ::listen for IPv6 socket: {}", NativeSocketUtil::getErrorMessage(errno));
 			setError();
 			return;
 		}
@@ -502,8 +472,7 @@ NativeSocketUtil::addrinfo_ptr NativeSocketUtil::make_addrinfo_ptr(addrinfo * ai
 }
 
 int NativeSocketUtil::findValidSocket(const addrinfo_ptr &ptr, bool shouldBind, addrinfo **targetStruct) {
-	auto logger = el::Loggers::getLogger("APG");
-
+	auto logger = spdlog::get("APG");
 	int socketFD = -1;
 
 	addrinfo *p;
@@ -514,7 +483,7 @@ int NativeSocketUtil::findValidSocket(const addrinfo_ptr &ptr, bool shouldBind, 
 		const std::string inetString = (p->ai_family == AF_INET ? "IPv4" : "IPv6");
 
 		if (socketFD == -1) {
-			logger->verbose(9, "Couldn't establish socket connection for addrinfo struct for %v.", inetString);
+			logger->trace("Couldn't establish socket connection for addrinfo struct for {}", inetString);
 			continue;
 		}
 
@@ -524,7 +493,7 @@ int NativeSocketUtil::findValidSocket(const addrinfo_ptr &ptr, bool shouldBind, 
 				logger->error("Couldn't bind socket.");
 				return -1;
 			} else {
-				logger->verbose(9, "Bound socket with ai_family %v.", inetString);
+				logger->trace("Bound socket with ai_family {}.", inetString);
 				break;
 			}
 		} else {
@@ -533,7 +502,7 @@ int NativeSocketUtil::findValidSocket(const addrinfo_ptr &ptr, bool shouldBind, 
 				logger->error("Couldn't connect socket.");
 				return -1;
 			} else {
-				logger->verbose(9, "Connected socket with ai_family %v.", inetString);
+				logger->trace("Connected socket with ai_family {}.", inetString);
 				break;
 			}
 		}
@@ -548,7 +517,7 @@ int NativeSocketUtil::findValidSocket(const addrinfo_ptr &ptr, bool shouldBind, 
 
 NativeSocketUtil::DualSocketReturn NativeSocketUtil::findValidDualSockets(int &ip4Socket, int &ip6Socket,
         const addrinfo_ptr &ptr, addrinfo **targetStruct4, addrinfo **targetStruct6) {
-	auto logger = el::Loggers::getLogger("APG");
+	auto logger = spdlog::get("APG");
 
 	int tempSocketFD = -1;
 
@@ -571,7 +540,7 @@ NativeSocketUtil::DualSocketReturn NativeSocketUtil::findValidDualSockets(int &i
 				continue;
 			}
 		} else {
-			logger->verbose(9, "Unsupported ai_family found: %v", p->ai_family);
+			logger->trace("Unsupported ai_family found: {}", p->ai_family);
 			continue;
 		}
 
@@ -580,7 +549,7 @@ NativeSocketUtil::DualSocketReturn NativeSocketUtil::findValidDualSockets(int &i
 		const std::string inetString = (p->ai_family == AF_INET ? "IPv4" : "IPv6");
 
 		if (tempSocketFD == -1) {
-			logger->verbose(9, "Couldn't establish socket connection for addrinfo struct for %v.", inetString);
+			logger->trace("Couldn't establish socket connection for addrinfo struct for {}.", inetString);
 			continue;
 		}
 
@@ -592,7 +561,7 @@ NativeSocketUtil::DualSocketReturn NativeSocketUtil::findValidDualSockets(int &i
 #endif
 
 			if (::setsockopt(tempSocketFD, IPPROTO_IPV6, IPV6_V6ONLY, &opt, sizeof(opt)) < 0) {
-				logger->error("Couldn't set IPV6_V6ONLY for IPv6 socket: %v", NativeSocketUtil::getErrorMessage(errno));
+				logger->error("Couldn't set IPV6_V6ONLY for IPv6 socket: {}", NativeSocketUtil::getErrorMessage(errno));
 				NativeSocketUtil::closeSocket(tempSocketFD);
 				continue;
 			}
@@ -600,12 +569,12 @@ NativeSocketUtil::DualSocketReturn NativeSocketUtil::findValidDualSockets(int &i
 
 		if (::bind(tempSocketFD, p->ai_addr, p->ai_addrlen) == -1) {
 			NativeSocketUtil::closeSocket(tempSocketFD);
-			logger->warn("Couldn't bind socket for %v. This could indicate connectivity problems for this IP version.",
+			logger->warn("Couldn't bind socket for {}. This could indicate connectivity problems for this IP version.",
 			        inetString);
 			continue;
 		}
 
-		logger->verbose(9, "Connected/bound socket with ai_family %v.", inetString);
+		logger->trace("Connected/bound socket with ai_family {}.", inetString);
 
 		if (p->ai_family == AF_INET) {
 			ip4Socket = tempSocketFD;
@@ -672,15 +641,16 @@ int NativeSocketUtil::setTCPNodelay(int socketFD) {
 
 void NativeSocket::nativeSocketInit() {
 #ifdef _WIN32
+	auto logger = spdlog::get("APG");
 	WSADATA wsaData;
 
 	int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
 	if(result != 0) {
-		el::Loggers::getLogger("APG")->fatal("Couldn't initialise winsock2.");
+		logger->fatal("Couldn't initialise winsock2.");
 		return;
 	} else {
-		el::Loggers::getLogger("APG")->verbose(9, "Initialised winsock2.");
+		logger->trace("Initialised winsock2.");
 	}
 #else
 	/* No-op on non-windows platforms */

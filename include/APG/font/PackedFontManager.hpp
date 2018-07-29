@@ -7,6 +7,8 @@
 
 #include <glm/vec4.hpp>
 
+#include "spdlog/spdlog.h"
+
 #include "APG/font/FontManager.hpp"
 #include "APG/font/StoredSDLFont.hpp"
 #include "APG/graphics/PackedTexture.hpp"
@@ -44,12 +46,11 @@ private:
 
 	SDL_Color glmToSDLColor(const glm::vec4 &glmColor);
 
-	SpriteBase *renderTextIgnoreWhitespace(const StoredSDLFont &font, const std::string &text, FontRenderMethod method,
-										   el::Logger *logger);
+	SpriteBase *renderTextIgnoreWhitespace(const StoredSDLFont &font, const std::string &text, FontRenderMethod method);
 
-	SpriteBase *
-	renderTextWithWhitespace(const StoredSDLFont &font, const std::string &text, const FontRenderMethod method,
-							 el::Logger *logger);
+	SpriteBase *renderTextWithWhitespace(const StoredSDLFont &font, const std::string &text, const FontRenderMethod method);
+
+	std::shared_ptr<spdlog::logger> logger;
 };
 
 }

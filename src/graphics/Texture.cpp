@@ -19,7 +19,7 @@
 #include "APG/graphics/ShaderProgram.hpp"
 #include "APG/internal/Assert.hpp"
 
-#include "easylogging++.h"
+#include "spdlog/spdlog.h"
 
 namespace APG {
 std::atomic<uint32_t> Texture::availableTextureUnit(0);
@@ -38,14 +38,15 @@ uint32_t Texture::TEXTURE_TARGETS[] = {
 
 Texture::Texture(const std::string &fileName) :
 		fileName{fileName},
-		sWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
-		tWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
-		minFilter{APG::TextureFilterType::LINEAR},
-		magFilter{APG::TextureFilterType::LINEAR} {
+		sWrap{TextureWrapType::CLAMP_TO_EDGE},
+		tWrap{TextureWrapType::CLAMP_TO_EDGE},
+		minFilter{TextureFilterType::LINEAR},
+		magFilter{TextureFilterType::LINEAR},
+		logger {spdlog::get("APG")} {
 	auto surface = IMG_Load(fileName.c_str());
 
 	if (surface == nullptr) {
-		el::Loggers::getLogger("APG")->fatal("Couldn't load %v, SDL_image error: %v", fileName, IMG_GetError());
+		logger->critical("Couldn't load {}: got error {}", fileName, IMG_GetError());
 		return;
 	}
 
@@ -55,10 +56,10 @@ Texture::Texture(const std::string &fileName) :
 
 Texture::Texture(SDL_Surface *surface) :
 		fileName{"from SDL_Surface"},
-		sWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
-		tWrap{APG::TextureWrapType::CLAMP_TO_EDGE},
-		minFilter{APG::TextureFilterType::LINEAR},
-		magFilter{APG::TextureFilterType::LINEAR} {
+		sWrap{TextureWrapType::CLAMP_TO_EDGE},
+		tWrap{TextureWrapType::CLAMP_TO_EDGE},
+		minFilter{TextureFilterType::LINEAR},
+		magFilter{TextureFilterType::LINEAR} {
 	REQUIRE(surface != nullptr, "Can't create texture from null surface ptr.");
 
 	generateTextureID();
@@ -83,17 +84,13 @@ void Texture::generateTextureID() {
 	textureUnitInt = availableTextureUnit++;
 	textureUnitGL = TEXTURE_TARGETS[textureUnitInt];
 
-	el::Loggers::getLogger("APG")->info("Generating texture");
-
 	glGenTextures(1, &textureID);
-	el::Loggers::getLogger("APG")->info("Generating texture");
+	logger->info("Generated texture {}", textureID);
 }
 
 void Texture::loadTexture(SDL_Surface *surface, bool andPreserve) {
-	const auto logger = el::Loggers::getLogger("APG");
-
 	if (surface == nullptr) {
-		logger->fatal("Call to loadTexture with null surface");
+		logger->critical("Call to loadTexture with null surface");
 		return;
 	}
 
@@ -113,16 +110,14 @@ void Texture::loadTexture(SDL_Surface *surface, bool andPreserve) {
 			glFormat = GL_BGR;
 		}
 	} else {
-		logger->fatal(
-				"Invalid bytes per pixel value in %v (%v is invalid, only 4 or 3 supported.)",
-				fileName,
-				(uint32_t) numberOfColors
+		logger->critical("Invalid bytes per pixel value in {} ({} is invalid, only 4 or 3 supported.)",
+				fileName, (uint32_t) numberOfColors
 		);
 		return;
 	}
 
 	// loaded successfully, upload to graphics card
-	logger->info("Uploading texture: %vx%v", surface->w, surface->h);
+	logger->info("Uploading texture: {}x{}", surface->w, surface->h);
 
 	tempBind();
 
@@ -134,8 +129,7 @@ void Texture::loadTexture(SDL_Surface *surface, bool andPreserve) {
 
 	if (glError != GL_NO_ERROR) {
 		while (glError != GL_NO_ERROR) {
-			logger->fatal("GL error while uploading texture: %v", prettyGLError(glError));
-
+			logger->critical("GL error while uploading texture: {}", prettyGLError(glError));
 			glError = glGetError();
 		}
 
@@ -148,7 +142,7 @@ void Texture::loadTexture(SDL_Surface *surface, bool andPreserve) {
 	invWidth = 1.0f / width;
 	invHeight = 1.0f / height;
 
-	logger->info("Loaded texture \"%v\" at unit GL_TEXTURE%v", fileName, textureUnitInt);
+	logger->info("Loaded texture \"{}\" at unit GL_TEXTURE{}", fileName, textureUnitInt);
 
 	if (andPreserve) {
 		preservedSurface = SXXDL::make_surface_ptr(surface);

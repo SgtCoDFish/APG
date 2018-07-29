@@ -7,6 +7,8 @@
 
 #include <array>
 
+#include <spdlog/spdlog.h>
+
 #include "APG/SDL.hpp"
 
 #include "APG/input/InputManager.hpp"
@@ -66,10 +68,12 @@ private:
 
 	int32_t mouseX{0};
 	int32_t mouseY{0};
+
+	std::shared_ptr<spdlog::logger> logger;
 };
 
 }
 
 #endif
 
-#endif /* INCLUDE_APG_SDLINPUTMANAGER_HPP_ */
+#endif
