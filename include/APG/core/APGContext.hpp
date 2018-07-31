@@ -102,7 +102,12 @@ private:
 
 	uint32_t sdl2InitFlags {SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS};
 	uint32_t sdl2ImageInitFlags {IMG_INIT_PNG};
+#if defined (__APPLE__)
+	// TODO: Work out why this is required.
+	uint32_t sdl2MixerInitFlags {0};
+#else
 	uint32_t sdl2MixerInitFlags {MIX_INIT_OGG};
+#endif
 	uint32_t sdl2WindowInitFlags {SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL};
 };
 

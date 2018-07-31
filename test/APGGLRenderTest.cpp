@@ -195,15 +195,16 @@ int main(int argc, char *argv[]) {
 	const std::string windowTitle("APG GLTmxRenderer Example");
 	const uint32_t windowWidth = 1280;
 	const uint32_t windowHeight = 720;
-	auto game = std::make_unique<APG::APGGLRenderTest>(windowTitle, windowWidth, windowHeight);
-	// spdlog::set_level(spdlog::level::trace);
+	auto apgContext = APG::APGContextBuilder(windowTitle, windowWidth, windowHeight).setGLContextVersion(3, 2).build();
+	auto game = APG::APGGLRenderTest(apgContext);
+	//auto game = std::make_unique<APG::APGGLRenderTest>(windowTitle, windowWidth, windowHeight);
 
-	if (!game->init()) {
+	if (!game.init()) {
 		return EXIT_FAILURE;
 	}
 
 	loop_arg arg;
-	arg.rpg = game.get();
+	arg.rpg = &game;
 	arg.timepoint = std::chrono::high_resolution_clock::now();
 	arg.done = false;
 	arg.logger = spdlog::get("APG");

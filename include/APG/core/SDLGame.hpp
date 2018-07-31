@@ -10,6 +10,7 @@
 
 #include "APG/SXXDL.hpp"
 #include "APG/core/Game.hpp"
+#include "APG/core/APGContext.hpp"
 #include "APG/input/SDLInputManager.hpp"
 #include "APG/audio/SDLAudioManager.hpp"
 #include "APG/font/PackedFontManager.hpp"
@@ -18,9 +19,7 @@ namespace APG {
 
 class SDLGame : public Game {
 public:
-	explicit SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
-	        uint32_t glContextMajor = 3, uint32_t glContextMinor = 2, uint32_t windowX = SDL_WINDOWPOS_UNDEFINED,
-	        uint32_t windowY = SDL_WINDOWPOS_UNDEFINED);
+	explicit SDLGame(APGContext &apgContext);
 	virtual ~SDLGame();
 
 	bool update(float deltaTime) override;
@@ -46,44 +45,8 @@ public:
 		return fontManager.get();
 	}
 
-	/**
-	 * Defaults to SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS.
-	 *
-	 * Without these defaults at least, initialization will probably fail.
-	 */
-	static uint32_t SDL_INIT_FLAGS;
-
-	/**
-	 * Defaults to IMG_INIT_PNG.
-	 */
-	static uint32_t SDL_IMAGE_INIT_FLAGS;
-
-	/**
-	 * Defaults to MIX_INIT_OGG
-	 */
-	static uint32_t SDL_MIXER_INIT_FLAGS;
-
-	/**
-	 * Defaults to SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL.
-	 */
-	static uint32_t SDL_WINDOW_FLAGS;
-
-	/**
-	 * This method calls all of the SDL_Init related functions. These functions should only be called once in a program's lifetime.
-	 *
-	 * *** IF YOU CREATE OR SUBCLASS SDLGame YOU DON'T NEED TO CALL THIS METHOD ***
-	 *
-	 * However, if you don't need the whole APG SDLGame framework you can use this method (and SDLGame::shutdownSDL)
-	 * to make your life easier.
-	 */
-	static void initialiseSDL(std::shared_ptr<spdlog::logger> &logger);
-
-	/**
-	 * See the note for SDLGame::initialiseSDL(). Should be called once at most per program run, and after all SDL related activity is completed.
-	 */
-	static void shutdownSDL();
-
 protected:
+	APGContext &context;
 	SXXDL::window_ptr window = SXXDL::make_window_ptr(nullptr);
 	SDL_GLContext glContext = nullptr;
 

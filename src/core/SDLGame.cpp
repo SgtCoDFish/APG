@@ -14,28 +14,15 @@
 
 #include "spdlog/spdlog.h"
 
-uint32_t APG::SDLGame::SDL_INIT_FLAGS = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS;
-uint32_t APG::SDLGame::SDL_IMAGE_INIT_FLAGS = IMG_INIT_PNG;
-
-#if defined (__APPLE__)
-uint32_t APG::SDLGame::SDL_MIXER_INIT_FLAGS = 0;
-#else
-uint32_t APG::SDLGame::SDL_MIXER_INIT_FLAGS = MIX_INIT_OGG;
-#endif
-
-uint32_t APG::SDLGame::SDL_WINDOW_FLAGS = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
-
 namespace APG {
 
-SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight, uint32_t glContextMajor,
-				 uint32_t glContextMinor, uint32_t windowX, uint32_t windowY) :
-		APG::Game(windowWidth, windowHeight),
+SDLGame::SDLGame(APGContext &context) :
+		Game(context.windowWidth, context.windowHeight),
+		context {context},
 		logger {spdlog::stdout_logger_mt("APG")}  {
 	spdlog::set_level(spdlog::level::info);
 	spdlog::set_pattern("%Y-%m-%dT%H:%M:%S.%e%z [%L] [%n] %v");
-	logger->info("Initialising APG with OpenGL version {}.{}", glContextMajor, glContextMinor);
-
-	SDLGame::initialiseSDL(logger);
+	logger->info("Initialising APG with OpenGL version {}.{}", context.glContextMajor, context.glContextMinor);
 	
 	logger->info("Initialised SDL.");
 
@@ -46,7 +33,7 @@ SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t 
 	logger->trace("Input, Audio and Font managers created.");
 
 	window = SXXDL::make_window_ptr(
-			SDL_CreateWindow(windowTitle.c_str(), windowX, windowY, windowWidth, windowHeight, SDL_WINDOW_FLAGS));
+			SDL_CreateWindow(context.windowTitle.c_str(), context.windowX, context.windowY, context.windowWidth, context.windowHeight, context.sdl2WindowInitFlags));
 	logger->trace("SDL window created.");
 
 	if (window == nullptr) {
@@ -56,8 +43,8 @@ SDLGame::SDLGame(const std::string &windowTitle, uint32_t windowWidth, uint32_t 
 
 #if !defined (__EMSCRIPTEN__)
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, glContextMajor);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, glContextMinor);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, context.glContextMajor);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, context.glContextMinor);
 #endif
 
 	glContext = SDL_GL_CreateContext(window.get());
@@ -77,7 +64,6 @@ SDLGame::~SDLGame() {
 	audioManager.reset();
 
 	SDL_GL_DeleteContext(glContext);
-	SDLGame::shutdownSDL();
 }
 
 void SDLGame::handleEvent(SDL_Event &event) {
@@ -107,53 +93,6 @@ bool SDLGame::update(float deltaTime) {
 
 void SDLGame::quit() {
 	shouldQuit = true;
-}
-
-void SDLGame::initialiseSDL(std::shared_ptr<spdlog::logger> &logger) {
-	if (SDL_Init(SDL_INIT_FLAGS) < 0) {
-		logger->critical("Couldn't initialise SDL2: {}", SDL_GetError());
-		throw std::runtime_error("Failed to initialise SDL2");
-	} else {
-		logger->trace("Successfully initialised SDL2.");
-	}
-
-	if ((IMG_Init(SDL_IMAGE_INIT_FLAGS) & SDL_IMAGE_INIT_FLAGS) != SDL_IMAGE_INIT_FLAGS) {
-		logger->critical("Couldn't initialise SDL2_image: {}", IMG_GetError());
-		throw std::runtime_error("Failed to initialise SDL2_image");
-	} else {
-		logger->trace("Successfully initialised SDL2_image.");
-	}
-
-	if (TTF_Init() == -1) {
-		logger->critical("Couldn't initialise SDL2_ttf: {}", TTF_GetError());
-		throw std::runtime_error("Failed to initialise SDL2_ttf");
-	} else {
-		logger->trace("Successfully initialised SDL2_ttf.");
-	}
-
-	if ((Mix_Init(SDL_MIXER_INIT_FLAGS) & SDL_MIXER_INIT_FLAGS) != SDL_MIXER_INIT_FLAGS) {
-		logger->critical("Couldn't initialise SDL2_mixer: {}", Mix_GetError());
-		throw std::runtime_error("Failed to initialise SDL2_mixer");
-	} else {
-		logger->trace("Successfully initialised SDL2_mixer.");
-	}
-
-	if (SDLNet_Init() == -1) {
-		logger->critical("Couldn't initialise SDL2_net: {}", SDLNet_GetError());
-		throw std::runtime_error("Failed to initialise SDL2_net");
-	} else {
-		logger->trace("Successfully initialised SDL2_net");
-	}
-
-	SDLGame::logSDLVersions(logger);
-}
-
-void SDLGame::shutdownSDL() {
-	SDLNet_Quit();
-	Mix_Quit();
-	TTF_Quit();
-	IMG_Quit();
-	SDL_Quit();
 }
 
 void SDLGame::resetGLErrors() {

@@ -106,15 +106,16 @@ int main(int argc, char *argv[]) {
 	const std::string windowTitle("APG SDLTmxRenderer Example");
 	const uint32_t windowWidth = 1280;
 	const uint32_t windowHeight = 720;
+	auto apgContext = APG::APGContextBuilder(windowTitle, windowWidth, windowHeight).setGLContextVersion(3, 2).build();
 
-	auto rpg = std::make_unique<APGSDLRenderTest>(windowTitle, windowWidth, windowHeight);
+	auto rpg = APGSDLRenderTest(apgContext);
 
-	if (!rpg->init()) {
+	if (!rpg.init()) {
 		return EXIT_FAILURE;
 	}
 
 	loop_arg arg;
-	arg.rpg = rpg.get();
+	arg.rpg = &rpg;
 	arg.timepoint = std::chrono::high_resolution_clock::now();
 	arg.done = false;
 	arg.logger = spdlog::get("APG");

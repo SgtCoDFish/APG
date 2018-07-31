@@ -27,10 +27,8 @@ namespace APG {
 
 class APGGLRenderTest final : public APG::SDLGame {
 public:
-	explicit APGGLRenderTest(const std::string &windowTitle, uint32_t windowWidth, uint32_t windowHeight,
-	        uint32_t glContextMajor = 3, uint32_t glContextMinor = 2, uint32_t windowX = SDL_WINDOWPOS_CENTERED,
-	        uint32_t windowY = SDL_WINDOWPOS_CENTERED) :
-			        SDLGame(windowTitle, windowWidth, windowHeight, glContextMajor, glContextMinor, windowX, windowY) {
+	explicit APGGLRenderTest(APGContext &apgContext) :
+			        SDLGame(apgContext) {
 	}
 
 	virtual ~APGGLRenderTest() = default;
