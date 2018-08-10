@@ -42,7 +42,7 @@ if( APG_NO_GL OR APG_NO_SDL )
 endif()
 
 if( EXCLUDE_TESTS )
-    message("All tests disabled")
+	message("All tests disabled")
 	set(EXCLUDE_GL_TEST ON)
 	set(EXCLUDE_SDL_TEST ON)
 	set(EXCLUDE_AUDIO_TEST ON)
@@ -121,14 +121,43 @@ set(VENDOR_SPDLOG_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/spdlog/include)
 set(VENDOR_FILES
 	${VENDOR_TINYXML2_FILES}
 	${VENDOR_TMXPARSER_FILES}
-)
+	)
 set(VENDOR_INCLUDE_DIRS
 	${VENDOR_TINYXML2_INCLUDE_DIRS}
 	${VENDOR_TMXPARSER_INCLUDE_DIRS}
 	${VENDOR_GLM_INCLUDE_DIRS}
 	${VENDOR_RAPIDJSON_INCLUDE_DIRS}
 	${VENDOR_SPDLOG_INCLUDR_DIRS}
-)
+	)
+
+set(BASE_INCLUDE_DIRS
+	"include"
+	${PROJECT_BINARY_DIR}
+	${VENDOR_INCLUDE_DIRS}
+	${ZLIB_INCLUDE_DIRS}
+	)
+
+if ( NOT APG_NO_SDL )
+	set(SDL_INCLUDE_DIRS
+		${SDL2_INCLUDE_DIR}
+		${SDL2_TTF_INCLUDE_DIR}
+		${SDL2_IMAGE_INCLUDE_DIR}
+		${SDL2_MIXER_INCLUDE_DIR}
+		${SDL2_NET_INCLUDE_DIR}
+		)
+else()
+	set(SDL_INCLUDE_DIRS "")
+endif ()
+
+if ( NOT APG_NO_GL )
+	set(GL_INCLUDE_DIRS
+		${OPENGL_INCLUDE_DIR}
+		${GLEW_INCLUDE_DIRS}
+		)
+else()
+	set(GL_INCLUDE_DIRS "")
+endif ()
+
 
 file(GLOB_RECURSE APG_SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 file(GLOB_RECURSE APG_HEADERS ${PROJECT_SOURCE_DIR}/include/*.hpp)
@@ -187,29 +216,6 @@ endif()
 set(CMAKE_CXX_FLAGS_BASE "${CMAKE_CXX_FLAGS_BASE} ${COMPILER_FLAGS}")
 message("${CMAKE_CXX_FLAGS_BASE}")
 
-include_directories(
-	"include"
-	${PROJECT_BINARY_DIR}
-	${VENDOR_INCLUDE_DIRS}
-	${ZLIB_INCLUDE_DIRS}
-)
-
-if ( NOT APG_NO_SDL )
-	include_directories(
-		${SDL2_INCLUDE_DIR}
-		${SDL2_TTF_INCLUDE_DIR}
-		${SDL2_IMAGE_INCLUDE_DIR}
-		${SDL2_MIXER_INCLUDE_DIR}
-		${SDL2_NET_INCLUDE_DIR}
-	)
-endif ()
-
-if ( NOT APG_NO_GL )
-	include_directories(${OPENGL_INCLUDE_DIR}
-		${GLEW_INCLUDE_DIRS}
-		)
-endif ()
-
 if ( APG_DEBUG )
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BASE} ${APG_DEBUG_FLAGS}")
 else ()
@@ -217,6 +223,8 @@ else ()
 endif ()
 
 add_library(APG ${FULL_SOURCES} ${APG_HEADERS})
+target_include_directories(APG PRIVATE ${BASE_INCLUDE_DIRS} ${VENDOR_INCLUDE_DIRS} ${SDL_INCLUDE_DIRS} ${GL_INCLUDE_DIRS})
+
 
 if ( (NOT EXCLUDE_SDL_TEST) OR (NOT EXCLUDE_GL_TEST) OR (NOT EXCLUDE_AUDIO_TEST) )
 	file(MAKE_DIRECTORY assets)
@@ -232,7 +240,7 @@ if ( (NOT EXCLUDE_SDL_TEST) OR (NOT EXCLUDE_GL_TEST) OR (NOT EXCLUDE_AUDIO_TEST)
 		${OS_LIBS}
 		${TMXPARSER_LIBRARY}
 		${ZLIB_LIBRARIES}
-	)
+		)
 
 	if ( EMSCRIPTEN )
 		set (CMAKE_EXECUTABLE_SUFFIX ".html")
@@ -244,7 +252,7 @@ set(BASE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS})
 if ( EMSCRIPTEN )
 	set(BASE_LINKER_FLAGS "${BASE_LINKER_FLAGS} -s ALLOW_MEMORY_GROWTH=1")
 elseif(APPLE)
-    set(BASE_LINKER_FLAGS "-framework OpenGL -framework GLUT")
+	set(BASE_LINKER_FLAGS "-framework OpenGL -framework GLUT")
 endif ()
 
 if ( NOT EXCLUDE_SDL_TEST)
@@ -258,6 +266,7 @@ if ( NOT EXCLUDE_SDL_TEST)
 
 	add_executable(SDLRenderTest ${SDLRENDERTEST_SOURCES} ${EXTRA_SOURCES})
 	target_link_libraries(SDLRenderTest APG ${EXAMPLE_LIBS})
+	target_include_directories(SDLRenderTest PRIVATE ${BASE_INCLUDE_DIRS} ${SDL_INCLUDE_DIRS} ${GL_INCLUDE_DIRS})
 endif ( NOT EXCLUDE_SDL_TEST )
 
 if ( NOT EXCLUDE_GL_TEST )
@@ -271,6 +280,7 @@ if ( NOT EXCLUDE_GL_TEST )
 
 	add_executable(GLRenderTest ${GLRENDERTEST_SOURCES} ${EXTRA_SOURCES})
 	target_link_libraries(GLRenderTest APG ${EXAMPLE_LIBS})
+	target_include_directories(GLRenderTest PRIVATE ${BASE_INCLUDE_DIRS} ${SDL_INCLUDE_DIRS} ${GL_INCLUDE_DIRS})
 endif ( NOT EXCLUDE_GL_TEST )
 
 if ( NOT EXCLUDE_AUDIO_TEST )
@@ -284,6 +294,7 @@ if ( NOT EXCLUDE_AUDIO_TEST )
 
 	add_executable(AudioTest ${AUDIOTEST_SOURCES} ${EXTRA_SOURCES})
 	target_link_libraries(AudioTest APG ${EXAMPLE_LIBS})
+	target_include_directories(AudioTest PRIVATE ${BASE_INCLUDE_DIRS} ${SDL_INCLUDE_DIRS} ${GL_INCLUDE_DIRS})
 endif ( NOT EXCLUDE_AUDIO_TEST )
 
 install (TARGETS APG DESTINATION lib)
