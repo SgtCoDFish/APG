@@ -19,12 +19,10 @@ namespace APG {
 SDLGame::SDLGame(APGContext &context) :
 		Game(context.windowWidth, context.windowHeight),
 		context {context},
-		logger {spdlog::stdout_logger_mt("APG")}  {
+		logger {context.logger} {
 	spdlog::set_level(spdlog::level::info);
 	spdlog::set_pattern("%Y-%m-%dT%H:%M:%S.%e%z [%L] [%n] %v");
 	logger->info("Initialising APG with OpenGL version {}.{}", context.glContextMajor, context.glContextMinor);
-	
-	logger->info("Initialised SDL.");
 
 	inputManager = std::make_unique<SDLInputManager>();
 	audioManager = std::make_unique<SDLAudioManager>();

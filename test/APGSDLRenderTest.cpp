@@ -108,14 +108,14 @@ int main(int argc, char *argv[]) {
 	const uint32_t windowHeight = 720;
 	auto apgContext = APG::APGContextBuilder(windowTitle, windowWidth, windowHeight).setGLContextVersion(3, 2).build();
 
-	auto rpg = APGSDLRenderTest(apgContext);
+	auto rpg = std::make_unique<APGSDLRenderTest>(apgContext);
 
-	if (!rpg.init()) {
+	if (!rpg->init()) {
 		return EXIT_FAILURE;
 	}
 
 	loop_arg arg;
-	arg.rpg = &rpg;
+	arg.rpg = rpg.get();
 	arg.timepoint = std::chrono::high_resolution_clock::now();
 	arg.done = false;
 	arg.logger = spdlog::get("APG");

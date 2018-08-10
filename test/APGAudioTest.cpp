@@ -77,10 +77,10 @@ void APG::APGAudioTest::clearToGreen() {
 
 int main(int argc, char **argv) {
 	auto apgContext = APG::APGContextBuilder("APG Audio Test", 640, 480).setGLContextVersion(3, 2).build();
-	auto game = APG::APGAudioTest(apgContext);
+	auto game = std::make_unique<APG::APGAudioTest>(apgContext);
 	{
 		auto logger = spdlog::get("APG");
-		if (!game.init()) {
+		if (!game->init()) {
 			logger->critical("Couldn't init audio test.");
 			return EXIT_FAILURE;
 		}
@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
 			const float deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - startTime).count()
 			        / 1000.0f;
 
-			if (game.update(deltaTime)) {
+			if (game->update(deltaTime)) {
 				break;
 			}
 		}

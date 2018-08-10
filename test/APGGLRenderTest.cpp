@@ -196,15 +196,15 @@ int main(int argc, char *argv[]) {
 	const uint32_t windowWidth = 1280;
 	const uint32_t windowHeight = 720;
 	auto apgContext = APG::APGContextBuilder(windowTitle, windowWidth, windowHeight).setGLContextVersion(3, 2).build();
-	auto game = APG::APGGLRenderTest(apgContext);
-	//auto game = std::make_unique<APG::APGGLRenderTest>(windowTitle, windowWidth, windowHeight);
+	//auto game = APG::APGGLRenderTest(apgContext);
+	auto game = std::make_unique<APG::APGGLRenderTest>(apgContext);
 
-	if (!game.init()) {
+	if (!game->init()) {
 		return EXIT_FAILURE;
 	}
 
 	loop_arg arg;
-	arg.rpg = &game;
+	arg.rpg = game.get();
 	arg.timepoint = std::chrono::high_resolution_clock::now();
 	arg.done = false;
 	arg.logger = spdlog::get("APG");
