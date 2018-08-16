@@ -1,79 +1,81 @@
 #include "APG/core/APGContext.hpp"
 
+#include "spdlog/sinks/stdout_color_sinks.h"
+
 namespace APG {
 
 APGContextBuilder::APGContextBuilder(std::string windowTitle,
-        uint32_t windowWidth, uint32_t windowHeight) :
-    windowTitle{std::move(windowTitle)},
-    windowWidth{windowWidth},
-    windowHeight{windowHeight} {
-}
+		uint32_t windowWidth, uint32_t windowHeight) :
+	windowTitle{std::move(windowTitle)},
+	windowWidth{windowWidth},
+	windowHeight{windowHeight} {
+	}
 
 
 APGContextBuilder &APGContextBuilder::setLogLevel(const spdlog::level::level_enum &level) {
-    this->logLevel = level;
-    return *this;
+	this->logLevel = level;
+	return *this;
 }
 
 APGContextBuilder &APGContextBuilder::setWindowPos(uint32_t windowX, uint32_t windowY) {
-    this->windowX = windowX;
-    this->windowY = windowY;
-    return *this;
+	this->windowX = windowX;
+	this->windowY = windowY;
+	return *this;
 }
 
 APGContextBuilder &APGContextBuilder::setGLContextVersion(uint32_t glContextMajor, uint32_t glContextMinor) {
-    this->glContextMajor = glContextMajor;
-    this->glContextMinor = glContextMinor;
-    return *this;
+	this->glContextMajor = glContextMajor;
+	this->glContextMinor = glContextMinor;
+	return *this;
 }
 
 APGContextBuilder &APGContextBuilder::addAdditionalSDLInitFlags(uint32_t additionalFlags) {
-    this->sdl2InitFlags |= additionalFlags;
-    return *this;
+	this->sdl2InitFlags |= additionalFlags;
+	return *this;
 }
 
 APGContextBuilder &APGContextBuilder::addAdditionalSDLImageInitFlags(uint32_t additionalFlags) {
-    this->sdl2ImageInitFlags |= additionalFlags;
-    return *this;
+	this->sdl2ImageInitFlags |= additionalFlags;
+	return *this;
 }
 
 APGContextBuilder &APGContextBuilder::addAdditionalSDLMixerInitFlags(uint32_t additionalFlags) {
-    this->sdl2MixerInitFlags |= additionalFlags;
-    return *this;
+	this->sdl2MixerInitFlags |= additionalFlags;
+	return *this;
 }
 
 APGContextBuilder &APGContextBuilder::addAdditionalSDLWindowInitFlags(uint32_t additionalFlags) {
-    this->sdl2WindowInitFlags |= additionalFlags;
-    return *this;
+	this->sdl2WindowInitFlags |= additionalFlags;
+	return *this;
 }
 
 APGContext APGContextBuilder::build() {
-    auto context = APGContext(windowTitle, windowWidth, windowHeight, windowX, windowY, glContextMajor, glContextMinor,
-                logLevel, sdl2InitFlags, sdl2ImageInitFlags, sdl2MixerInitFlags, sdl2WindowInitFlags);
-    return context;
+	auto context = APGContext(windowTitle, windowWidth, windowHeight, windowX, windowY, glContextMajor, glContextMinor,
+			logLevel, sdl2InitFlags, sdl2ImageInitFlags, sdl2MixerInitFlags, sdl2WindowInitFlags);
+	return context;
 }
 
 APGContext::APGContext(std::string windowTitle, uint32_t windowWidth, uint32_t windowHeight, uint32_t windowX, uint32_t windowY,
-						uint32_t glContextMajor, uint32_t glContextMinor,
-						spdlog::level::level_enum logLevel,
-						uint32_t sdl2InitFlags, uint32_t sdl2ImageInitFlags,
-						uint32_t sdl2MixerInitFlags, uint32_t sdl2WindowInitFlags) :
-                            windowTitle{std::move(windowTitle)},
-                            windowWidth{windowWidth},
-                            windowHeight{windowHeight},
-                            windowX{windowX},
-                            windowY{windowY},
-                            glContextMajor{glContextMajor},
-                            glContextMinor{glContextMinor},
-                            logLevel{logLevel},
-                            logger{spdlog::get("APG") == nullptr ? spdlog::stdout_logger_mt("APG") : spdlog::get("APG")},
-                            sdl2InitFlags{sdl2InitFlags},
-                            sdl2ImageInitFlags{sdl2ImageInitFlags},
-                            sdl2MixerInitFlags{sdl2MixerInitFlags},
-                            sdl2WindowInitFlags{sdl2WindowInitFlags} {
-    logger->set_level(logLevel);
-    initSDL();
-}
+		uint32_t glContextMajor, uint32_t glContextMinor,
+		spdlog::level::level_enum logLevel,
+		uint32_t sdl2InitFlags, uint32_t sdl2ImageInitFlags,
+		uint32_t sdl2MixerInitFlags, uint32_t sdl2WindowInitFlags) :
+	windowTitle{std::move(windowTitle)},
+	windowWidth{windowWidth},
+	windowHeight{windowHeight},
+	windowX{windowX},
+	windowY{windowY},
+	glContextMajor{glContextMajor},
+	glContextMinor{glContextMinor},
+	logLevel{logLevel},
+	logger{spdlog::get("APG") == nullptr ? spdlog::stdout_color_mt("APG") : spdlog::get("APG")},
+	sdl2InitFlags{sdl2InitFlags},
+	sdl2ImageInitFlags{sdl2ImageInitFlags},
+	sdl2MixerInitFlags{sdl2MixerInitFlags},
+	sdl2WindowInitFlags{sdl2WindowInitFlags} {
+		logger->set_level(logLevel);
+		initSDL();
+	}
 
 APGContext::~APGContext() {
 	SDLNet_Quit();

@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 set(CMAKE_LEGACY_CYGWIN32 0)
 
 cmake_policy(SET CMP0072 NEW)
+cmake_policy(SET CMP0046 NEW)
 
 project(APG)
 
@@ -81,6 +82,13 @@ endif ()
 
 #find_package(spdlog REQUIRED)
 
+set(RAPIDJSON_BUILD_DOC OFF)
+set(RAPIDJSON_BUILD_EXAMPLES OFF)
+set(RAPIDJSON_BUILD_TESTS OFF)
+set(SPDLOG_BUILD_TESTING OFF)
+set(SPDLOG_BUILD_EXAMPLES OFF)
+set(BUILD_TESTING OFF)  # tinyxml2 doesn't namespace this option
+
 if ( EMSCRIPTEN )
 	set(CMAKE_CXX_FLAGS_BASE "${CMAKE_CXX_FLAGS_BASE} -s USE_ZLIB=1")
 	set(ZLIB_LIBRARIES "-s USE_ZLIB=1")
@@ -89,37 +97,38 @@ else ()
 	find_package(ZLIB REQUIRED)
 endif ()
 
-set(VENDOR_TINYXML2_FILES ${PROJECT_SOURCE_DIR}/vendor/tinyxml2/tinyxml2.cpp ${PROJECT_SOURCE_DIR}/vendor/tinyxml2/tinyxml2.h)
-set(VENDOR_TINYXML2_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/tinyxml2)
+set(RAPIDJSON_BUILD_DOC OFF CACHE BOOL "We don't build the rapidjson docs")
+set(RAPIDJSON_BUILD_EXAMPLES OFF CACHE BOOL "We don't build the rapidjson examples")
+set(RAPIDJSON_BUILD_TESTS OFF CACHE BOOL "We don't build rapidjson tests")
+set(SPDLOG_BUILD_TESTING OFF CACHE BOOL "We don't build spdlog tests")
+set(SPDLOG_BUILD_EXAMPLES OFF CACHE BOOL "We don't build spdlog examples")
+set(BUILD_TESTING OFF CACHE BOOL "We don't build tinyxml2 tests")  # tinyxml2 doesn't namespace this option
+
+# GLM isn't needed to be built - it's header only
+# add_subdirectory(vendor/glm)
+
+add_subdirectory(vendor/rapidjson)
+add_subdirectory(vendor/spdlog)
+add_subdirectory(vendor/tinyxml2)
+#add_subdirectory(vendor/tmxparser)
 
 configure_file(${PROJECT_SOURCE_DIR}/vendor/tmxparser/src/Tmx.h.in ${PROJECT_BINARY_DIR}/Tmx.h)
 file(GLOB_RECURSE VENDOR_TMXPARSER_SOURCES ${PROJECT_SOURCE_DIR}/vendor/tmxparser/src/*.cpp)
 file(GLOB_RECURSE VENDOR_TMXPARSER_HEADERS ${PROJECT_SOURCE_DIR}/vendor/tmxparser/src/*.h ${PROJECT_BINARY_DIR}/Tmx.h)
+
 set(VENDOR_TMXPARSER_FILES ${VENDOR_TMXPARSER_SOURCES} ${VENDOR_TMXPARSER_HEADERS})
 set(VENDOR_TMXPARSER_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/tmxparser/src)
-
 set(VENDOR_GLM_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/glm)
-
 set(VENDOR_RAPIDJSON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/rapidjson/include)
+set(VENDOR_TINYXML2_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/tinyxml2)
 
-set(VENDOR_SPDLOG_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/vendor/spdlog/include)
-
-set(VENDOR_FILES
-	${VENDOR_TINYXML2_FILES}
-	${VENDOR_TMXPARSER_FILES}
-	)
-set(VENDOR_INCLUDE_DIRS
-	${VENDOR_TINYXML2_INCLUDE_DIRS}
-	${VENDOR_TMXPARSER_INCLUDE_DIRS}
-	${VENDOR_GLM_INCLUDE_DIRS}
-	${VENDOR_RAPIDJSON_INCLUDE_DIRS}
-	${VENDOR_SPDLOG_INCLUDR_DIRS}
-	)
+set(VENDOR_PUBLIC_INCLUDE_DIRS ${VENDOR_TMXPARSER_INCLUDE_DIRS} ${VENDOR_GLM_INCLUDE_DIRS} ${VENDOR_RAPIDJSON_INCLUDE_DIRS})
+set(VENDOR_INCLUDE_DIRS ${VENDOR_TINYXML2_INCLUDE_DIRS})
+set(VENDOR_FILES ${VENDOR_TMXPARSER_FILES})
 
 set(BASE_INCLUDE_DIRS
 	"include"
 	${PROJECT_BINARY_DIR}
-	${VENDOR_INCLUDE_DIRS}
 	${ZLIB_INCLUDE_DIRS}
 	)
 
@@ -181,8 +190,9 @@ if ( NOT MSVC )
 	set(COMPILER_FLAGS -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable)
 endif ()
 
-add_library(APG ${FULL_SOURCES} ${APG_HEADERS})
-target_include_directories(APG PRIVATE ${BASE_INCLUDE_DIRS} ${VENDOR_INCLUDE_DIRS} ${SDL_INCLUDE_DIRS} ${GL_INCLUDE_DIRS})
+add_library(APG STATIC ${FULL_SOURCES} ${APG_HEADERS})
+target_include_directories(APG PUBLIC $<$<NOT:$<CONFIG:APG_NO_SDL>>:${SDL_INCLUDE_DIRS}> $<$<NOT:$<CONFIG:APG_NO_GL>>:${GL_INCLUDE_DIRS}> ${VENDOR_PUBLIC_INCLUDE_DIRS})
+target_include_directories(APG PRIVATE ${BASE_INCLUDE_DIRS} ${VENDOR_INCLUDE_DIRS})
 target_compile_definitions(APG PUBLIC GLM_FORCE_RADIANS $<$<CONFIG:APG_NO_GL>:APG_NO_GL> $<$<CONFIG:APG_NO_SDL>:APG_NO_SDL>)
 target_compile_options(APG PUBLIC ${COMPILER_FLAGS} ${OS_FLAGS})
 
@@ -197,9 +207,8 @@ if ( (NOT EXCLUDE_SDL_TEST) OR (NOT EXCLUDE_GL_TEST) OR (NOT EXCLUDE_AUDIO_TEST)
 		${SDL2_NET_LIBRARY}
 		${GLEW_LIBRARIES}
 		${OPENGL_LIBRARIES}
-		${TINYXML2_LIBRARIES}
+		tinyxml2
 		${OS_LIBS}
-		${TMXPARSER_LIBRARY}
 		${ZLIB_LIBRARIES}
 		)
 

@@ -72,8 +72,8 @@ void APG::ShaderProgram::setFloatAttribute(const char *const attributeName, uint
 		return;
 	}
 
-	glEnableVertexAttribArray(static_cast<const GLuint>(attributeLocation));
-	glVertexAttribPointer(static_cast<const GLuint>(attributeLocation), valueCount, GL_FLOAT,
+	glEnableVertexAttribArray(static_cast<GLuint>(attributeLocation));
+	glVertexAttribPointer(static_cast<GLuint>(attributeLocation), valueCount, GL_FLOAT,
 						  static_cast<GLboolean>((normalize ? GL_TRUE : GL_FALSE)),
 						  strideInElements * sizeof(float), (void *) (sizeof(float) * offsetInElements));
 
