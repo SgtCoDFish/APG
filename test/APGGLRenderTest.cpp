@@ -185,7 +185,7 @@ void loop(void *v_arg) {
 		const float sum = std::accumulate(arg->timesTaken.begin(), arg->timesTaken.end(), 0.0f);
 		const float fps = 1 / (sum / arg->timesTaken.size());
 
-		arg->logger->info("FPS: ", fps);
+		arg->logger->info("FPS: {}", fps);
 
 		arg->timesTaken.clear();
 	}
